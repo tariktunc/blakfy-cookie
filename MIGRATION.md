@@ -21,7 +21,7 @@ v1 son sürümü `1.2.0`'da donduruldu. Critical security patch çıkarsa `1.2.x
 
 ```diff
 - <script src="https://cdn.jsdelivr.net/gh/tariktunc/blakfy-cookie@1/cookie.js"
-+ <script src="https://cdn.jsdelivr.net/gh/tariktunc/blakfy-cookie@2/dist/cookie.min.js"
++ <script src="https://cdn.jsdelivr.net/gh/tariktunc/blakfy-cookie@v2/dist/cookie.min.js"
           data-blakfy-locale="auto"
           data-blakfy-policy-url="/cerez-politikasi"></script>
 ```

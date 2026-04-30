@@ -8,7 +8,7 @@
  */
 (() => {
   // src/core/config.js
-  var CDN_BASE = "https://cdn.jsdelivr.net/gh/tariktunc/blakfy-cookie@2";
+  var CDN_BASE = "https://cdn.jsdelivr.net/gh/tariktunc/blakfy-cookie@v2";
   var DEFAULTS = {
     locale: "auto",
     mainLang: null,

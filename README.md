@@ -16,7 +16,7 @@
 
 ```html
 <!-- Bootstrap: Tüm consent sinyallerini 'denied' olarak başlatır -->
-<script src="https://cdn.jsdelivr.net/gh/tariktunc/blakfy-cookie@2/dist/cookie-defaults.min.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/tariktunc/blakfy-cookie@v2/dist/cookie-defaults.min.js"></script>
 ```
 
 ### 2. Site içerik script'lerin (GTM/GA4/Pixel/Clarity vb.)
@@ -38,7 +38,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 
 ```html
 <script
-  src="https://cdn.jsdelivr.net/gh/tariktunc/blakfy-cookie@2/dist/cookie.min.js"
+  src="https://cdn.jsdelivr.net/gh/tariktunc/blakfy-cookie@v2/dist/cookie.min.js"
   data-blakfy-locale="auto"
   data-blakfy-policy-url="/cerez-politikasi"
   data-blakfy-version="1.0"
