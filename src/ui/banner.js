@@ -1,4 +1,4 @@
-// blakfy-cookie/src/ui/banner.js — first-visit consent banner DOM factory (badge slot reserved for A5)
+// blakfy-cookie/src/ui/banner.js — first-visit consent banner DOM factory (horizontal layout)
 
 export const createBanner = ({ t, isRTL, accent, policyUrl, onAccept, onReject, onPrefs }) => {
   const card = document.createElement("div");
@@ -9,10 +9,16 @@ export const createBanner = ({ t, isRTL, accent, policyUrl, onAccept, onReject, 
   card.setAttribute("aria-describedby", "blakfy-desc");
   card.style.cssText = "--blakfy-accent:" + accent;
 
+  const body = document.createElement("div");
+  body.className = "blakfy-banner-body";
+
+  const textBlock = document.createElement("div");
+  textBlock.className = "blakfy-card-text";
+
   const h2 = document.createElement("h2");
   h2.id = "blakfy-title";
   h2.textContent = "🍪 " + t.title;
-  card.appendChild(h2);
+  textBlock.appendChild(h2);
 
   const p = document.createElement("p");
   p.id = "blakfy-desc";
@@ -21,7 +27,9 @@ export const createBanner = ({ t, isRTL, accent, policyUrl, onAccept, onReject, 
   a.href = policyUrl;
   a.textContent = t.policyLink;
   p.appendChild(a);
-  card.appendChild(p);
+  textBlock.appendChild(p);
+
+  body.appendChild(textBlock);
 
   const actions = document.createElement("div");
   actions.className = "blakfy-actions";
@@ -47,7 +55,8 @@ export const createBanner = ({ t, isRTL, accent, policyUrl, onAccept, onReject, 
   btnAccept.addEventListener("click", () => { if (onAccept) onAccept(); });
   actions.appendChild(btnAccept);
 
-  card.appendChild(actions);
+  body.appendChild(actions);
+  card.appendChild(body);
 
   const badgeSlot = document.createElement("div");
   badgeSlot.className = "blakfy-badge-slot";

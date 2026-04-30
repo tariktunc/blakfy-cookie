@@ -9,7 +9,7 @@ const RULES = [
   ".blakfy-overlay.modal{position:fixed !important;inset:0;background:rgba(0,0,0,.4);z-index:2147483646 !important;display:flex !important;align-items:center;justify-content:center;padding:16px}",
   // Widget mode (tooltip/banner — transparent, no backdrop)
   ".blakfy-overlay.widget{position:fixed !important;inset:auto;background:transparent;padding:0;display:block !important;z-index:2147483646 !important;pointer-events:none}",
-  ".blakfy-overlay.widget .blakfy-card{max-width:380px;position:relative;pointer-events:auto}",
+  ".blakfy-overlay.widget .blakfy-card{width:min(90vw,780px);max-width:none;position:relative;pointer-events:auto;padding-bottom:40px}",
   // Position modifiers (widget)
   ".blakfy-overlay.widget.bottom-center{bottom:16px;left:50%;right:auto;top:auto;transform:translateX(-50%)}",
   ".blakfy-overlay.widget.bottom-right{bottom:16px;right:16px;left:auto;top:auto}",
@@ -18,14 +18,23 @@ const RULES = [
   ".blakfy-overlay.widget.top-right{top:16px;right:16px;left:auto;bottom:auto}",
   ".blakfy-overlay.widget.top-left{top:16px;left:16px;right:auto;bottom:auto}",
   ".blakfy-overlay.widget.center{top:50%;left:50%;right:auto;bottom:auto;transform:translate(-50%,-50%)}",
-  // Card
+  // Card base (shared by banner + modal)
   ".blakfy-card{background:#fff;color:#222;border-radius:16px;max-width:560px;width:100%;padding:24px;border:3px solid var(--blakfy-accent,#3E5C3A);font-family:system-ui,-apple-system,sans-serif;line-height:1.5;position:relative}",
   ".blakfy-card[dir=rtl]{text-align:right}",
   ".blakfy-card h2{margin:0 0 12px;font-size:18px;font-weight:600}",
   ".blakfy-card p{margin:0 0 16px;font-size:14px;color:#444}",
   ".blakfy-card a{color:var(--blakfy-accent,#3E5C3A);text-decoration:underline}",
+  // Horizontal banner layout (banner.js wraps content in .blakfy-banner-body)
+  ".blakfy-banner-body{display:flex;flex-direction:row;align-items:center;gap:24px}",
+  ".blakfy-banner-body .blakfy-card-text{flex:1;min-width:0}",
+  ".blakfy-banner-body .blakfy-card-text h2{margin:0 0 4px;font-size:16px;font-weight:600}",
+  ".blakfy-banner-body .blakfy-card-text p{margin:0;font-size:13px;color:#444}",
+  ".blakfy-banner-body .blakfy-actions{flex-shrink:0;flex-direction:column;flex-wrap:nowrap;margin-top:0;gap:6px;min-width:156px}",
+  ".blakfy-banner-body .blakfy-actions .blakfy-btn{flex:none;width:100%;min-width:0;min-height:38px;padding:8px 14px;font-size:13px}",
+  ".blakfy-card[dir=rtl] .blakfy-banner-body{flex-direction:row-reverse}",
+  // Actions (generic — used in modal + banner)
   ".blakfy-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}",
-  // Buttons (squared 3px radius)
+  // Buttons (3px radius per spec)
   ".blakfy-btn{flex:1;min-width:120px;min-height:44px;padding:12px 16px;border:1px solid #ddd;border-radius:3px;background:#fff;color:#222;font-size:14px;font-weight:500;cursor:pointer;transition:transform .1s,background .15s}",
   ".blakfy-btn:hover{transform:translateY(-1px)}",
   ".blakfy-btn-primary{background:var(--blakfy-accent,#3E5C3A);color:#fff;border-color:transparent}",
@@ -34,7 +43,7 @@ const RULES = [
   ".blakfy-cat-text{flex:1}",
   ".blakfy-cat-text strong{display:block;font-size:14px;margin-bottom:2px}",
   ".blakfy-cat-text span{font-size:13px;color:#666}",
-  // Switches stay pill-shaped (UX standard)
+  // Switches (pill-shaped — UX standard)
   ".blakfy-switch{flex-shrink:0;width:44px;height:24px;border-radius:999px;background:#ccc;position:relative;cursor:pointer;border:none;padding:0}",
   ".blakfy-switch[aria-checked=true]{background:var(--blakfy-accent,#3E5C3A)}",
   ".blakfy-switch::after{content:'';position:absolute;top:2px;left:2px;width:20px;height:20px;border-radius:50%;background:#fff;transition:transform .2s}",
@@ -53,7 +62,8 @@ const RULES = [
   "@media (prefers-reduced-motion:reduce){.blakfy-btn,.blakfy-switch::after{transition:none}}",
   // Responsive breakpoints
   "@media (max-width:1024px){.blakfy-card{max-width:440px}}",
-  "@media (max-width:768px){.blakfy-card{max-width:calc(100vw - 32px);padding:18px}.blakfy-card h2{font-size:16px}.blakfy-card p{font-size:13px}.blakfy-btn{flex:1 1 100%;min-height:44px;padding:10px 14px;font-size:13px}.blakfy-overlay.widget.bottom-center,.blakfy-overlay.widget.top-center{left:16px;right:16px;transform:none;max-width:none}}",
+  // Tablet/mobile: banner collapses to vertical stack
+  "@media (max-width:768px){.blakfy-card{max-width:calc(100vw - 32px);padding:18px}.blakfy-card h2{font-size:16px}.blakfy-card p{font-size:13px}.blakfy-btn{flex:1 1 100%;min-height:44px;padding:10px 14px;font-size:13px}.blakfy-overlay.widget.bottom-center,.blakfy-overlay.widget.top-center{left:16px;right:16px;transform:none}.blakfy-overlay.widget .blakfy-card{width:100%}.blakfy-banner-body{flex-direction:column;align-items:stretch;gap:12px}.blakfy-banner-body .blakfy-actions{min-width:auto;flex-direction:row;flex-wrap:wrap;gap:8px}.blakfy-banner-body .blakfy-actions .blakfy-btn{flex:1 1 100%;width:auto;min-height:44px;padding:10px 14px;font-size:13px}}",
   "@media (max-width:480px){.blakfy-overlay.widget .blakfy-card{width:100%;max-width:calc(100vw - 32px)}}",
 ];
 
