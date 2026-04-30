@@ -96,11 +96,12 @@ const bootstrap = async () => {
     applyGPC({ mode: "respect", currentState: null, setPrefs: () => { /* defaults remain denied */ } });
   }
 
-  // 12. Apply presets
+  // 12. Apply presets (list kept in closure for Services tab)
+  let activePresetList = [];
   if (config.presets) {
-    const list = String(config.presets).split(",").map((s) => s.trim()).filter(Boolean);
-    for (let i = 0; i < list.length; i++) {
-      try { applyPreset(list[i], { registerCleanup: registerCleanup }); } catch (e) { /* ignore */ }
+    activePresetList = String(config.presets).split(",").map((s) => s.trim()).filter(Boolean);
+    for (let i = 0; i < activePresetList.length; i++) {
+      try { applyPreset(activePresetList[i], { registerCleanup: registerCleanup }); } catch (e) { /* ignore */ }
     }
   }
 
@@ -183,6 +184,8 @@ const bootstrap = async () => {
       isRTL: isRTL,
       accent: config.accent,
       currentState: state,
+      presets: activePresetList,
+      version: api.version,
       onSave: (prefs) => api.__internal.commit(prefs, "save"),
       onAccept: () => api.acceptAll(),
       onClose: () => api.__internal.closeUI()

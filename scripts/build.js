@@ -43,7 +43,7 @@ const TARGETS = [
 ];
 
 const BUDGETS = {
-  "cookie.min.js":          24 * 1024,
+  "cookie.min.js":          32 * 1024,   // raised: service-metadata DB + 3-tab modal added
   "cookie-defaults.min.js":  1.5 * 1024
 };
 

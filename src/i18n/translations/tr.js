@@ -19,5 +19,35 @@ export default {
     title: "İçerik engellendi",
     desc: "Bu içeriği görmek için {category} çerezlerine izin vermeniz gerekiyor.",
     cta: "İzin ver"
+  },
+  tabs: {
+    categories: "Kategoriler",
+    services:   "Hizmetler",
+    about:      "Hakkında"
+  },
+  service: {
+    description:       "Açıklama",
+    processor:         "Veri İşleyici",
+    address:           "Adres",
+    dpo:               "VKO İletişim",
+    purposes:          "Amaçlar",
+    technologies:      "Kullanılan Teknolojiler",
+    dataCollected:     "Toplanan Veriler",
+    legalBasis:        "Hukuki Dayanak",
+    retention:         "Saklama Süresi",
+    transferCountries: "Aktarım Ülkeleri",
+    privacyPolicy:     "Gizlilik Politikası",
+    cookiePolicy:      "Çerez Politikası",
+    legalBasisValues: {
+      consent:             "Açık Rıza (GDPR Madde 6/1-a)",
+      legitimate_interest: "Meşru Menfaat (GDPR Madde 6/1-f)"
+    },
+    noServices: "Bu site için henüz hizmet yapılandırılmamış."
+  },
+  svcAbout: {
+    title:       "Bu CMP Hakkında",
+    description: "Bu web sitesi; GDPR, KVKK, CCPA ve diğer geçerli gizlilik mevzuatlarına uyum sağlamak amacıyla rıza tercihlerinizi yönetmek için Blakfy Çerez Yönetim Platformu'nu (CMP) kullanmaktadır.",
+    version:     "Sürüm",
+    learnMore:   "blakfy.com'da daha fazla bilgi"
   }
 };

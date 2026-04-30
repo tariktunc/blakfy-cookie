@@ -33,10 +33,10 @@
     return all[all.length - 1] || null;
   };
   var readConfig = (scriptEl) => {
-    const el = scriptEl || getScriptEl();
+    const el2 = scriptEl || getScriptEl();
     const attr = (name, fallback) => {
-      if (!el) return fallback;
-      const v = el.getAttribute(name);
+      if (!el2) return fallback;
+      const v = el2.getAttribute(name);
       return v == null ? fallback : v;
     };
     return {
@@ -239,6 +239,36 @@
       title: "\u0130\xE7erik engellendi",
       desc: "Bu i\xE7eri\u011Fi g\xF6rmek i\xE7in {category} \xE7erezlerine izin vermeniz gerekiyor.",
       cta: "\u0130zin ver"
+    },
+    tabs: {
+      categories: "Kategoriler",
+      services: "Hizmetler",
+      about: "Hakk\u0131nda"
+    },
+    service: {
+      description: "A\xE7\u0131klama",
+      processor: "Veri \u0130\u015Fleyici",
+      address: "Adres",
+      dpo: "VKO \u0130leti\u015Fim",
+      purposes: "Ama\xE7lar",
+      technologies: "Kullan\u0131lan Teknolojiler",
+      dataCollected: "Toplanan Veriler",
+      legalBasis: "Hukuki Dayanak",
+      retention: "Saklama S\xFCresi",
+      transferCountries: "Aktar\u0131m \xDClkeleri",
+      privacyPolicy: "Gizlilik Politikas\u0131",
+      cookiePolicy: "\xC7erez Politikas\u0131",
+      legalBasisValues: {
+        consent: "A\xE7\u0131k R\u0131za (GDPR Madde 6/1-a)",
+        legitimate_interest: "Me\u015Fru Menfaat (GDPR Madde 6/1-f)"
+      },
+      noServices: "Bu site i\xE7in hen\xFCz hizmet yap\u0131land\u0131r\u0131lmam\u0131\u015F."
+    },
+    svcAbout: {
+      title: "Bu CMP Hakk\u0131nda",
+      description: "Bu web sitesi; GDPR, KVKK, CCPA ve di\u011Fer ge\xE7erli gizlilik mevzuatlar\u0131na uyum sa\u011Flamak amac\u0131yla r\u0131za tercihlerinizi y\xF6netmek i\xE7in Blakfy \xC7erez Y\xF6netim Platformu'nu (CMP) kullanmaktad\u0131r.",
+      version: "S\xFCr\xFCm",
+      learnMore: "blakfy.com'da daha fazla bilgi"
     }
   };
 
@@ -262,6 +292,36 @@
       title: "Content blocked",
       desc: "You need to allow {category} cookies to view this content.",
       cta: "Allow"
+    },
+    tabs: {
+      categories: "Categories",
+      services: "Services",
+      about: "About"
+    },
+    service: {
+      description: "Description",
+      processor: "Data Processor",
+      address: "Address",
+      dpo: "DPO Contact",
+      purposes: "Purposes",
+      technologies: "Technologies Used",
+      dataCollected: "Data Collected",
+      legalBasis: "Legal Basis",
+      retention: "Retention Period",
+      transferCountries: "Transfer Countries",
+      privacyPolicy: "Privacy Policy",
+      cookiePolicy: "Cookie Policy",
+      legalBasisValues: {
+        consent: "Consent (Art. 6 para. 1 s. 1 lit. a GDPR)",
+        legitimate_interest: "Legitimate Interest (Art. 6 para. 1 s. 1 lit. f GDPR)"
+      },
+      noServices: "No services are configured for this site."
+    },
+    svcAbout: {
+      title: "About this CMP",
+      description: "This website uses Blakfy Cookie Management Platform (CMP) to manage your consent preferences in compliance with GDPR, KVKK, CCPA and other applicable privacy regulations.",
+      version: "Version",
+      learnMore: "Learn more at blakfy.com"
     }
   };
 
@@ -285,6 +345,36 @@
       title: "\u062A\u0645 \u062D\u0638\u0631 \u0627\u0644\u0645\u062D\u062A\u0648\u0649",
       desc: "\u062A\u062D\u062A\u0627\u062C \u0625\u0644\u0649 \u0627\u0644\u0633\u0645\u0627\u062D \u0628\u0645\u0644\u0641\u0627\u062A \u062A\u0639\u0631\u064A\u0641 \u0627\u0644\u0627\u0631\u062A\u0628\u0627\u0637 \u0644\u0640 {category} \u0644\u0639\u0631\u0636 \u0647\u0630\u0627 \u0627\u0644\u0645\u062D\u062A\u0648\u0649.",
       cta: "\u0627\u0644\u0633\u0645\u0627\u062D"
+    },
+    tabs: {
+      categories: "Categories",
+      services: "Services",
+      about: "About"
+    },
+    service: {
+      description: "Description",
+      processor: "Data Processor",
+      address: "Address",
+      dpo: "DPO Contact",
+      purposes: "Purposes",
+      technologies: "Technologies Used",
+      dataCollected: "Data Collected",
+      legalBasis: "Legal Basis",
+      retention: "Retention Period",
+      transferCountries: "Transfer Countries",
+      privacyPolicy: "Privacy Policy",
+      cookiePolicy: "Cookie Policy",
+      legalBasisValues: {
+        consent: "Consent (Art. 6 para. 1 s. 1 lit. a GDPR)",
+        legitimate_interest: "Legitimate Interest (Art. 6 para. 1 s. 1 lit. f GDPR)"
+      },
+      noServices: "No services are configured for this site."
+    },
+    svcAbout: {
+      title: "About this CMP",
+      description: "This website uses Blakfy Cookie Management Platform (CMP) to manage your consent preferences in compliance with GDPR, KVKK, CCPA and other applicable privacy regulations.",
+      version: "Version",
+      learnMore: "Learn more at blakfy.com"
     }
   };
 
@@ -308,6 +398,36 @@
       title: "\u0645\u062D\u062A\u0648\u0627 \u0645\u0633\u062F\u0648\u062F \u0634\u062F",
       desc: "\u0628\u0631\u0627\u06CC \u0645\u0634\u0627\u0647\u062F\u0647 \u0627\u06CC\u0646 \u0645\u062D\u062A\u0648\u0627 \u0628\u0627\u06CC\u062F \u06A9\u0648\u06A9\u06CC\u200C\u0647\u0627\u06CC {category} \u0631\u0627 \u0645\u062C\u0627\u0632 \u06A9\u0646\u06CC\u062F.",
       cta: "\u0627\u062C\u0627\u0632\u0647 \u062F\u0627\u062F\u0646"
+    },
+    tabs: {
+      categories: "Categories",
+      services: "Services",
+      about: "About"
+    },
+    service: {
+      description: "Description",
+      processor: "Data Processor",
+      address: "Address",
+      dpo: "DPO Contact",
+      purposes: "Purposes",
+      technologies: "Technologies Used",
+      dataCollected: "Data Collected",
+      legalBasis: "Legal Basis",
+      retention: "Retention Period",
+      transferCountries: "Transfer Countries",
+      privacyPolicy: "Privacy Policy",
+      cookiePolicy: "Cookie Policy",
+      legalBasisValues: {
+        consent: "Consent (Art. 6 para. 1 s. 1 lit. a GDPR)",
+        legitimate_interest: "Legitimate Interest (Art. 6 para. 1 s. 1 lit. f GDPR)"
+      },
+      noServices: "No services are configured for this site."
+    },
+    svcAbout: {
+      title: "About this CMP",
+      description: "This website uses Blakfy Cookie Management Platform (CMP) to manage your consent preferences in compliance with GDPR, KVKK, CCPA and other applicable privacy regulations.",
+      version: "Version",
+      learnMore: "Learn more at blakfy.com"
     }
   };
 
@@ -331,6 +451,36 @@
       title: "\u0645\u0648\u0627\u062F \u0628\u0644\u0627\u06A9 \u06C1\u06D2",
       desc: "\u0627\u0633 \u0645\u0648\u0627\u062F \u06A9\u0648 \u062F\u06CC\u06A9\u06BE\u0646\u06D2 \u06A9\u06D2 \u0644\u06CC\u06D2 \u0622\u067E \u06A9\u0648 {category} \u06A9\u0648\u06A9\u06CC\u0632 \u06A9\u06CC \u0627\u062C\u0627\u0632\u062A \u062F\u06CC\u0646\u06CC \u06C1\u0648\u06AF\u06CC\u06D4",
       cta: "\u0627\u062C\u0627\u0632\u062A \u062F\u06CC\u06BA"
+    },
+    tabs: {
+      categories: "Categories",
+      services: "Services",
+      about: "About"
+    },
+    service: {
+      description: "Description",
+      processor: "Data Processor",
+      address: "Address",
+      dpo: "DPO Contact",
+      purposes: "Purposes",
+      technologies: "Technologies Used",
+      dataCollected: "Data Collected",
+      legalBasis: "Legal Basis",
+      retention: "Retention Period",
+      transferCountries: "Transfer Countries",
+      privacyPolicy: "Privacy Policy",
+      cookiePolicy: "Cookie Policy",
+      legalBasisValues: {
+        consent: "Consent (Art. 6 para. 1 s. 1 lit. a GDPR)",
+        legitimate_interest: "Legitimate Interest (Art. 6 para. 1 s. 1 lit. f GDPR)"
+      },
+      noServices: "No services are configured for this site."
+    },
+    svcAbout: {
+      title: "About this CMP",
+      description: "This website uses Blakfy Cookie Management Platform (CMP) to manage your consent preferences in compliance with GDPR, KVKK, CCPA and other applicable privacy regulations.",
+      version: "Version",
+      learnMore: "Learn more at blakfy.com"
     }
   };
 
@@ -354,6 +504,36 @@
       title: "Contenu bloqu\xE9",
       desc: "Vous devez autoriser les cookies {category} pour voir ce contenu.",
       cta: "Autoriser"
+    },
+    tabs: {
+      categories: "Categories",
+      services: "Services",
+      about: "About"
+    },
+    service: {
+      description: "Description",
+      processor: "Data Processor",
+      address: "Address",
+      dpo: "DPO Contact",
+      purposes: "Purposes",
+      technologies: "Technologies Used",
+      dataCollected: "Data Collected",
+      legalBasis: "Legal Basis",
+      retention: "Retention Period",
+      transferCountries: "Transfer Countries",
+      privacyPolicy: "Privacy Policy",
+      cookiePolicy: "Cookie Policy",
+      legalBasisValues: {
+        consent: "Consent (Art. 6 para. 1 s. 1 lit. a GDPR)",
+        legitimate_interest: "Legitimate Interest (Art. 6 para. 1 s. 1 lit. f GDPR)"
+      },
+      noServices: "No services are configured for this site."
+    },
+    svcAbout: {
+      title: "About this CMP",
+      description: "This website uses Blakfy Cookie Management Platform (CMP) to manage your consent preferences in compliance with GDPR, KVKK, CCPA and other applicable privacy regulations.",
+      version: "Version",
+      learnMore: "Learn more at blakfy.com"
     }
   };
 
@@ -377,6 +557,36 @@
       title: "\u041A\u043E\u043D\u0442\u0435\u043D\u0442 \u0437\u0430\u0431\u043B\u043E\u043A\u0438\u0440\u043E\u0432\u0430\u043D",
       desc: "\u0427\u0442\u043E\u0431\u044B \u043F\u0440\u043E\u0441\u043C\u043E\u0442\u0440\u0435\u0442\u044C \u044D\u0442\u043E\u0442 \u043A\u043E\u043D\u0442\u0435\u043D\u0442, \u0440\u0430\u0437\u0440\u0435\u0448\u0438\u0442\u0435 \u0444\u0430\u0439\u043B\u044B cookie \u043A\u0430\u0442\u0435\u0433\u043E\u0440\u0438\u0438 {category}.",
       cta: "\u0420\u0430\u0437\u0440\u0435\u0448\u0438\u0442\u044C"
+    },
+    tabs: {
+      categories: "Categories",
+      services: "Services",
+      about: "About"
+    },
+    service: {
+      description: "Description",
+      processor: "Data Processor",
+      address: "Address",
+      dpo: "DPO Contact",
+      purposes: "Purposes",
+      technologies: "Technologies Used",
+      dataCollected: "Data Collected",
+      legalBasis: "Legal Basis",
+      retention: "Retention Period",
+      transferCountries: "Transfer Countries",
+      privacyPolicy: "Privacy Policy",
+      cookiePolicy: "Cookie Policy",
+      legalBasisValues: {
+        consent: "Consent (Art. 6 para. 1 s. 1 lit. a GDPR)",
+        legitimate_interest: "Legitimate Interest (Art. 6 para. 1 s. 1 lit. f GDPR)"
+      },
+      noServices: "No services are configured for this site."
+    },
+    svcAbout: {
+      title: "About this CMP",
+      description: "This website uses Blakfy Cookie Management Platform (CMP) to manage your consent preferences in compliance with GDPR, KVKK, CCPA and other applicable privacy regulations.",
+      version: "Version",
+      learnMore: "Learn more at blakfy.com"
     }
   };
 
@@ -400,6 +610,36 @@
       title: "Inhalt blockiert",
       desc: "Sie m\xFCssen {category}-Cookies erlauben, um diesen Inhalt anzuzeigen.",
       cta: "Erlauben"
+    },
+    tabs: {
+      categories: "Categories",
+      services: "Services",
+      about: "About"
+    },
+    service: {
+      description: "Description",
+      processor: "Data Processor",
+      address: "Address",
+      dpo: "DPO Contact",
+      purposes: "Purposes",
+      technologies: "Technologies Used",
+      dataCollected: "Data Collected",
+      legalBasis: "Legal Basis",
+      retention: "Retention Period",
+      transferCountries: "Transfer Countries",
+      privacyPolicy: "Privacy Policy",
+      cookiePolicy: "Cookie Policy",
+      legalBasisValues: {
+        consent: "Consent (Art. 6 para. 1 s. 1 lit. a GDPR)",
+        legitimate_interest: "Legitimate Interest (Art. 6 para. 1 s. 1 lit. f GDPR)"
+      },
+      noServices: "No services are configured for this site."
+    },
+    svcAbout: {
+      title: "About this CMP",
+      description: "This website uses Blakfy Cookie Management Platform (CMP) to manage your consent preferences in compliance with GDPR, KVKK, CCPA and other applicable privacy regulations.",
+      version: "Version",
+      learnMore: "Learn more at blakfy.com"
     }
   };
 
@@ -423,6 +663,36 @@
       title: "\u05D4\u05EA\u05D5\u05DB\u05DF \u05D7\u05E1\u05D5\u05DD",
       desc: "\u05E2\u05DC\u05D9\u05DA \u05DC\u05D0\u05E9\u05E8 \u05E2\u05D5\u05D2\u05D9\u05D5\u05EA {category} \u05DB\u05D3\u05D9 \u05DC\u05E6\u05E4\u05D5\u05EA \u05D1\u05EA\u05D5\u05DB\u05DF \u05D6\u05D4.",
       cta: "\u05D0\u05E4\u05E9\u05E8"
+    },
+    tabs: {
+      categories: "Categories",
+      services: "Services",
+      about: "About"
+    },
+    service: {
+      description: "Description",
+      processor: "Data Processor",
+      address: "Address",
+      dpo: "DPO Contact",
+      purposes: "Purposes",
+      technologies: "Technologies Used",
+      dataCollected: "Data Collected",
+      legalBasis: "Legal Basis",
+      retention: "Retention Period",
+      transferCountries: "Transfer Countries",
+      privacyPolicy: "Privacy Policy",
+      cookiePolicy: "Cookie Policy",
+      legalBasisValues: {
+        consent: "Consent (Art. 6 para. 1 s. 1 lit. a GDPR)",
+        legitimate_interest: "Legitimate Interest (Art. 6 para. 1 s. 1 lit. f GDPR)"
+      },
+      noServices: "No services are configured for this site."
+    },
+    svcAbout: {
+      title: "About this CMP",
+      description: "This website uses Blakfy Cookie Management Platform (CMP) to manage your consent preferences in compliance with GDPR, KVKK, CCPA and other applicable privacy regulations.",
+      version: "Version",
+      learnMore: "Learn more at blakfy.com"
     }
   };
 
@@ -446,6 +716,36 @@
       title: "\u0412\u043C\u0456\u0441\u0442 \u0437\u0430\u0431\u043B\u043E\u043A\u043E\u0432\u0430\u043D\u043E",
       desc: "\u0429\u043E\u0431 \u043F\u0435\u0440\u0435\u0433\u043B\u044F\u043D\u0443\u0442\u0438 \u0446\u0435\u0439 \u0432\u043C\u0456\u0441\u0442, \u0434\u043E\u0437\u0432\u043E\u043B\u044C\u0442\u0435 \u0444\u0430\u0439\u043B\u0438 cookie \u043A\u0430\u0442\u0435\u0433\u043E\u0440\u0456\u0457 {category}.",
       cta: "\u0414\u043E\u0437\u0432\u043E\u043B\u0438\u0442\u0438"
+    },
+    tabs: {
+      categories: "Categories",
+      services: "Services",
+      about: "About"
+    },
+    service: {
+      description: "Description",
+      processor: "Data Processor",
+      address: "Address",
+      dpo: "DPO Contact",
+      purposes: "Purposes",
+      technologies: "Technologies Used",
+      dataCollected: "Data Collected",
+      legalBasis: "Legal Basis",
+      retention: "Retention Period",
+      transferCountries: "Transfer Countries",
+      privacyPolicy: "Privacy Policy",
+      cookiePolicy: "Cookie Policy",
+      legalBasisValues: {
+        consent: "Consent (Art. 6 para. 1 s. 1 lit. a GDPR)",
+        legitimate_interest: "Legitimate Interest (Art. 6 para. 1 s. 1 lit. f GDPR)"
+      },
+      noServices: "No services are configured for this site."
+    },
+    svcAbout: {
+      title: "About this CMP",
+      description: "This website uses Blakfy Cookie Management Platform (CMP) to manage your consent preferences in compliance with GDPR, KVKK, CCPA and other applicable privacy regulations.",
+      version: "Version",
+      learnMore: "Learn more at blakfy.com"
     }
   };
 
@@ -469,6 +769,36 @@
       title: "Contenido bloqueado",
       desc: "Necesitas permitir las cookies de {category} para ver este contenido.",
       cta: "Permitir"
+    },
+    tabs: {
+      categories: "Categories",
+      services: "Services",
+      about: "About"
+    },
+    service: {
+      description: "Description",
+      processor: "Data Processor",
+      address: "Address",
+      dpo: "DPO Contact",
+      purposes: "Purposes",
+      technologies: "Technologies Used",
+      dataCollected: "Data Collected",
+      legalBasis: "Legal Basis",
+      retention: "Retention Period",
+      transferCountries: "Transfer Countries",
+      privacyPolicy: "Privacy Policy",
+      cookiePolicy: "Cookie Policy",
+      legalBasisValues: {
+        consent: "Consent (Art. 6 para. 1 s. 1 lit. a GDPR)",
+        legitimate_interest: "Legitimate Interest (Art. 6 para. 1 s. 1 lit. f GDPR)"
+      },
+      noServices: "No services are configured for this site."
+    },
+    svcAbout: {
+      title: "About this CMP",
+      description: "This website uses Blakfy Cookie Management Platform (CMP) to manage your consent preferences in compliance with GDPR, KVKK, CCPA and other applicable privacy regulations.",
+      version: "Version",
+      learnMore: "Learn more at blakfy.com"
     }
   };
 
@@ -492,6 +822,36 @@
       title: "Contenuto bloccato",
       desc: "Devi consentire i cookie {category} per visualizzare questo contenuto.",
       cta: "Consenti"
+    },
+    tabs: {
+      categories: "Categories",
+      services: "Services",
+      about: "About"
+    },
+    service: {
+      description: "Description",
+      processor: "Data Processor",
+      address: "Address",
+      dpo: "DPO Contact",
+      purposes: "Purposes",
+      technologies: "Technologies Used",
+      dataCollected: "Data Collected",
+      legalBasis: "Legal Basis",
+      retention: "Retention Period",
+      transferCountries: "Transfer Countries",
+      privacyPolicy: "Privacy Policy",
+      cookiePolicy: "Cookie Policy",
+      legalBasisValues: {
+        consent: "Consent (Art. 6 para. 1 s. 1 lit. a GDPR)",
+        legitimate_interest: "Legitimate Interest (Art. 6 para. 1 s. 1 lit. f GDPR)"
+      },
+      noServices: "No services are configured for this site."
+    },
+    svcAbout: {
+      title: "About this CMP",
+      description: "This website uses Blakfy Cookie Management Platform (CMP) to manage your consent preferences in compliance with GDPR, KVKK, CCPA and other applicable privacy regulations.",
+      version: "Version",
+      learnMore: "Learn more at blakfy.com"
     }
   };
 
@@ -515,6 +875,36 @@
       title: "Conte\xFAdo bloqueado",
       desc: "Voc\xEA precisa permitir cookies de {category} para ver este conte\xFAdo.",
       cta: "Permitir"
+    },
+    tabs: {
+      categories: "Categories",
+      services: "Services",
+      about: "About"
+    },
+    service: {
+      description: "Description",
+      processor: "Data Processor",
+      address: "Address",
+      dpo: "DPO Contact",
+      purposes: "Purposes",
+      technologies: "Technologies Used",
+      dataCollected: "Data Collected",
+      legalBasis: "Legal Basis",
+      retention: "Retention Period",
+      transferCountries: "Transfer Countries",
+      privacyPolicy: "Privacy Policy",
+      cookiePolicy: "Cookie Policy",
+      legalBasisValues: {
+        consent: "Consent (Art. 6 para. 1 s. 1 lit. a GDPR)",
+        legitimate_interest: "Legitimate Interest (Art. 6 para. 1 s. 1 lit. f GDPR)"
+      },
+      noServices: "No services are configured for this site."
+    },
+    svcAbout: {
+      title: "About this CMP",
+      description: "This website uses Blakfy Cookie Management Platform (CMP) to manage your consent preferences in compliance with GDPR, KVKK, CCPA and other applicable privacy regulations.",
+      version: "Version",
+      learnMore: "Learn more at blakfy.com"
     }
   };
 
@@ -538,6 +928,36 @@
       title: "Inhoud geblokkeerd",
       desc: "U moet {category}-cookies toestaan om deze inhoud te bekijken.",
       cta: "Toestaan"
+    },
+    tabs: {
+      categories: "Categories",
+      services: "Services",
+      about: "About"
+    },
+    service: {
+      description: "Description",
+      processor: "Data Processor",
+      address: "Address",
+      dpo: "DPO Contact",
+      purposes: "Purposes",
+      technologies: "Technologies Used",
+      dataCollected: "Data Collected",
+      legalBasis: "Legal Basis",
+      retention: "Retention Period",
+      transferCountries: "Transfer Countries",
+      privacyPolicy: "Privacy Policy",
+      cookiePolicy: "Cookie Policy",
+      legalBasisValues: {
+        consent: "Consent (Art. 6 para. 1 s. 1 lit. a GDPR)",
+        legitimate_interest: "Legitimate Interest (Art. 6 para. 1 s. 1 lit. f GDPR)"
+      },
+      noServices: "No services are configured for this site."
+    },
+    svcAbout: {
+      title: "About this CMP",
+      description: "This website uses Blakfy Cookie Management Platform (CMP) to manage your consent preferences in compliance with GDPR, KVKK, CCPA and other applicable privacy regulations.",
+      version: "Version",
+      learnMore: "Learn more at blakfy.com"
     }
   };
 
@@ -561,6 +981,36 @@
       title: "Tre\u015B\u0107 zablokowana",
       desc: "Musisz zezwoli\u0107 na pliki cookie {category}, aby wy\u015Bwietli\u0107 t\u0119 tre\u015B\u0107.",
       cta: "Zezw\xF3l"
+    },
+    tabs: {
+      categories: "Categories",
+      services: "Services",
+      about: "About"
+    },
+    service: {
+      description: "Description",
+      processor: "Data Processor",
+      address: "Address",
+      dpo: "DPO Contact",
+      purposes: "Purposes",
+      technologies: "Technologies Used",
+      dataCollected: "Data Collected",
+      legalBasis: "Legal Basis",
+      retention: "Retention Period",
+      transferCountries: "Transfer Countries",
+      privacyPolicy: "Privacy Policy",
+      cookiePolicy: "Cookie Policy",
+      legalBasisValues: {
+        consent: "Consent (Art. 6 para. 1 s. 1 lit. a GDPR)",
+        legitimate_interest: "Legitimate Interest (Art. 6 para. 1 s. 1 lit. f GDPR)"
+      },
+      noServices: "No services are configured for this site."
+    },
+    svcAbout: {
+      title: "About this CMP",
+      description: "This website uses Blakfy Cookie Management Platform (CMP) to manage your consent preferences in compliance with GDPR, KVKK, CCPA and other applicable privacy regulations.",
+      version: "Version",
+      learnMore: "Learn more at blakfy.com"
     }
   };
 
@@ -584,6 +1034,36 @@
       title: "Inneh\xE5ll blockerat",
       desc: "Du m\xE5ste till\xE5ta {category}-cookies f\xF6r att visa detta inneh\xE5ll.",
       cta: "Till\xE5t"
+    },
+    tabs: {
+      categories: "Categories",
+      services: "Services",
+      about: "About"
+    },
+    service: {
+      description: "Description",
+      processor: "Data Processor",
+      address: "Address",
+      dpo: "DPO Contact",
+      purposes: "Purposes",
+      technologies: "Technologies Used",
+      dataCollected: "Data Collected",
+      legalBasis: "Legal Basis",
+      retention: "Retention Period",
+      transferCountries: "Transfer Countries",
+      privacyPolicy: "Privacy Policy",
+      cookiePolicy: "Cookie Policy",
+      legalBasisValues: {
+        consent: "Consent (Art. 6 para. 1 s. 1 lit. a GDPR)",
+        legitimate_interest: "Legitimate Interest (Art. 6 para. 1 s. 1 lit. f GDPR)"
+      },
+      noServices: "No services are configured for this site."
+    },
+    svcAbout: {
+      title: "About this CMP",
+      description: "This website uses Blakfy Cookie Management Platform (CMP) to manage your consent preferences in compliance with GDPR, KVKK, CCPA and other applicable privacy regulations.",
+      version: "Version",
+      learnMore: "Learn more at blakfy.com"
     }
   };
 
@@ -607,6 +1087,36 @@
       title: "Obsah blokov\xE1n",
       desc: "Pro zobrazen\xED tohoto obsahu mus\xEDte povolit soubory cookie {category}.",
       cta: "Povolit"
+    },
+    tabs: {
+      categories: "Categories",
+      services: "Services",
+      about: "About"
+    },
+    service: {
+      description: "Description",
+      processor: "Data Processor",
+      address: "Address",
+      dpo: "DPO Contact",
+      purposes: "Purposes",
+      technologies: "Technologies Used",
+      dataCollected: "Data Collected",
+      legalBasis: "Legal Basis",
+      retention: "Retention Period",
+      transferCountries: "Transfer Countries",
+      privacyPolicy: "Privacy Policy",
+      cookiePolicy: "Cookie Policy",
+      legalBasisValues: {
+        consent: "Consent (Art. 6 para. 1 s. 1 lit. a GDPR)",
+        legitimate_interest: "Legitimate Interest (Art. 6 para. 1 s. 1 lit. f GDPR)"
+      },
+      noServices: "No services are configured for this site."
+    },
+    svcAbout: {
+      title: "About this CMP",
+      description: "This website uses Blakfy Cookie Management Platform (CMP) to manage your consent preferences in compliance with GDPR, KVKK, CCPA and other applicable privacy regulations.",
+      version: "Version",
+      learnMore: "Learn more at blakfy.com"
     }
   };
 
@@ -630,6 +1140,36 @@
       title: "\u5185\u5BB9\u5DF2\u88AB\u963B\u6B62",
       desc: "\u60A8\u9700\u8981\u5141\u8BB8 {category} Cookie \u624D\u80FD\u67E5\u770B\u6B64\u5185\u5BB9\u3002",
       cta: "\u5141\u8BB8"
+    },
+    tabs: {
+      categories: "Categories",
+      services: "Services",
+      about: "About"
+    },
+    service: {
+      description: "Description",
+      processor: "Data Processor",
+      address: "Address",
+      dpo: "DPO Contact",
+      purposes: "Purposes",
+      technologies: "Technologies Used",
+      dataCollected: "Data Collected",
+      legalBasis: "Legal Basis",
+      retention: "Retention Period",
+      transferCountries: "Transfer Countries",
+      privacyPolicy: "Privacy Policy",
+      cookiePolicy: "Cookie Policy",
+      legalBasisValues: {
+        consent: "Consent (Art. 6 para. 1 s. 1 lit. a GDPR)",
+        legitimate_interest: "Legitimate Interest (Art. 6 para. 1 s. 1 lit. f GDPR)"
+      },
+      noServices: "No services are configured for this site."
+    },
+    svcAbout: {
+      title: "About this CMP",
+      description: "This website uses Blakfy Cookie Management Platform (CMP) to manage your consent preferences in compliance with GDPR, KVKK, CCPA and other applicable privacy regulations.",
+      version: "Version",
+      learnMore: "Learn more at blakfy.com"
     }
   };
 
@@ -653,6 +1193,36 @@
       title: "\u5167\u5BB9\u5DF2\u88AB\u5C01\u9396",
       desc: "\u60A8\u9700\u8981\u5141\u8A31 {category} Cookie \u624D\u80FD\u6AA2\u8996\u6B64\u5167\u5BB9\u3002",
       cta: "\u5141\u8A31"
+    },
+    tabs: {
+      categories: "Categories",
+      services: "Services",
+      about: "About"
+    },
+    service: {
+      description: "Description",
+      processor: "Data Processor",
+      address: "Address",
+      dpo: "DPO Contact",
+      purposes: "Purposes",
+      technologies: "Technologies Used",
+      dataCollected: "Data Collected",
+      legalBasis: "Legal Basis",
+      retention: "Retention Period",
+      transferCountries: "Transfer Countries",
+      privacyPolicy: "Privacy Policy",
+      cookiePolicy: "Cookie Policy",
+      legalBasisValues: {
+        consent: "Consent (Art. 6 para. 1 s. 1 lit. a GDPR)",
+        legitimate_interest: "Legitimate Interest (Art. 6 para. 1 s. 1 lit. f GDPR)"
+      },
+      noServices: "No services are configured for this site."
+    },
+    svcAbout: {
+      title: "About this CMP",
+      description: "This website uses Blakfy Cookie Management Platform (CMP) to manage your consent preferences in compliance with GDPR, KVKK, CCPA and other applicable privacy regulations.",
+      version: "Version",
+      learnMore: "Learn more at blakfy.com"
     }
   };
 
@@ -676,6 +1246,36 @@
       title: "\u30B3\u30F3\u30C6\u30F3\u30C4\u304C\u30D6\u30ED\u30C3\u30AF\u3055\u308C\u307E\u3057\u305F",
       desc: "\u3053\u306E\u30B3\u30F3\u30C6\u30F3\u30C4\u3092\u8868\u793A\u3059\u308B\u306B\u306F{category}Cookie\u3092\u8A31\u53EF\u3059\u308B\u5FC5\u8981\u304C\u3042\u308A\u307E\u3059\u3002",
       cta: "\u8A31\u53EF\u3059\u308B"
+    },
+    tabs: {
+      categories: "Categories",
+      services: "Services",
+      about: "About"
+    },
+    service: {
+      description: "Description",
+      processor: "Data Processor",
+      address: "Address",
+      dpo: "DPO Contact",
+      purposes: "Purposes",
+      technologies: "Technologies Used",
+      dataCollected: "Data Collected",
+      legalBasis: "Legal Basis",
+      retention: "Retention Period",
+      transferCountries: "Transfer Countries",
+      privacyPolicy: "Privacy Policy",
+      cookiePolicy: "Cookie Policy",
+      legalBasisValues: {
+        consent: "Consent (Art. 6 para. 1 s. 1 lit. a GDPR)",
+        legitimate_interest: "Legitimate Interest (Art. 6 para. 1 s. 1 lit. f GDPR)"
+      },
+      noServices: "No services are configured for this site."
+    },
+    svcAbout: {
+      title: "About this CMP",
+      description: "This website uses Blakfy Cookie Management Platform (CMP) to manage your consent preferences in compliance with GDPR, KVKK, CCPA and other applicable privacy regulations.",
+      version: "Version",
+      learnMore: "Learn more at blakfy.com"
     }
   };
 
@@ -699,6 +1299,36 @@
       title: "\uCF58\uD150\uCE20\uAC00 \uCC28\uB2E8\uB418\uC5C8\uC2B5\uB2C8\uB2E4",
       desc: "\uC774 \uCF58\uD150\uCE20\uB97C \uBCF4\uB824\uBA74 {category} \uCFE0\uD0A4\uB97C \uD5C8\uC6A9\uD574\uC57C \uD569\uB2C8\uB2E4.",
       cta: "\uD5C8\uC6A9"
+    },
+    tabs: {
+      categories: "Categories",
+      services: "Services",
+      about: "About"
+    },
+    service: {
+      description: "Description",
+      processor: "Data Processor",
+      address: "Address",
+      dpo: "DPO Contact",
+      purposes: "Purposes",
+      technologies: "Technologies Used",
+      dataCollected: "Data Collected",
+      legalBasis: "Legal Basis",
+      retention: "Retention Period",
+      transferCountries: "Transfer Countries",
+      privacyPolicy: "Privacy Policy",
+      cookiePolicy: "Cookie Policy",
+      legalBasisValues: {
+        consent: "Consent (Art. 6 para. 1 s. 1 lit. a GDPR)",
+        legitimate_interest: "Legitimate Interest (Art. 6 para. 1 s. 1 lit. f GDPR)"
+      },
+      noServices: "No services are configured for this site."
+    },
+    svcAbout: {
+      title: "About this CMP",
+      description: "This website uses Blakfy Cookie Management Platform (CMP) to manage your consent preferences in compliance with GDPR, KVKK, CCPA and other applicable privacy regulations.",
+      version: "Version",
+      learnMore: "Learn more at blakfy.com"
     }
   };
 
@@ -722,6 +1352,36 @@
       title: "Konten diblokir",
       desc: "Anda harus mengizinkan cookie {category} untuk melihat konten ini.",
       cta: "Izinkan"
+    },
+    tabs: {
+      categories: "Categories",
+      services: "Services",
+      about: "About"
+    },
+    service: {
+      description: "Description",
+      processor: "Data Processor",
+      address: "Address",
+      dpo: "DPO Contact",
+      purposes: "Purposes",
+      technologies: "Technologies Used",
+      dataCollected: "Data Collected",
+      legalBasis: "Legal Basis",
+      retention: "Retention Period",
+      transferCountries: "Transfer Countries",
+      privacyPolicy: "Privacy Policy",
+      cookiePolicy: "Cookie Policy",
+      legalBasisValues: {
+        consent: "Consent (Art. 6 para. 1 s. 1 lit. a GDPR)",
+        legitimate_interest: "Legitimate Interest (Art. 6 para. 1 s. 1 lit. f GDPR)"
+      },
+      noServices: "No services are configured for this site."
+    },
+    svcAbout: {
+      title: "About this CMP",
+      description: "This website uses Blakfy Cookie Management Platform (CMP) to manage your consent preferences in compliance with GDPR, KVKK, CCPA and other applicable privacy regulations.",
+      version: "Version",
+      learnMore: "Learn more at blakfy.com"
     }
   };
 
@@ -745,6 +1405,36 @@
       title: "\u0938\u093E\u092E\u0917\u094D\u0930\u0940 \u0905\u0935\u0930\u0941\u0926\u094D\u0927 \u0939\u0948",
       desc: "\u0907\u0938 \u0938\u093E\u092E\u0917\u094D\u0930\u0940 \u0915\u094B \u0926\u0947\u0916\u0928\u0947 \u0915\u0947 \u0932\u093F\u090F \u0906\u092A\u0915\u094B {category} \u0915\u0941\u0915\u0940\u091C\u093C \u0915\u0940 \u0905\u0928\u0941\u092E\u0924\u093F \u0926\u0947\u0928\u0940 \u0939\u094B\u0917\u0940\u0964",
       cta: "\u0905\u0928\u0941\u092E\u0924\u093F \u0926\u0947\u0902"
+    },
+    tabs: {
+      categories: "Categories",
+      services: "Services",
+      about: "About"
+    },
+    service: {
+      description: "Description",
+      processor: "Data Processor",
+      address: "Address",
+      dpo: "DPO Contact",
+      purposes: "Purposes",
+      technologies: "Technologies Used",
+      dataCollected: "Data Collected",
+      legalBasis: "Legal Basis",
+      retention: "Retention Period",
+      transferCountries: "Transfer Countries",
+      privacyPolicy: "Privacy Policy",
+      cookiePolicy: "Cookie Policy",
+      legalBasisValues: {
+        consent: "Consent (Art. 6 para. 1 s. 1 lit. a GDPR)",
+        legitimate_interest: "Legitimate Interest (Art. 6 para. 1 s. 1 lit. f GDPR)"
+      },
+      noServices: "No services are configured for this site."
+    },
+    svcAbout: {
+      title: "About this CMP",
+      description: "This website uses Blakfy Cookie Management Platform (CMP) to manage your consent preferences in compliance with GDPR, KVKK, CCPA and other applicable privacy regulations.",
+      version: "Version",
+      learnMore: "Learn more at blakfy.com"
     }
   };
 
@@ -834,7 +1524,39 @@
     // Responsive
     "@media (max-width:1024px){.blakfy-card{max-width:440px}}",
     "@media (max-width:768px){.blakfy-card{max-width:calc(100vw - 32px);padding:18px}.blakfy-card h2{font-size:16px}.blakfy-card p{font-size:13px}.blakfy-btn{flex:1 1 100%;min-height:44px;padding:10px 14px;font-size:13px}.blakfy-overlay.widget.bottom-center,.blakfy-overlay.widget.top-center{left:16px;right:16px;transform:none}.blakfy-overlay.widget .blakfy-card{width:100%}.blakfy-overlay.widget .blakfy-actions .blakfy-btn{flex:1 1 100%;min-width:0}}",
-    "@media (max-width:480px){.blakfy-overlay.widget .blakfy-card{width:100%;max-width:calc(100vw - 32px)}}"
+    "@media (max-width:480px){.blakfy-overlay.widget .blakfy-card{width:100%;max-width:calc(100vw - 32px)}}",
+    // Tab bar
+    ".blakfy-tabs{display:flex;border-bottom:2px solid #eee;margin:12px 0 16px;gap:0}",
+    ".blakfy-tab-btn{flex:1;background:none;border:none;border-bottom:2px solid transparent;margin-bottom:-2px;padding:8px 10px;font-size:13px;font-weight:500;color:#666;cursor:pointer;transition:color .15s,border-color .15s;white-space:nowrap;font-family:inherit}",
+    ".blakfy-tab-btn:hover{color:#222}",
+    ".blakfy-tab-btn--active{color:var(--blakfy-accent,#3E5C3A);border-bottom-color:var(--blakfy-accent,#3E5C3A);font-weight:600}",
+    // Tab panels
+    ".blakfy-tab-panel[aria-hidden=true]{display:none}",
+    ".blakfy-tab-panel[aria-hidden=false]{display:block}",
+    // Service list + cards
+    ".blakfy-service-list{display:flex;flex-direction:column;gap:8px;max-height:340px;overflow-y:auto;padding-right:2px}",
+    ".blakfy-service-card{border:1px solid #eee;border-radius:6px;overflow:hidden}",
+    ".blakfy-service-card-header{display:flex;align-items:center;gap:8px;padding:10px 12px;cursor:pointer;background:#fafafa;user-select:none}",
+    ".blakfy-service-card-header:hover{background:#f3f3f3}",
+    ".blakfy-service-name{flex:1;font-size:13px;font-weight:600;color:#222}",
+    ".blakfy-service-cat{font-size:11px;padding:2px 8px;border-radius:999px;background:#eee;color:#555;text-transform:capitalize}",
+    ".blakfy-service-toggle{font-size:11px;color:#aaa;line-height:1}",
+    ".blakfy-service-body[aria-hidden=true]{display:none}",
+    ".blakfy-service-body[aria-hidden=false]{display:block;padding:12px;border-top:1px solid #eee}",
+    ".blakfy-service-dl{margin:0 0 10px;display:grid;grid-template-columns:auto 1fr;gap:4px 12px}",
+    ".blakfy-service-dt{font-size:11px;font-weight:600;color:#888;text-transform:uppercase;letter-spacing:.4px;white-space:nowrap}",
+    ".blakfy-service-dd{margin:0;font-size:12px;color:#444;word-break:break-word}",
+    ".blakfy-service-links{display:flex;gap:12px;margin-top:8px;flex-wrap:wrap}",
+    ".blakfy-service-links a{font-size:12px;color:var(--blakfy-accent,#3E5C3A);text-decoration:underline}",
+    ".blakfy-svc-empty{font-size:13px;color:#888;padding:16px 0}",
+    // About panel
+    ".blakfy-about-panel{padding:4px 0}",
+    ".blakfy-about-brand{display:flex;align-items:center;gap:8px;margin-bottom:14px}",
+    ".blakfy-about-brand strong{font-size:15px;color:#222}",
+    ".blakfy-about-panel p{font-size:13px;color:#555;margin:0 0 10px;line-height:1.6}",
+    ".blakfy-about-panel a{font-size:13px;color:var(--blakfy-accent,#3E5C3A);text-decoration:underline}",
+    ".blakfy-about-meta{font-size:12px;color:#aaa;margin-top:12px}",
+    "@media (max-width:480px){.blakfy-tab-btn{font-size:12px;padding:8px 6px}.blakfy-service-list{max-height:260px}}"
   ];
   var injectStyles = () => {
     if (document.getElementById(STYLE_ID)) return;
@@ -898,67 +1620,384 @@
     return card;
   };
 
+  // src/data/service-metadata.js
+  var SERVICE_METADATA = {
+    ga4: {
+      displayName: "Google Analytics 4",
+      category: "analytics",
+      description: "Website analytics service that collects and reports traffic data to help website owners understand how visitors interact with their site.",
+      processor: {
+        name: "Google Ireland Limited",
+        address: "Gordon House, Barrow St, Dublin 4, Ireland",
+        dpo: "https://support.google.com/policies/contact/general_privacy_form"
+      },
+      purposes: ["Analytics", "Performance measurement", "User behavior analysis"],
+      technologies: ["Cookies", "JavaScript"],
+      dataCollected: ["IP address", "Browser information", "Usage data", "Device information", "Geographic location", "Date and time of visit", "Pages visited"],
+      legalBasis: "consent",
+      retention: "14 months",
+      transferCountries: ["United States of America"],
+      privacyUrl: "https://policies.google.com/privacy",
+      cookiePolicyUrl: "https://policies.google.com/technologies/cookies"
+    },
+    gtm: {
+      displayName: "Google Tag Manager",
+      category: "analytics",
+      description: "Tag management system that allows website owners to manage and deploy marketing and analytics tags without modifying the website code.",
+      processor: {
+        name: "Google Ireland Limited",
+        address: "Gordon House, Barrow St, Dublin 4, Ireland",
+        dpo: "https://support.google.com/policies/contact/general_privacy_form"
+      },
+      purposes: ["Tag management", "Analytics", "Marketing"],
+      technologies: ["Website tags", "JavaScript"],
+      dataCollected: ["Aggregated tag firing data", "Diagnostic data"],
+      legalBasis: "consent",
+      retention: "14 days",
+      transferCountries: ["United States of America", "Singapore", "Chile", "Taiwan"],
+      privacyUrl: "https://business.safety.google/privacy/",
+      cookiePolicyUrl: "https://policies.google.com/technologies/cookies"
+    },
+    facebook: {
+      displayName: "Facebook Pixel",
+      category: "marketing",
+      description: "Tracking technology by Meta that measures ad effectiveness and enables retargeting of users who have visited the website.",
+      processor: {
+        name: "Meta Platforms Ireland Ltd.",
+        address: "4 Grand Canal Square, Grand Canal Harbour, Dublin 2, Ireland",
+        dpo: "https://www.facebook.com/help/contact/1650115808681298"
+      },
+      purposes: ["Analytics", "Marketing", "Retargeting", "Advertisement", "Conversion tracking"],
+      technologies: ["Cookies", "Pixel"],
+      dataCollected: ["IP address", "Browser information", "Device information", "Pages visited", "Pixel ID", "Ads viewed", "Usage behaviour", "Referrer URL"],
+      legalBasis: "consent",
+      retention: "180 days",
+      transferCountries: ["United States of America", "Singapore", "United Kingdom"],
+      privacyUrl: "https://www.facebook.com/privacy/explanation",
+      cookiePolicyUrl: "https://www.facebook.com/policies/cookies"
+    },
+    clarity: {
+      displayName: "Microsoft Clarity",
+      category: "analytics",
+      description: "Behavioral analytics tool that records user sessions and generates heatmaps to help understand how visitors interact with the website.",
+      processor: {
+        name: "Microsoft Ireland Operations Ltd.",
+        address: "One Microsoft Place, South County Business Park, Leopardstown, Dublin 18, Ireland",
+        dpo: "https://aka.ms/privacyresponse"
+      },
+      purposes: ["Analytics", "Heatmaps", "Session recording"],
+      technologies: ["Cookies", "JavaScript"],
+      dataCollected: ["IP address", "Mouse movements", "Clicks", "Scrolls", "Browser information", "Device information", "Referrer URL"],
+      legalBasis: "consent",
+      retention: "13 months",
+      transferCountries: ["United States of America"],
+      privacyUrl: "https://privacy.microsoft.com/en-us/privacystatement",
+      cookiePolicyUrl: ""
+    },
+    hotjar: {
+      displayName: "Hotjar",
+      category: "analytics",
+      description: "User experience analytics platform providing heatmaps, session recordings, and feedback tools to understand visitor behavior.",
+      processor: {
+        name: "Hotjar Ltd.",
+        address: "Dragonara Business Centre, 5th Floor, Dragonara Road, St. Julian's STJ 3141, Malta",
+        dpo: "privacy@hotjar.com"
+      },
+      purposes: ["Analytics", "Heatmaps", "User feedback", "Session recording"],
+      technologies: ["Cookies", "Pixel", "JavaScript"],
+      dataCollected: ["IP address", "Usage data", "Mouse movements", "Click behavior", "Device information", "Browser information"],
+      legalBasis: "consent",
+      retention: "365 days",
+      transferCountries: [],
+      privacyUrl: "https://www.hotjar.com/legal/policies/privacy/",
+      cookiePolicyUrl: "https://www.hotjar.com/legal/policies/cookie/"
+    },
+    youtube: {
+      displayName: "YouTube",
+      category: "marketing",
+      description: "Video hosting service by Google. When enabled, YouTube videos embedded on the website can be played and related cookies are set.",
+      processor: {
+        name: "Google Ireland Limited",
+        address: "Gordon House, Barrow St, Dublin 4, Ireland",
+        dpo: "https://support.google.com/policies/contact/general_privacy_form"
+      },
+      purposes: ["Marketing", "Video content delivery", "Personalisation"],
+      technologies: ["Cookies", "Pixel"],
+      dataCollected: ["IP address", "Browser information", "Usage data", "Video viewing data", "Device information"],
+      legalBasis: "consent",
+      retention: "180 days",
+      transferCountries: ["United States of America"],
+      privacyUrl: "https://policies.google.com/privacy",
+      cookiePolicyUrl: "https://policies.google.com/technologies/cookies"
+    },
+    vimeo: {
+      displayName: "Vimeo",
+      category: "marketing",
+      description: "Video hosting and sharing platform. When enabled, Vimeo videos embedded on the website can be played.",
+      processor: {
+        name: "Vimeo, Inc.",
+        address: "555 West 18th Street, New York, NY 10011, USA",
+        dpo: "privacy@vimeo.com"
+      },
+      purposes: ["Marketing", "Video content delivery"],
+      technologies: ["Cookies", "JavaScript"],
+      dataCollected: ["IP address", "Browser information", "Video viewing data", "Device information"],
+      legalBasis: "consent",
+      retention: "2 years",
+      transferCountries: ["United States of America"],
+      privacyUrl: "https://vimeo.com/privacy",
+      cookiePolicyUrl: "https://vimeo.com/cookie_policy"
+    },
+    linkedin: {
+      displayName: "LinkedIn Insight Tag",
+      category: "marketing",
+      description: "Analytics and retargeting tag by LinkedIn that enables conversion tracking and retargeting of website visitors through LinkedIn Ads.",
+      processor: {
+        name: "LinkedIn Ireland Unlimited Company",
+        address: "Wilton Plaza, Wilton Place, Dublin 2, Ireland",
+        dpo: "privacy@linkedin.com"
+      },
+      purposes: ["Marketing", "Analytics", "Retargeting", "Conversion tracking"],
+      technologies: ["Cookies", "Pixel"],
+      dataCollected: ["IP address", "Device information", "Pages visited", "Referrer URL", "Professional data"],
+      legalBasis: "consent",
+      retention: "90 days",
+      transferCountries: ["United States of America"],
+      privacyUrl: "https://www.linkedin.com/legal/privacy-policy",
+      cookiePolicyUrl: "https://www.linkedin.com/legal/cookie-policy"
+    },
+    yandex: {
+      displayName: "Yandex Metrica",
+      category: "analytics",
+      description: "Web analytics service that collects and evaluates statistical data on user behavior for optimization and marketing purposes.",
+      processor: {
+        name: "Yandex LLC",
+        address: "16 Lva Tolstogo St., Moscow 119021, Russia",
+        dpo: ""
+      },
+      purposes: ["Analytics", "Optimization"],
+      technologies: ["Cookies", "Web beacons", "Pixel"],
+      dataCollected: ["IP address", "Browser information", "Usage data", "Device information", "Date and time of visit", "Geographic location"],
+      legalBasis: "consent",
+      retention: "As long as necessary",
+      transferCountries: ["Russia"],
+      privacyUrl: "https://yandex.com/legal/confidential/",
+      cookiePolicyUrl: ""
+    },
+    bing: {
+      displayName: "Bing Ads UET",
+      category: "marketing",
+      description: "Universal Event Tracking tag by Microsoft Bing that enables conversion tracking and audience targeting for Bing Ads campaigns.",
+      processor: {
+        name: "Microsoft Corporation",
+        address: "One Microsoft Way, Redmond, WA 98052, USA",
+        dpo: "https://aka.ms/privacyresponse"
+      },
+      purposes: ["Marketing", "Conversion tracking", "Audience targeting"],
+      technologies: ["Cookies", "Pixel"],
+      dataCollected: ["IP address", "Browser information", "Conversion data", "Device information"],
+      legalBasis: "consent",
+      retention: "180 days",
+      transferCountries: ["United States of America"],
+      privacyUrl: "https://privacy.microsoft.com/en-us/privacystatement",
+      cookiePolicyUrl: ""
+    },
+    tiktok: {
+      displayName: "TikTok Pixel",
+      category: "marketing",
+      description: "Tracking pixel by TikTok that measures ad performance and enables retargeting for TikTok advertising campaigns.",
+      processor: {
+        name: "TikTok Information Technologies UK Limited",
+        address: "6th Floor, One London Wall, London EC2Y 5EB, United Kingdom",
+        dpo: "privacy@tiktok.com"
+      },
+      purposes: ["Marketing", "Retargeting", "Conversion tracking"],
+      technologies: ["Cookies", "Pixel"],
+      dataCollected: ["IP address", "Browser information", "Usage data", "Device information", "Pages visited"],
+      legalBasis: "consent",
+      retention: "13 months",
+      transferCountries: ["United States of America", "Singapore"],
+      privacyUrl: "https://www.tiktok.com/legal/page/row/privacy-policy/en",
+      cookiePolicyUrl: "https://www.tiktok.com/legal/page/row/cookie-policy/en"
+    },
+    pinterest: {
+      displayName: "Pinterest Tag",
+      category: "marketing",
+      description: "Analytics and retargeting tag by Pinterest that tracks conversions and enables targeting of website visitors through Pinterest Ads.",
+      processor: {
+        name: "Pinterest Europe Ltd.",
+        address: "Palmerston House, 2nd Floor, Fenian Street, Dublin 2, Ireland",
+        dpo: "privacy@pinterest.com"
+      },
+      purposes: ["Marketing", "Retargeting", "Conversion tracking"],
+      technologies: ["Cookies", "Pixel"],
+      dataCollected: ["IP address", "Browser information", "Usage data", "Device information"],
+      legalBasis: "consent",
+      retention: "1 year",
+      transferCountries: ["United States of America"],
+      privacyUrl: "https://policy.pinterest.com/en/privacy-policy",
+      cookiePolicyUrl: "https://policy.pinterest.com/en/cookies"
+    },
+    tawkto: {
+      displayName: "Tawk.to",
+      category: "functional",
+      description: "Live chat widget that allows website visitors to communicate in real time with website support agents.",
+      processor: {
+        name: "Tawk.to, Inc.",
+        address: "2880 Zanker Road Suite 203, San Jose, CA 95134, USA",
+        dpo: "privacy@tawk.to"
+      },
+      purposes: ["Functional", "Live chat", "Customer support"],
+      technologies: ["Cookies", "JavaScript"],
+      dataCollected: ["IP address", "Browser information", "Chat messages", "Usage data", "Device information"],
+      legalBasis: "consent",
+      retention: "2 years",
+      transferCountries: ["United States of America"],
+      privacyUrl: "https://www.tawk.to/privacy-policy/",
+      cookiePolicyUrl: ""
+    },
+    intercom: {
+      displayName: "Intercom",
+      category: "functional",
+      description: "Customer messaging platform providing live chat, in-app messaging, and customer support tools.",
+      processor: {
+        name: "Intercom R&D Unlimited Company",
+        address: "2nd Floor, Stephen Court, 18-21 St. Stephen's Green, Dublin 2, Ireland",
+        dpo: "privacy@intercom.io"
+      },
+      purposes: ["Functional", "Customer support", "Marketing"],
+      technologies: ["Cookies", "JavaScript"],
+      dataCollected: ["IP address", "Browser information", "Chat messages", "Usage data", "Device information", "Email address"],
+      legalBasis: "consent",
+      retention: "2 years",
+      transferCountries: ["United States of America"],
+      privacyUrl: "https://www.intercom.com/legal/privacy",
+      cookiePolicyUrl: ""
+    },
+    hubspot: {
+      displayName: "HubSpot",
+      category: "marketing",
+      description: "CRM and marketing automation platform. Tracks website visitor behavior to enable lead generation and marketing automation.",
+      processor: {
+        name: "HubSpot, Inc.",
+        address: "25 First Street, Cambridge, MA 02141, USA",
+        dpo: "privacy@hubspot.com"
+      },
+      purposes: ["Marketing", "Analytics", "CRM", "Lead generation"],
+      technologies: ["Cookies", "Pixel", "JavaScript"],
+      dataCollected: ["IP address", "Browser information", "Form submissions", "Pages visited", "Usage data", "Email address"],
+      legalBasis: "consent",
+      retention: "13 months",
+      transferCountries: ["United States of America"],
+      privacyUrl: "https://legal.hubspot.com/privacy-policy",
+      cookiePolicyUrl: "https://legal.hubspot.com/cookie-policy"
+    },
+    mailchimp: {
+      displayName: "Mailchimp",
+      category: "marketing",
+      description: "Email marketing and automation platform. Tracks email campaign interactions and website activity for subscriber management.",
+      processor: {
+        name: "The Rocket Science Group LLC (Mailchimp)",
+        address: "675 Ponce de Leon Ave NE, Suite 5000, Atlanta, GA 30308, USA",
+        dpo: "privacy@mailchimp.com"
+      },
+      purposes: ["Marketing", "Email campaigns", "Analytics"],
+      technologies: ["Cookies", "Pixel", "Web beacons"],
+      dataCollected: ["IP address", "Email behaviour", "Form submissions", "Device information", "Browser information"],
+      legalBasis: "consent",
+      retention: "2 years",
+      transferCountries: ["United States of America"],
+      privacyUrl: "https://mailchimp.com/legal/privacy/",
+      cookiePolicyUrl: "https://mailchimp.com/legal/cookies/"
+    },
+    maps: {
+      displayName: "Google Maps",
+      category: "functional",
+      description: "Interactive maps service by Google embedded on the website to display locations and provide directions.",
+      processor: {
+        name: "Google Ireland Limited",
+        address: "Gordon House, Barrow St, Dublin 4, Ireland",
+        dpo: "https://support.google.com/policies/contact/general_privacy_form"
+      },
+      purposes: ["Functional", "Maps display", "Location services"],
+      technologies: ["Cookies", "JavaScript"],
+      dataCollected: ["IP address", "Location data", "Usage data", "Device information"],
+      legalBasis: "consent",
+      retention: "6 months",
+      transferCountries: ["United States of America"],
+      privacyUrl: "https://policies.google.com/privacy",
+      cookiePolicyUrl: "https://policies.google.com/technologies/cookies"
+    },
+    recaptcha: {
+      displayName: "Google reCAPTCHA",
+      category: "functional",
+      description: "Bot detection and security service by Google that protects forms and interactive elements from automated abuse.",
+      processor: {
+        name: "Google Ireland Limited",
+        address: "Gordon House, Barrow St, Dublin 4, Ireland",
+        dpo: "https://support.google.com/policies/contact/general_privacy_form"
+      },
+      purposes: ["Functional", "Security", "Bot detection"],
+      technologies: ["Cookies", "JavaScript"],
+      dataCollected: ["IP address", "Browser fingerprint", "Usage data", "Device information", "Mouse behaviour"],
+      legalBasis: "consent",
+      retention: "6 months",
+      transferCountries: ["United States of America"],
+      privacyUrl: "https://policies.google.com/privacy",
+      cookiePolicyUrl: "https://policies.google.com/technologies/cookies"
+    }
+  };
+
   // src/ui/modal.js
   var CATEGORIES = ["essential", "analytics", "marketing", "functional"];
+  var el = (tag, props) => {
+    const node = document.createElement(tag);
+    if (props) {
+      for (const k in props) {
+        if (k === "text") node.textContent = props[k];
+        else if (k === "html") node.innerHTML = props[k];
+        else if (k === "class") node.className = props[k];
+        else node.setAttribute(k, props[k]);
+      }
+    }
+    return node;
+  };
+  var safeGet = (obj, path, fallback) => {
+    let cur = obj;
+    const parts = path.split(".");
+    for (let i = 0; i < parts.length; i++) {
+      if (cur == null) return fallback;
+      cur = cur[parts[i]];
+    }
+    return cur != null ? cur : fallback;
+  };
   var buildCatRow = (key, t, alwaysOn, checked) => {
-    const c = t.cat[key];
-    const row = document.createElement("div");
-    row.className = "blakfy-cat";
-    const text = document.createElement("div");
-    text.className = "blakfy-cat-text";
-    const strong = document.createElement("strong");
-    strong.textContent = c.title;
+    const c = safeGet(t, "cat." + key, {});
+    const row = el("div", { class: "blakfy-cat" });
+    const text = el("div", { class: "blakfy-cat-text" });
+    const strong = el("strong", { text: c.title || key });
     text.appendChild(strong);
-    const span = document.createElement("span");
-    span.textContent = c.desc + (alwaysOn ? " (" + (c.always || "") + ")" : "");
+    const span = el("span", { text: (c.desc || "") + (alwaysOn ? " (" + (c.always || "") + ")" : "") });
     text.appendChild(span);
     row.appendChild(text);
-    const sw = document.createElement("button");
-    sw.className = "blakfy-switch";
-    sw.setAttribute("role", "switch");
-    sw.setAttribute("aria-checked", checked ? "true" : "false");
-    sw.setAttribute("data-cat", key);
+    const sw = el("button", { class: "blakfy-switch", role: "switch", "aria-checked": checked ? "true" : "false", "data-cat": key });
     if (alwaysOn) sw.disabled = true;
     sw.addEventListener("click", () => {
       if (sw.disabled) return;
-      const on = sw.getAttribute("aria-checked") === "true";
-      sw.setAttribute("aria-checked", on ? "false" : "true");
+      sw.setAttribute("aria-checked", sw.getAttribute("aria-checked") === "true" ? "false" : "true");
     });
     row.appendChild(sw);
     return row;
   };
-  var createModal = ({ t, isRTL, accent, currentState, onSave, onAccept, onClose }) => {
-    const current = currentState || { analytics: false, marketing: false, functional: false };
-    const card = document.createElement("div");
-    card.className = "blakfy-card";
-    card.setAttribute("dir", isRTL ? "rtl" : "ltr");
-    card.setAttribute("role", "dialog");
-    card.setAttribute("aria-labelledby", "blakfy-mtitle");
-    card.style.cssText = "--blakfy-accent:" + accent + ";position:relative";
-    const closeBtn = document.createElement("button");
-    closeBtn.className = "blakfy-close";
-    closeBtn.setAttribute("aria-label", t.close);
-    closeBtn.setAttribute("data-act", "close");
-    closeBtn.textContent = "\xD7";
-    closeBtn.addEventListener("click", () => {
-      if (onClose) onClose();
-    });
-    card.appendChild(closeBtn);
-    const h2 = document.createElement("h2");
-    h2.id = "blakfy-mtitle";
-    h2.textContent = t.title;
-    card.appendChild(h2);
-    card.appendChild(buildCatRow("essential", t, true, true));
-    card.appendChild(buildCatRow("analytics", t, false, !!current.analytics));
-    card.appendChild(buildCatRow("marketing", t, false, !!current.marketing));
-    card.appendChild(buildCatRow("functional", t, false, !!current.functional));
-    const actions = document.createElement("div");
-    actions.className = "blakfy-actions";
+  var buildCategoriesPanel = (t, current, card, onSave, onAccept) => {
+    const panel = el("div", { class: "blakfy-tab-panel", "data-panel": "categories", "aria-hidden": "false" });
+    panel.appendChild(buildCatRow("essential", t, true, true));
+    panel.appendChild(buildCatRow("analytics", t, false, !!current.analytics));
+    panel.appendChild(buildCatRow("marketing", t, false, !!current.marketing));
+    panel.appendChild(buildCatRow("functional", t, false, !!current.functional));
+    const actions = el("div", { class: "blakfy-actions" });
     actions.style.marginTop = "16px";
-    const btnSave = document.createElement("button");
-    btnSave.className = "blakfy-btn";
-    btnSave.setAttribute("data-act", "save");
-    btnSave.textContent = t.save;
+    const btnSave = el("button", { class: "blakfy-btn", "data-act": "save", text: t.save || "Save" });
     btnSave.addEventListener("click", () => {
       const prefs = {};
       for (let i = 0; i < CATEGORIES.length; i++) {
@@ -970,18 +2009,155 @@
       if (onSave) onSave(prefs);
     });
     actions.appendChild(btnSave);
-    const btnAccept = document.createElement("button");
-    btnAccept.className = "blakfy-btn blakfy-btn-primary";
-    btnAccept.setAttribute("data-act", "accept");
-    btnAccept.textContent = t.acceptAll;
+    const btnAccept = el("button", { class: "blakfy-btn blakfy-btn-primary", "data-act": "accept", text: t.acceptAll || "Accept All" });
     btnAccept.addEventListener("click", () => {
       if (onAccept) onAccept();
     });
     actions.appendChild(btnAccept);
-    card.appendChild(actions);
-    const badgeSlot = document.createElement("div");
-    badgeSlot.className = "blakfy-badge-slot";
-    card.appendChild(badgeSlot);
+    panel.appendChild(actions);
+    return panel;
+  };
+  var buildServiceCard = (presetKey, meta, t) => {
+    const s = safeGet(t, "service", {});
+    const card = el("div", { class: "blakfy-service-card" });
+    const header = el("div", { class: "blakfy-service-card-header" });
+    header.appendChild(el("span", { class: "blakfy-service-name", text: meta.displayName }));
+    header.appendChild(el("span", { class: "blakfy-service-cat", text: meta.category }));
+    const toggle = el("span", { class: "blakfy-service-toggle", text: "\u25B8" });
+    header.appendChild(toggle);
+    card.appendChild(header);
+    const body = el("div", { class: "blakfy-service-body", "aria-hidden": "true" });
+    const dl = el("dl", { class: "blakfy-service-dl" });
+    const addRow = (label, value) => {
+      if (!value) return;
+      const dt = el("dt", { class: "blakfy-service-dt", text: label });
+      const dd = el("dd", { class: "blakfy-service-dd", text: value });
+      dl.appendChild(dt);
+      dl.appendChild(dd);
+    };
+    addRow(s.description || "Description", meta.description);
+    addRow(s.processor || "Data Processor", meta.processor && meta.processor.name ? meta.processor.name : "");
+    addRow(s.address || "Address", meta.processor && meta.processor.address ? meta.processor.address : "");
+    if (meta.processor && meta.processor.dpo && meta.processor.dpo.indexOf("http") !== 0) {
+      addRow(s.dpo || "DPO Contact", meta.processor.dpo);
+    }
+    addRow(s.purposes || "Purposes", meta.purposes && meta.purposes.length ? meta.purposes.join(", ") : "");
+    addRow(s.technologies || "Technologies Used", meta.technologies && meta.technologies.length ? meta.technologies.join(", ") : "");
+    addRow(s.dataCollected || "Data Collected", meta.dataCollected && meta.dataCollected.length ? meta.dataCollected.join(", ") : "");
+    const lbv = safeGet(t, "service.legalBasisValues", {});
+    const lbLabel = lbv[meta.legalBasis] || s.legalBasisValues && s.legalBasisValues[meta.legalBasis] || meta.legalBasis || "";
+    addRow(s.legalBasis || "Legal Basis", lbLabel);
+    addRow(s.retention || "Retention Period", meta.retention);
+    addRow(s.transferCountries || "Transfer Countries", meta.transferCountries && meta.transferCountries.length ? meta.transferCountries.join(", ") : "");
+    body.appendChild(dl);
+    if (meta.privacyUrl && meta.privacyUrl.length || meta.cookiePolicyUrl && meta.cookiePolicyUrl.length) {
+      const links = el("div", { class: "blakfy-service-links" });
+      if (meta.privacyUrl) {
+        const a = el("a", { href: meta.privacyUrl, target: "_blank", rel: "noopener noreferrer", text: s.privacyPolicy || "Privacy Policy" });
+        links.appendChild(a);
+      }
+      if (meta.cookiePolicyUrl) {
+        const a = el("a", { href: meta.cookiePolicyUrl, target: "_blank", rel: "noopener noreferrer", text: s.cookiePolicy || "Cookie Policy" });
+        links.appendChild(a);
+      }
+      body.appendChild(links);
+    }
+    card.appendChild(body);
+    header.addEventListener("click", () => {
+      const hidden = body.getAttribute("aria-hidden") === "true";
+      body.setAttribute("aria-hidden", hidden ? "false" : "true");
+      toggle.textContent = hidden ? "\u25BE" : "\u25B8";
+    });
+    return card;
+  };
+  var buildServicesPanel = (activePresets, t) => {
+    const panel = el("div", { class: "blakfy-tab-panel", "data-panel": "services", "aria-hidden": "true" });
+    const list = el("div", { class: "blakfy-service-list" });
+    if (!activePresets || activePresets.length === 0) {
+      const empty = el("p", { class: "blakfy-svc-empty", text: safeGet(t, "service.noServices", "No services configured.") });
+      list.appendChild(empty);
+    } else {
+      for (let i = 0; i < activePresets.length; i++) {
+        const { key, meta } = activePresets[i];
+        if (meta) list.appendChild(buildServiceCard(key, meta, t));
+      }
+    }
+    panel.appendChild(list);
+    return panel;
+  };
+  var buildAboutPanel = (t, version) => {
+    const panel = el("div", { class: "blakfy-tab-panel", "data-panel": "about", "aria-hidden": "true" });
+    const content = el("div", { class: "blakfy-about-panel" });
+    const brand = el("div", { class: "blakfy-about-brand" });
+    brand.appendChild(el("strong", { text: "Blakfy Studio" }));
+    content.appendChild(brand);
+    const ab = safeGet(t, "svcAbout", {});
+    if (ab.title) content.appendChild(el("p", { text: "" })).textContent = ab.title ? "" : "";
+    const desc = el("p", { text: ab.description || "This website uses Blakfy Cookie Management Platform (CMP) to manage your consent preferences." });
+    content.appendChild(desc);
+    const meta = el("p", { class: "blakfy-about-meta" });
+    meta.textContent = (ab.version || "Version") + ": " + (version || "");
+    content.appendChild(meta);
+    const a = el("a", { href: "https://blakfy.com", target: "_blank", rel: "noopener noreferrer", text: ab.learnMore || "Learn more at blakfy.com" });
+    content.appendChild(a);
+    panel.appendChild(content);
+    return panel;
+  };
+  var initTabs = (card) => {
+    const btns = card.querySelectorAll(".blakfy-tab-btn");
+    const panels = card.querySelectorAll(".blakfy-tab-panel");
+    const switchTab = (target) => {
+      for (let i = 0; i < btns.length; i++) {
+        const active = btns[i].getAttribute("data-tab") === target;
+        btns[i].setAttribute("aria-selected", active ? "true" : "false");
+        if (active) btns[i].classList.add("blakfy-tab-btn--active");
+        else btns[i].classList.remove("blakfy-tab-btn--active");
+      }
+      for (let i = 0; i < panels.length; i++) {
+        panels[i].setAttribute("aria-hidden", panels[i].getAttribute("data-panel") === target ? "false" : "true");
+      }
+    };
+    for (let i = 0; i < btns.length; i++) {
+      btns[i].addEventListener("click", function() {
+        switchTab(this.getAttribute("data-tab"));
+      });
+    }
+  };
+  var createModal = ({ t, isRTL, accent, currentState, presets, version, onSave, onAccept, onClose }) => {
+    const current = currentState || { analytics: false, marketing: false, functional: false };
+    const card = el("div", { class: "blakfy-card", role: "dialog", "aria-labelledby": "blakfy-mtitle" });
+    card.setAttribute("dir", isRTL ? "rtl" : "ltr");
+    card.style.cssText = "--blakfy-accent:" + accent + ";position:relative";
+    const closeBtn = el("button", { class: "blakfy-close", "aria-label": t.close || "Close", "data-act": "close", text: "\xD7" });
+    closeBtn.addEventListener("click", () => {
+      if (onClose) onClose();
+    });
+    card.appendChild(closeBtn);
+    const h2 = el("h2", { id: "blakfy-mtitle", text: t.title || "Cookie Preferences" });
+    card.appendChild(h2);
+    const tabs = safeGet(t, "tabs", { categories: "Categories", services: "Services", about: "About" });
+    const tabBar = el("nav", { class: "blakfy-tabs", role: "tablist" });
+    const makeTabBtn = (id, label, active) => {
+      const btn = el("button", { class: "blakfy-tab-btn" + (active ? " blakfy-tab-btn--active" : ""), role: "tab", "data-tab": id, "aria-selected": active ? "true" : "false", text: label });
+      return btn;
+    };
+    tabBar.appendChild(makeTabBtn("categories", tabs.categories || "Categories", true));
+    tabBar.appendChild(makeTabBtn("services", tabs.services || "Services", false));
+    tabBar.appendChild(makeTabBtn("about", tabs.about || "About", false));
+    card.appendChild(tabBar);
+    const enriched = [];
+    if (presets && presets.length) {
+      for (let i = 0; i < presets.length; i++) {
+        const key = typeof presets[i] === "string" ? presets[i] : presets[i].key;
+        const meta = SERVICE_METADATA[key] || (typeof presets[i] === "object" ? presets[i].meta : null);
+        if (meta) enriched.push({ key, meta });
+      }
+    }
+    card.appendChild(buildCategoriesPanel(t, current, card, onSave, onAccept));
+    card.appendChild(buildServicesPanel(enriched, t));
+    card.appendChild(buildAboutPanel(t, version));
+    card.appendChild(el("div", { class: "blakfy-badge-slot" }));
+    initTabs(card);
     return card;
   };
 
@@ -2623,11 +3799,12 @@
       applyGPC({ mode: "respect", currentState: null, setPrefs: () => {
       } });
     }
+    let activePresetList = [];
     if (config.presets) {
-      const list = String(config.presets).split(",").map((s) => s.trim()).filter(Boolean);
-      for (let i = 0; i < list.length; i++) {
+      activePresetList = String(config.presets).split(",").map((s) => s.trim()).filter(Boolean);
+      for (let i = 0; i < activePresetList.length; i++) {
         try {
-          applyPreset(list[i], { registerCleanup });
+          applyPreset(activePresetList[i], { registerCleanup });
         } catch (e) {
         }
       }
@@ -2706,6 +3883,8 @@
         isRTL,
         accent: config.accent,
         currentState: state,
+        presets: activePresetList,
+        version: api.version,
         onSave: (prefs) => api.__internal.commit(prefs, "save"),
         onAccept: () => api.acceptAll(),
         onClose: () => api.__internal.closeUI()
