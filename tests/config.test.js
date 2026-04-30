@@ -58,9 +58,9 @@ describe("config readConfig", () => {
     expect(cfg.statusEnabled).toBe(true);
   });
 
-  it("CDN_BASE points to @2, NOT @latest", () => {
-    expect(CDN_BASE).toContain("@2");
+  it("CDN_BASE points to @v2, NOT @latest", () => {
+    expect(CDN_BASE).toContain("@v2");
     expect(CDN_BASE).not.toContain("@latest");
-    expect(DEFAULTS.statusUrl).toContain("@2");
+    expect(DEFAULTS.statusUrl).toContain("@v2");
   });
 });
