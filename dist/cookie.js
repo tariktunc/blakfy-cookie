@@ -2394,7 +2394,7 @@
   };
 
   // src/api.js
-  var VERSION = "2.0.0";
+  var VERSION = "2.0.2";
   var CATEGORIES2 = ["analytics", "marketing", "functional", "recording"];
   var createAPI = (ctx) => {
     const { config, emitter, deps } = ctx;
