@@ -783,9 +783,11 @@
     "/* Layout architecture is locked \u2014 only --blakfy-accent is overridable */",
     // Modal mode (centered, dimmed backdrop)
     ".blakfy-overlay.modal{position:fixed !important;inset:0;background:rgba(0,0,0,.4);z-index:2147483646 !important;display:flex !important;align-items:center;justify-content:center;padding:16px}",
-    // Widget mode (tooltip/banner — transparent, no backdrop)
+    // Widget mode (transparent, no backdrop)
     ".blakfy-overlay.widget{position:fixed !important;inset:auto;background:transparent;padding:0;display:block !important;z-index:2147483646 !important;pointer-events:none}",
     ".blakfy-overlay.widget .blakfy-card{width:min(96vw,1100px);max-width:none;border-radius:8px;position:relative;pointer-events:auto;padding-bottom:40px}",
+    // Widget butonları yan yana sıralı, sabit genişlik (flex:1 kullanılmaz yoksa çok geniş olur)
+    ".blakfy-overlay.widget .blakfy-actions .blakfy-btn{flex:0 0 auto;min-width:150px}",
     // Position modifiers (widget)
     ".blakfy-overlay.widget.bottom-center{bottom:16px;left:50%;right:auto;top:auto;transform:translateX(-50%)}",
     ".blakfy-overlay.widget.bottom-right{bottom:16px;right:16px;left:auto;top:auto}",
@@ -797,18 +799,10 @@
     // Card base (shared by banner + modal)
     ".blakfy-card{background:#fff;color:#222;border-radius:16px;max-width:560px;width:100%;padding:24px;border:3px solid var(--blakfy-accent,#3E5C3A);font-family:system-ui,-apple-system,sans-serif;line-height:1.5;position:relative}",
     ".blakfy-card[dir=rtl]{text-align:right}",
-    ".blakfy-card h2{margin:0 0 12px;font-size:18px;font-weight:600}",
+    ".blakfy-card h2{margin:0 0 8px;font-size:18px;font-weight:600}",
     ".blakfy-card p{margin:0 0 16px;font-size:14px;color:#444}",
     ".blakfy-card a{color:var(--blakfy-accent,#3E5C3A);text-decoration:underline}",
-    // Horizontal banner layout (banner.js wraps content in .blakfy-banner-body)
-    ".blakfy-banner-body{display:flex;flex-direction:row;align-items:center;gap:24px}",
-    ".blakfy-banner-body .blakfy-card-text{flex:1;min-width:0}",
-    ".blakfy-banner-body .blakfy-card-text h2{margin:0 0 4px;font-size:16px;font-weight:600}",
-    ".blakfy-banner-body .blakfy-card-text p{margin:0;font-size:13px;color:#444}",
-    ".blakfy-banner-body .blakfy-actions{flex-shrink:0;flex-direction:column;flex-wrap:nowrap;margin-top:0;gap:6px;min-width:156px}",
-    ".blakfy-banner-body .blakfy-actions .blakfy-btn{flex:none;width:100%;min-width:0;min-height:38px;padding:8px 14px;font-size:13px}",
-    ".blakfy-card[dir=rtl] .blakfy-banner-body{flex-direction:row-reverse}",
-    // Actions (generic — used in modal + banner)
+    // Actions
     ".blakfy-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}",
     // Buttons (3px radius per spec)
     ".blakfy-btn{flex:1;min-width:120px;min-height:44px;padding:12px 16px;border:1px solid #ddd;border-radius:3px;background:#fff;color:#222;font-size:14px;font-weight:500;cursor:pointer;transition:transform .1s,background .15s}",
@@ -836,10 +830,9 @@
     ".blakfy-status-dismiss{background:none;border:none;color:inherit;cursor:pointer;padding:4px 10px;border-radius:6px;font-size:16px;opacity:.8;line-height:1}",
     ".blakfy-status-dismiss:hover{opacity:1;background:rgba(255,255,255,.2)}",
     "@media (prefers-reduced-motion:reduce){.blakfy-btn,.blakfy-switch::after{transition:none}}",
-    // Responsive breakpoints
+    // Responsive
     "@media (max-width:1024px){.blakfy-card{max-width:440px}}",
-    // Tablet/mobile: banner collapses to vertical stack
-    "@media (max-width:768px){.blakfy-card{max-width:calc(100vw - 32px);padding:18px}.blakfy-card h2{font-size:16px}.blakfy-card p{font-size:13px}.blakfy-btn{flex:1 1 100%;min-height:44px;padding:10px 14px;font-size:13px}.blakfy-overlay.widget.bottom-center,.blakfy-overlay.widget.top-center{left:16px;right:16px;transform:none}.blakfy-overlay.widget .blakfy-card{width:100%}.blakfy-banner-body{flex-direction:column;align-items:stretch;gap:12px}.blakfy-banner-body .blakfy-actions{min-width:auto;flex-direction:row;flex-wrap:wrap;gap:8px}.blakfy-banner-body .blakfy-actions .blakfy-btn{flex:1 1 100%;width:auto;min-height:44px;padding:10px 14px;font-size:13px}}",
+    "@media (max-width:768px){.blakfy-card{max-width:calc(100vw - 32px);padding:18px}.blakfy-card h2{font-size:16px}.blakfy-card p{font-size:13px}.blakfy-btn{flex:1 1 100%;min-height:44px;padding:10px 14px;font-size:13px}.blakfy-overlay.widget.bottom-center,.blakfy-overlay.widget.top-center{left:16px;right:16px;transform:none}.blakfy-overlay.widget .blakfy-card{width:100%}.blakfy-overlay.widget .blakfy-actions .blakfy-btn{flex:1 1 100%;min-width:0}}",
     "@media (max-width:480px){.blakfy-overlay.widget .blakfy-card{width:100%;max-width:calc(100vw - 32px)}}"
   ];
   var injectStyles = () => {
@@ -859,14 +852,10 @@
     card.setAttribute("aria-labelledby", "blakfy-title");
     card.setAttribute("aria-describedby", "blakfy-desc");
     card.style.cssText = "--blakfy-accent:" + accent;
-    const body = document.createElement("div");
-    body.className = "blakfy-banner-body";
-    const textBlock = document.createElement("div");
-    textBlock.className = "blakfy-card-text";
     const h2 = document.createElement("h2");
     h2.id = "blakfy-title";
     h2.textContent = "\u{1F36A} " + t.title;
-    textBlock.appendChild(h2);
+    card.appendChild(h2);
     const p = document.createElement("p");
     p.id = "blakfy-desc";
     p.textContent = t.intro + " ";
@@ -874,8 +863,7 @@
     a.href = policyUrl;
     a.textContent = t.policyLink;
     p.appendChild(a);
-    textBlock.appendChild(p);
-    body.appendChild(textBlock);
+    card.appendChild(p);
     const actions = document.createElement("div");
     actions.className = "blakfy-actions";
     const btnReject = document.createElement("button");
@@ -902,8 +890,7 @@
       if (onAccept) onAccept();
     });
     actions.appendChild(btnAccept);
-    body.appendChild(actions);
-    card.appendChild(body);
+    card.appendChild(actions);
     const badgeSlot = document.createElement("div");
     badgeSlot.className = "blakfy-badge-slot";
     card.appendChild(badgeSlot);
