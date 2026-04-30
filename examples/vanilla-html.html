@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Blakfy Cookie Widget — Vanilla HTML Demo (v2)</title>
+
+  <!-- ============================================================ -->
+  <!-- 1. BOOTSTRAP — must be the FIRST script in <head>             -->
+  <!--    Sets gtag/uetq/ym defaults to 'denied' so any third-party  -->
+  <!--    tag below this line starts in a denied state.              -->
+  <!-- ============================================================ -->
+  <script src="https://cdn.jsdelivr.net/gh/tariktunc/blakfy-cookie@2/dist/cookie-defaults.min.js"></script>
+
+  <!-- ============================================================ -->
+  <!-- 2. SIMULATED GTM — installed normally, no special wrapping.   -->
+  <!--    Bootstrap above already pushed `consent default denied`,   -->
+  <!--    so GTM-gated tags will not fire until user accepts.        -->
+  <!-- ============================================================ -->
+  <script>
+    (function (w, d, s, l, i) {
+      w[l] = w[l] || []; w[l].push({ 'gtm.start': new Date().getTime(), event: 'gtm.js' });
+      var f = d.getElementsByTagName(s)[0],
+          j = d.createElement(s),
+          dl = l != 'dataLayer' ? '&l=' + l : '';
+      j.async = true; j.src = 'https://www.googletagmanager.com/gtm.js?id=' + i + dl;
+      f.parentNode.insertBefore(j, f);
+    })(window, document, 'script', 'dataLayer', 'GTM-XXXXXX');
+  </script>
+
+  <style>
+    * { box-sizing: border-box; }
+    body { font: 16px/1.6 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; max-width: 960px; margin: 0 auto; padding: 24px; color: #111; }
+    h1 { color: #3E5C3A; }
+    h2 { margin-top: 32px; border-bottom: 1px solid #eee; padding-bottom: 6px; }
+    button { background: #3E5C3A; color: white; border: 0; padding: 10px 16px; border-radius: 8px; font-size: 14px; cursor: pointer; margin: 4px 4px 4px 0; }
+    button:hover { background: #2e4429; }
+    button.secondary { background: #6b7280; }
+    pre { background: #f6f8fa; padding: 14px; border-radius: 8px; overflow-x: auto; font-size: 13px; }
+    .row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+    .pill { display: inline-block; padding: 2px 10px; border-radius: 999px; font-size: 12px; background: #e5e7eb; }
+    iframe { max-width: 100%; border: 0; border-radius: 8px; }
+  </style>
+</head>
+
+<body>
+  <h1>Blakfy Cookie Widget — v2 Demo</h1>
+  <p>
+    Bu demo: bootstrap + GTM + widget (5 preset) + tag-gated inline script + tag-gated YouTube iframe + canlı state izleyici + v2 API test butonları.
+  </p>
+
+  <h2>API Test Butonları</h2>
+  <p>Her butonun yanında çalıştığı API çağrısı gösteriliyor.</p>
+  <div class="row">
+    <button onclick="window.BlakfyCookie.open()">open()</button>
+    <button onclick="window.BlakfyCookie.acceptAll()">acceptAll()</button>
+    <button onclick="window.BlakfyCookie.rejectAll()" class="secondary">rejectAll()</button>
+    <button onclick="alert('Jurisdiction: ' + window.BlakfyCookie.getJurisdiction())" class="secondary">getJurisdiction()</button>
+    <button onclick="alert('TC string:\n' + (window.BlakfyCookie.tcf.getTCString() || '(none — TCF not enabled)'))" class="secondary">tcf.getTCString()</button>
+    <button onclick="window.BlakfyCookie.ccpa.optOut(); alert('CCPA opt-out: ' + window.BlakfyCookie.ccpa.isOptedOut())" class="secondary">ccpa.optOut()</button>
+    <button onclick="alert('Scanned & unblocked: ' + JSON.stringify(window.BlakfyCookie.scan()))" class="secondary">scan()</button>
+    <button onclick="window.BlakfyCookie.usePreset('youtube'); alert('YouTube preset registered cleanup');" class="secondary">usePreset('youtube')</button>
+    <button onclick="window.BlakfyCookie.setLocale('en')" class="secondary">setLocale('en')</button>
+    <button onclick="window.BlakfyCookie.setLocale('tr')" class="secondary">setLocale('tr')</button>
+  </div>
+
+  <h2>Canlı State <span class="pill" id="jurisdictionPill">jurisdiction: ?</span></h2>
+  <pre id="state">Widget yükleniyor…</pre>
+
+  <h2>Tag-Gated Inline Script (marketing kategorisi)</h2>
+  <p>Aşağıdaki <code>&lt;script type="text/plain"&gt;</code> kullanıcı <strong>marketing</strong> kabul edene kadar çalışmaz. Onay sonrası console'da "Marketing tag fired" yazısı görürsün.</p>
+  <script type="text/plain" data-blakfy-category="marketing">
+    console.log("[Blakfy demo] Marketing tag fired — fbq/pixel etc. could go here.");
+    window.__blakfyDemoMarketingFired = true;
+  </script>
+
+  <h2>Tag-Gated External Script (analytics kategorisi)</h2>
+  <p>Harici örnek — kullanıcı <strong>analytics</strong> kabul edince yüklenir.</p>
+  <script type="text/plain"
+          data-blakfy-category="analytics"
+          data-blakfy-src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"
+          async></script>
+
+  <h2>Tag-Gated YouTube Iframe (marketing)</h2>
+  <p><code>data-blakfy-placeholder="auto"</code> sayesinde onay öncesi otomatik placeholder UI görünür.</p>
+  <iframe
+    data-blakfy-src="https://www.youtube.com/embed/dQw4w9WgXcQ"
+    data-blakfy-category="marketing"
+    data-blakfy-placeholder="auto"
+    width="560" height="315"
+    title="YouTube video player"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+    referrerpolicy="strict-origin-when-cross-origin"
+    allowfullscreen></iframe>
+
+  <h2>Footer "Çerez Tercihleri" linki</h2>
+  <p>
+    <a href="#" onclick="event.preventDefault(); window.BlakfyCookie.open();">Çerez Tercihleri</a>
+    — kalıcı erişim için footer'a koyulur.
+  </p>
+
+  <!-- Live state listener — wires up to BlakfyCookie events -->
+  <script>
+    (function () {
+      var pre = document.getElementById('state');
+      var pill = document.getElementById('jurisdictionPill');
+      function render() {
+        if (!window.BlakfyCookie) {
+          pre.textContent = 'Widget henüz yüklenmedi. (Adblocker veya CDN engeli olabilir.)';
+          return;
+        }
+        var s = window.BlakfyCookie.getState();
+        pill.textContent = 'jurisdiction: ' + window.BlakfyCookie.getJurisdiction();
+        pre.textContent = s ? JSON.stringify(s, null, 2) : '(state yok — kullanıcı henüz karar vermedi)';
+      }
+      function attach() {
+        if (!window.BlakfyCookie) { setTimeout(attach, 200); return; }
+        render();
+        window.BlakfyCookie.onChange(render);
+        // Category-specific listener — fires now (with current state) and on every change
+        window.BlakfyCookie.onConsent('marketing', function (granted) {
+          console.log('[Blakfy demo] marketing →', granted ? 'GRANTED' : 'DENIED');
+        });
+      }
+      attach();
+    })();
+  </script>
+
+  <!-- ============================================================ -->
+  <!-- 3. WIDGET — last script before </body>                        -->
+  <!--    Renders banner, badge, tag-gating observer, presets.       -->
+  <!-- ============================================================ -->
+  <script
+    src="https://cdn.jsdelivr.net/gh/tariktunc/blakfy-cookie@2/dist/cookie.min.js"
+    data-blakfy-locale="auto"
+    data-blakfy-policy-url="/cerez-politikasi"
+    data-blakfy-version="1.0"
+    data-blakfy-presets="ga4,gtm,facebook,clarity,youtube"
+    data-blakfy-ccpa="auto"
+    data-blakfy-tcf="false"
+    data-blakfy-position="bottom-right"
+    data-blakfy-theme="auto"
+    data-blakfy-accent="#3E5C3A"></script>
+</body>
+</html>

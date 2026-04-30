@@ -1,0 +1,36 @@
+{
+  "name": "@blakfy/cookie-next",
+  "version": "2.0.0-alpha.1",
+  "description": "Next.js / React wrapper for Blakfy Cookie Consent. SSR-safe, no FOUC.",
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
+    }
+  },
+  "files": ["dist", "README.md"],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch"
+  },
+  "keywords": ["nextjs", "react", "cookie-consent", "blakfy", "gdpr", "kvkk", "google-consent-mode"],
+  "homepage": "https://github.com/tariktunc/blakfy-cookie/tree/main/packages/cookie-next",
+  "repository": { "type": "git", "url": "https://github.com/tariktunc/blakfy-cookie.git", "directory": "packages/cookie-next" },
+  "author": "Blakfy Studio <hello@blakfy.com>",
+  "license": "MIT",
+  "peerDependencies": {
+    "next": ">=14",
+    "react": ">=18",
+    "react-dom": ">=18"
+  },
+  "devDependencies": {
+    "tsup": "^8.0.0",
+    "typescript": "^5.5.0",
+    "@types/react": "^18",
+    "@types/node": "^22"
+  }
+}

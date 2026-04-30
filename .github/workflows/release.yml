@@ -1,0 +1,146 @@
+name: release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+permissions:
+  contents: write
+  id-token: write
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run tests
+        run: npm run test
+
+      - name: Build (esbuild)
+        run: npm run build
+
+      - name: Build cookie-next (tsup)
+        run: npm run build:next
+
+      - name: Upload dist artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/
+          retention-days: 7
+
+      - name: Upload cookie-next dist artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: cookie-next-dist
+          path: packages/cookie-next/dist/
+          retention-days: 7
+
+  release:
+    name: github-release
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download dist artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist/
+
+      - name: Resolve tag
+        id: tag
+        run: echo "ref=${GITHUB_REF#refs/tags/}" >> "$GITHUB_OUTPUT"
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.tag.outputs.ref }}
+          name: ${{ steps.tag.outputs.ref }}
+          generate_release_notes: true
+          body_path: CHANGELOG.md
+          draft: false
+          prerelease: ${{ contains(steps.tag.outputs.ref, '-') }}
+          files: |
+            dist/cookie.min.js
+            dist/cookie.js
+            dist/cookie-defaults.min.js
+            dist/cookie-defaults.js
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Purge jsDelivr cache
+        run: |
+          set -e
+          TAG="${{ steps.tag.outputs.ref }}"
+          FILES="dist/cookie.min.js dist/cookie.js dist/cookie-defaults.min.js dist/cookie-defaults.js"
+          for f in $FILES; do
+            url="https://purge.jsdelivr.net/gh/tariktunc/blakfy-cookie@${TAG}/${f}"
+            echo "Purging $url"
+            curl -sS -X POST "$url" || echo "Warning: purge failed for $f (non-fatal)"
+          done
+
+  publish-npm:
+    name: publish-npm
+    needs: build
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check NPM_TOKEN presence
+        id: token
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          if [ -z "${NPM_TOKEN}" ]; then
+            echo "::warning::NPM_TOKEN secret is not set — skipping npm publish."
+            echo "present=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "present=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Checkout
+        if: steps.token.outputs.present == 'true'
+        uses: actions/checkout@v4
+
+      - name: Setup Node 20 with npm registry
+        if: steps.token.outputs.present == 'true'
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+          registry-url: https://registry.npmjs.org
+
+      - name: Install root deps
+        if: steps.token.outputs.present == 'true'
+        run: npm ci
+
+      - name: Build cookie-next
+        if: steps.token.outputs.present == 'true'
+        working-directory: packages/cookie-next
+        run: npm run build
+
+      - name: Publish @blakfy/cookie-next to npm
+        if: steps.token.outputs.present == 'true'
+        working-directory: packages/cookie-next
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: npm publish --access public --provenance

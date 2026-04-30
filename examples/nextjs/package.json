@@ -1,0 +1,24 @@
+{
+  "name": "blakfy-cookie-nextjs-example",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Minimal Next.js 15 app demonstrating @blakfy/cookie-next integration",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@blakfy/cookie-next": "file:../../packages/cookie-next",
+    "next": "^15.0.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "@types/react": "^18.3.0",
+    "@types/react-dom": "^18.3.0",
+    "typescript": "^5.4.0"
+  }
+}

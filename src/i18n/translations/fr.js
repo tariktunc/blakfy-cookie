@@ -1,0 +1,23 @@
+// blakfy-cookie/src/i18n/translations/fr.js — French translations
+
+export default {
+  title: "Préférences des Cookies",
+  intro: "Ce site utilise des cookies pour améliorer votre expérience. Consultez notre Politique de Cookies pour plus de détails.",
+  policyLink: "Politique de Cookies",
+  acceptAll: "Tout Accepter",
+  rejectAll: "Tout Refuser",
+  preferences: "Préférences",
+  save: "Enregistrer",
+  close: "Fermer",
+  cat: {
+    essential: { title: "Cookies Essentiels",   desc: "Nécessaires au fonctionnement du site. Ne peuvent pas être désactivés.", always: "Toujours actif" },
+    analytics:  { title: "Cookies Analytiques", desc: "Utilisés pour collecter des statistiques de visite anonymes." },
+    marketing:  { title: "Cookies Marketing",   desc: "Utilisés pour la publicité personnalisée et le reciblage." },
+    functional: { title: "Cookies Fonctionnels",desc: "Utilisés pour mémoriser vos préférences." }
+  },
+  placeholder: {
+    title: "Contenu bloqué",
+    desc: "Vous devez autoriser les cookies {category} pour voir ce contenu.",
+    cta: "Autoriser"
+  }
+};

@@ -1,0 +1,27 @@
+node_modules/
+dist/*.map
+dist/test.html
+dist/*.LEGAL.txt
+.DS_Store
+*.log
+.env
+.env.local
+coverage/
+.vitest/
+packages/*/node_modules/
+packages/*/dist/
+.idea/
+.vscode/
+
+# Next.js build artifacts
+.next/
+next-env.d.ts.bak
+*.tsbuildinfo
+
+# Sandbox / integration test scratch dirs
+sandbox/
+integration-test/
+
+# OS noise
+Thumbs.db
+desktop.ini

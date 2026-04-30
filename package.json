@@ -1,0 +1,61 @@
+{
+  "name": "@blakfy/cookie",
+  "version": "2.0.0-alpha.1",
+  "description": "Blakfy Studio — KVKK + GDPR + CCPA + Google CMv2 + Microsoft UET + Yandex + TCF v2.2 uyumlu cookie consent widget. 23 dil. 18 preset. Tag-gating dahil.",
+  "type": "module",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
+  "main": "dist/cookie.js",
+  "files": [
+    "dist/",
+    "README.md",
+    "ARCHITECTURE.md",
+    "COMPLIANCE.md",
+    "TCF-CERTIFICATION.md",
+    "MIGRATION.md",
+    "CHANGELOG.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "dev": "node scripts/build.js --watch",
+    "build": "node scripts/build.js",
+    "build:next": "npm -w @blakfy/cookie-next run build",
+    "build:all": "npm run build && npm run build:next",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "size": "node scripts/build.js --size-check",
+    "release:dry": "echo 'Run: git tag v2.x.x && git push --tags'"
+  },
+  "keywords": [
+    "cookie-consent",
+    "gdpr",
+    "kvkk",
+    "ccpa",
+    "google-consent-mode",
+    "microsoft-uet",
+    "yandex-metrica",
+    "iab-tcf",
+    "tcf-v2.2",
+    "gpc",
+    "blakfy",
+    "vanilla-js",
+    "privacy",
+    "tag-manager",
+    "consent-management"
+  ],
+  "homepage": "https://github.com/tariktunc/blakfy-cookie",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/tariktunc/blakfy-cookie.git"
+  },
+  "author": "Blakfy Studio <hello@blakfy.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "esbuild": "^0.24.0",
+    "vitest": "^2.1.0",
+    "jsdom": "^25.0.0",
+    "@vitest/ui": "^2.1.0"
+  }
+}
