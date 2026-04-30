@@ -10,8 +10,9 @@ const RULES = [
   // Widget mode (transparent, no backdrop)
   ".blakfy-overlay.widget{position:fixed !important;inset:auto;background:transparent;padding:0;display:block !important;z-index:2147483646 !important;pointer-events:none}",
   ".blakfy-overlay.widget .blakfy-card{width:min(96vw,1100px);max-width:none;border-radius:8px;position:relative;pointer-events:auto;padding-bottom:40px}",
-  // Widget butonları yan yana sıralı, sabit genişlik (flex:1 kullanılmaz yoksa çok geniş olur)
-  ".blakfy-overlay.widget .blakfy-actions .blakfy-btn{flex:0 0 auto;min-width:150px}",
+  // Widget butonları kart genişliğine eşit dağılımlı
+  ".blakfy-overlay.widget .blakfy-actions{flex-wrap:nowrap}",
+  ".blakfy-overlay.widget .blakfy-actions .blakfy-btn{flex:1;min-width:0}",
   // Position modifiers (widget)
   ".blakfy-overlay.widget.bottom-center{bottom:16px;left:50%;right:auto;top:auto;transform:translateX(-50%)}",
   ".blakfy-overlay.widget.bottom-right{bottom:16px;right:16px;left:auto;top:auto}",
