@@ -785,7 +785,7 @@
     ".blakfy-overlay.modal{position:fixed !important;inset:0;background:rgba(0,0,0,.4);z-index:2147483646 !important;display:flex !important;align-items:center;justify-content:center;padding:16px}",
     // Widget mode (tooltip/banner — transparent, no backdrop)
     ".blakfy-overlay.widget{position:fixed !important;inset:auto;background:transparent;padding:0;display:block !important;z-index:2147483646 !important;pointer-events:none}",
-    ".blakfy-overlay.widget .blakfy-card{width:min(90vw,780px);max-width:none;position:relative;pointer-events:auto;padding-bottom:40px}",
+    ".blakfy-overlay.widget .blakfy-card{width:min(96vw,1100px);max-width:none;border-radius:8px;position:relative;pointer-events:auto;padding-bottom:40px}",
     // Position modifiers (widget)
     ".blakfy-overlay.widget.bottom-center{bottom:16px;left:50%;right:auto;top:auto;transform:translateX(-50%)}",
     ".blakfy-overlay.widget.bottom-right{bottom:16px;right:16px;left:auto;top:auto}",
