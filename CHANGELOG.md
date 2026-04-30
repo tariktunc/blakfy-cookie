@@ -4,6 +4,31 @@ All notable changes follow [Keep a Changelog](https://keepachangelog.com/) and S
 
 ---
 
+## [2.1.0] — 2026-04-30
+
+### Added
+- **3-tab preferences modal** — Kategoriler / Hizmetler / Hakkında
+  - Hizmetler sekmesi: GDPR Madde 13/14 + KVKK Madde 10 uyumlu servis ifşası (veri işleyici, adres, amaçlar, teknolojiler, toplanan veriler, hukuki dayanak, saklama süresi, aktarım ülkeleri, gizlilik politikası linkleri)
+  - Accordion kartlar: accordion expand/collapse per service
+  - Hakkında sekmesi: CMP kimliği, platform açıklaması, sürüm
+- **18 preset için `SERVICE_METADATA`** (`src/data/service-metadata.js`) — ga4, gtm, facebook, clarity, hotjar, youtube, vimeo, linkedin, yandex, bing, tiktok, pinterest, tawkto, intercom, hubspot, mailchimp, maps, recaptcha
+- **3 renk teması** — `light` (beyaz), `gray` (açık gri), `dark` (siyah); `auto` → `prefers-color-scheme`
+- 23 dile `tabs`, `service`, `svcAbout` çeviri anahtarları eklendi
+
+### Changed
+- Banner emoji kaldırıldı (kurumsal uyumluluk)
+- Banner butonları `flex:1 flex-wrap:nowrap` ile eşit genişlikte, yatay düzen
+- Widget kart genişliği `min(96vw,1100px)` (önceki: 780px)
+- Widget kart `border-radius: 8px` (önceki: 16px)
+- Buton `min-height: 36px` (önceki: 44px)
+- Service list `max-height: 420px` (önceki: 340px)
+- Bundle size budget `32 KB` (önceki: 24 KB) — service-metadata DB nedeniyle
+
+### Fixed
+- CDN URL `@v2` → jsDelivr semver tag desteği
+
+---
+
 ## [2.0.0] — Unreleased
 
 ### Architecture

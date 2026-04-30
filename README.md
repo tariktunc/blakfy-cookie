@@ -1,10 +1,10 @@
 # Blakfy Cookie Widget
 
-> ![v2.0.0](https://img.shields.io/badge/version-2.0.0-3E5C3A) ![MIT](https://img.shields.io/badge/license-MIT-blue) ![size](https://img.shields.io/badge/size-%E2%89%A422KB-success) ![langs](https://img.shields.io/badge/languages-23-orange) ![presets](https://img.shields.io/badge/presets-18-purple)
+> ![v2.1.0](https://img.shields.io/badge/version-2.1.0-3E5C3A) ![MIT](https://img.shields.io/badge/license-MIT-blue) ![size](https://img.shields.io/badge/size-%E2%89%A430KB-success) ![langs](https://img.shields.io/badge/languages-23-orange) ![presets](https://img.shields.io/badge/presets-18-purple)
 >
-> Tek script ile **KVKK + GDPR + CCPA + Google CMv2 + Microsoft UET + Yandex Metrica + IAB TCF v2.2** uyumlu cookie consent (çerez onayı) widget. **23 dil**, **18 hazır preset** (üçüncü parti araç entegrasyonu), **tag-gating** (script engelleme/serbest bırakma) dahil.
+> Tek script ile **KVKK + GDPR + CCPA + Google CMv2 + Microsoft UET + Yandex Metrica + IAB TCF v2.2** uyumlu cookie consent (çerez onayı) widget. **23 dil**, **18 hazır preset** (üçüncü parti araç entegrasyonu), **3 renk teması**, **3-tab tercihler modalı** (Kategoriler / Hizmetler / Hakkında), **tag-gating** (script engelleme/serbest bırakma) dahil.
 
-**Versiyon:** 2.0.0  •  **Lisans:** MIT  •  **CDN:** `cdn.jsdelivr.net/gh/tariktunc/blakfy-cookie@2`  •  **npm:** `@blakfy/cookie-next@2`
+**Versiyon:** 2.1.0  •  **Lisans:** MIT  •  **CDN:** `cdn.jsdelivr.net/gh/tariktunc/blakfy-cookie@v2`  •  **npm:** `@blakfy/cookie-next@2`
 
 ---
 
@@ -151,6 +151,46 @@ ym(XXXXXXXX, "init", { clickmap:true, trackLinks:true, accurateTrackBitrate:true
 
 ---
 
+## Tercihler Modalı (3 Sekme)
+
+"Tercihler" veya `window.BlakfyCookie.open()` çağrıldığında açılan modal 3 sekmeden oluşur:
+
+| Sekme | İçerik |
+|---|---|
+| **Kategoriler** | Zorunlu / Analitik / Pazarlama / Fonksiyonel toggle switch'leri. "Seçimleri Kaydet" ve "Tümünü Kabul Et" butonları. |
+| **Hizmetler** | Aktif preset'lere göre accordion kartlar. Her kart: açıklama, veri işleyici, adres, amaçlar, teknolojiler, toplanan veriler, hukuki dayanak, saklama süresi, aktarım ülkeleri, gizlilik politikası linki. GDPR Madde 13/14 + KVKK Madde 10 zorunlu bilgi ifşası. |
+| **Hakkında** | CMP kimliği (Blakfy Studio), platform açıklaması (GDPR / KVKK / CCPA), sürüm numarası. |
+
+> **Yasal dayanak:** Hizmetler sekmesindeki bilgiler GDPR Madde 13/14 (bilgi yükümlülüğü) ve KVKK Madde 10 (aydınlatma yükümlülüğü) gerekliliklerini karşılar. Presets kullanmadan da her site kendi hizmet bilgilerini `SERVICE_METADATA` yapısına ekleyebilir.
+
+---
+
+## Renk Temaları
+
+3 hazır tema, `data-blakfy-theme` ile seçilir:
+
+| Tema | Açıklama | Attribute değeri |
+|---|---|---|
+| **Beyaz** (varsayılan) | Beyaz arka plan, koyu metin | `light` veya atlanabilir |
+| **Açık gri** | `#f0f0f0` arka plan, koyu metin | `gray` |
+| **Siyah** | `#1a1a1a` arka plan, açık metin | `dark` |
+| **Otomatik** | Sistem `prefers-color-scheme` ayarını okur | `auto` |
+
+```html
+<!-- Açık gri tema -->
+<script src="...cookie.min.js" data-blakfy-theme="gray" ...></script>
+
+<!-- Siyah tema -->
+<script src="...cookie.min.js" data-blakfy-theme="dark" ...></script>
+
+<!-- Sistem temasını takip et -->
+<script src="...cookie.min.js" data-blakfy-theme="auto" ...></script>
+```
+
+Tüm temalarda `--blakfy-accent` CSS değişkeni geçerliliğini korur — buton ve aktif sekme rengi `data-blakfy-accent` ile özelleştirilebilir.
+
+---
+
 ## Configuration Reference
 
 Tüm `<script>` tag'i üzerine konabilen `data-blakfy-*` attribute'ları:
@@ -163,7 +203,7 @@ Tüm `<script>` tag'i üzerine konabilen `data-blakfy-*` attribute'ları:
 | `data-blakfy-version` | `1.0` | string | **Politika versiyonu**. Bunu artırırsan tüm kullanıcılar tekrar onay vermek zorunda (re-consent). |
 | `data-blakfy-audit-endpoint` | `null` | URL | Consent kararı bu endpoint'e POST edilir (KVKK Md.12 / GDPR Art.7(1) kanıt). |
 | `data-blakfy-position` | `bottom-right` | enum | `bottom-right` \| `bottom-left` \| `bottom` \| `top` \| `center` |
-| `data-blakfy-theme` | `auto` | enum | `light` \| `dark` \| `auto` (`prefers-color-scheme`) |
+| `data-blakfy-theme` | `auto` | enum | **`light`** (beyaz) \| **`gray`** (açık gri) \| **`dark`** (siyah) \| `auto` (`prefers-color-scheme`) |
 | `data-blakfy-accent` | `#3E5C3A` | hex | Buton ve vurgu rengi. |
 | `data-blakfy-presets` | `null` | virgül listesi | Etkinleştirilecek preset key'leri. Örn: `ga4,gtm,facebook,clarity`. Aşağıda 18 preset listesi. |
 | `data-blakfy-tcf` | `false` | bool | IAB TCF v2.2 modülünü aç (`__tcfapi` global). |
@@ -184,7 +224,7 @@ Tüm `<script>` tag'i üzerine konabilen `data-blakfy-*` attribute'ları:
 
 | Metod | Sürüm | İmza | Açıklama |
 |---|---|---|---|
-| `version` | v1 | `string` | Kütüphane sürümü, örn. `"2.0.0"`. |
+| `version` | v1 | `string` | Kütüphane sürümü, örn. `"2.1.0"`. |
 | `open()` | v1 | `() => void` | Tercihler modalını aç. |
 | `acceptAll()` | v1 | `() => void` | Tüm kategorileri kabul et. |
 | `rejectAll()` | v1 | `() => void` | Tüm kategorileri reddet (essential dışında). |

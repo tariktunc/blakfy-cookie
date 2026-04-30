@@ -51,6 +51,17 @@ const bootstrap = async () => {
   let t = getTranslation(currentLocale);
   let isRTL = RTL_LOCALES.indexOf(currentLocale) > -1;
 
+  // 2b. resolve theme: auto → light/dark via matchMedia; aliases white→light, black→dark
+  const resolveTheme = (raw) => {
+    if (raw === "auto") {
+      try { return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light"; } catch (e) { return "light"; }
+    }
+    if (raw === "black") return "dark";
+    if (raw === "white") return "light";
+    return raw || "light";
+  };
+  const theme = resolveTheme(config.theme);
+
   // 3. styles
   injectStyles();
 
@@ -156,6 +167,7 @@ const bootstrap = async () => {
       t: t,
       isRTL: isRTL,
       accent: config.accent,
+      theme: theme,
       policyUrl: config.policyUrl,
       onAccept: () => api.acceptAll(),
       onReject: () => api.rejectAll(),
@@ -183,6 +195,7 @@ const bootstrap = async () => {
       t: (opts && opts.t) || t,
       isRTL: isRTL,
       accent: config.accent,
+      theme: theme,
       currentState: state,
       presets: activePresetList,
       version: api.version,

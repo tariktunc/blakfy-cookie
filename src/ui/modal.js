@@ -224,12 +224,13 @@ const initTabs = (card) => {
 
 // ── Public factory ────────────────────────────────────────────────────────────
 
-export const createModal = ({ t, isRTL, accent, currentState, presets, version, onSave, onAccept, onClose }) => {
+export const createModal = ({ t, isRTL, accent, theme, currentState, presets, version, onSave, onAccept, onClose }) => {
   const current = currentState || { analytics: false, marketing: false, functional: false };
 
   const card = el("div", { class: "blakfy-card", role: "dialog", "aria-labelledby": "blakfy-mtitle" });
   card.setAttribute("dir", isRTL ? "rtl" : "ltr");
   card.style.cssText = "--blakfy-accent:" + accent + ";position:relative";
+  if (theme && theme !== "light") card.setAttribute("data-blakfy-theme", theme);
 
   const closeBtn = el("button", { class: "blakfy-close", "aria-label": t.close || "Close", "data-act": "close", text: "×" });
   closeBtn.addEventListener("click", () => { if (onClose) onClose(); });

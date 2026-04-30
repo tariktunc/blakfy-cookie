@@ -1,6 +1,6 @@
 // blakfy-cookie/src/ui/banner.js — first-visit consent banner DOM factory
 
-export const createBanner = ({ t, isRTL, accent, policyUrl, onAccept, onReject, onPrefs }) => {
+export const createBanner = ({ t, isRTL, accent, theme, policyUrl, onAccept, onReject, onPrefs }) => {
   const card = document.createElement("div");
   card.className = "blakfy-card";
   card.setAttribute("dir", isRTL ? "rtl" : "ltr");
@@ -8,6 +8,7 @@ export const createBanner = ({ t, isRTL, accent, policyUrl, onAccept, onReject, 
   card.setAttribute("aria-labelledby", "blakfy-title");
   card.setAttribute("aria-describedby", "blakfy-desc");
   card.style.cssText = "--blakfy-accent:" + accent;
+  if (theme && theme !== "light") card.setAttribute("data-blakfy-theme", theme);
 
   const h2 = document.createElement("h2");
   h2.id = "blakfy-title";

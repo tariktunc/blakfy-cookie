@@ -1,5 +1,5 @@
 /*!
- * Blakfy Cookie Widget v2.0.0
+ * Blakfy Cookie Widget v2.1.0
  * https://github.com/tariktunc/blakfy-cookie
  * MIT License | (c) Blakfy Studio
  *
@@ -1534,7 +1534,7 @@
     ".blakfy-tab-panel[aria-hidden=true]{display:none}",
     ".blakfy-tab-panel[aria-hidden=false]{display:block}",
     // Service list + cards
-    ".blakfy-service-list{display:flex;flex-direction:column;gap:8px;max-height:340px;overflow-y:auto;padding-right:2px}",
+    ".blakfy-service-list{display:flex;flex-direction:column;gap:8px;max-height:420px;overflow-y:auto;padding-right:2px}",
     ".blakfy-service-card{border:1px solid #eee;border-radius:6px;overflow:hidden}",
     ".blakfy-service-card-header{display:flex;align-items:center;gap:8px;padding:10px 12px;cursor:pointer;background:#fafafa;user-select:none}",
     ".blakfy-service-card-header:hover{background:#f3f3f3}",
@@ -1556,7 +1556,39 @@
     ".blakfy-about-panel p{font-size:13px;color:#555;margin:0 0 10px;line-height:1.6}",
     ".blakfy-about-panel a{font-size:13px;color:var(--blakfy-accent,#3E5C3A);text-decoration:underline}",
     ".blakfy-about-meta{font-size:12px;color:#aaa;margin-top:12px}",
-    "@media (max-width:480px){.blakfy-tab-btn{font-size:12px;padding:8px 6px}.blakfy-service-list{max-height:260px}}"
+    "@media (max-width:480px){.blakfy-tab-btn{font-size:12px;padding:8px 6px}.blakfy-service-list{max-height:260px}}",
+    // ── Themes: gray ──────────────────────────────────────────────────────────
+    ".blakfy-card[data-blakfy-theme=gray]{background:#f0f0f0}",
+    ".blakfy-card[data-blakfy-theme=gray] .blakfy-btn{background:#e4e4e4;border-color:#ccc}",
+    ".blakfy-card[data-blakfy-theme=gray] .blakfy-service-card-header{background:#e8e8e8}",
+    ".blakfy-card[data-blakfy-theme=gray] .blakfy-service-card-header:hover{background:#ddd}",
+    // ── Themes: dark ──────────────────────────────────────────────────────────
+    ".blakfy-card[data-blakfy-theme=dark]{background:#1a1a1a;color:#f0f0f0;border-color:var(--blakfy-accent,#3E5C3A)}",
+    ".blakfy-card[data-blakfy-theme=dark] p{color:#aaa}",
+    ".blakfy-card[data-blakfy-theme=dark] .blakfy-cat-text span{color:#999}",
+    ".blakfy-card[data-blakfy-theme=dark] .blakfy-cat{border-top-color:#333}",
+    ".blakfy-card[data-blakfy-theme=dark] .blakfy-btn{background:#2a2a2a;color:#f0f0f0;border-color:#444}",
+    ".blakfy-card[data-blakfy-theme=dark] .blakfy-btn:hover{background:#333}",
+    ".blakfy-card[data-blakfy-theme=dark] .blakfy-switch{background:#444}",
+    ".blakfy-card[data-blakfy-theme=dark] .blakfy-close{color:#aaa}",
+    ".blakfy-card[data-blakfy-theme=dark] .blakfy-close:hover{background:#2a2a2a}",
+    ".blakfy-card[data-blakfy-theme=dark] .blakfy-tabs{border-bottom-color:#333}",
+    ".blakfy-card[data-blakfy-theme=dark] .blakfy-tab-btn{color:#888}",
+    ".blakfy-card[data-blakfy-theme=dark] .blakfy-tab-btn:hover{color:#f0f0f0}",
+    ".blakfy-card[data-blakfy-theme=dark] .blakfy-tab-btn--active{color:var(--blakfy-accent,#3E5C3A);border-bottom-color:var(--blakfy-accent,#3E5C3A)}",
+    ".blakfy-card[data-blakfy-theme=dark] .blakfy-service-card{border-color:#333}",
+    ".blakfy-card[data-blakfy-theme=dark] .blakfy-service-card-header{background:#252525}",
+    ".blakfy-card[data-blakfy-theme=dark] .blakfy-service-card-header:hover{background:#2e2e2e}",
+    ".blakfy-card[data-blakfy-theme=dark] .blakfy-service-body[aria-hidden=false]{border-top-color:#333}",
+    ".blakfy-card[data-blakfy-theme=dark] .blakfy-service-dt{color:#777}",
+    ".blakfy-card[data-blakfy-theme=dark] .blakfy-service-dd{color:#ccc}",
+    ".blakfy-card[data-blakfy-theme=dark] .blakfy-service-name{color:#f0f0f0}",
+    ".blakfy-card[data-blakfy-theme=dark] .blakfy-service-cat{background:#333;color:#aaa}",
+    ".blakfy-card[data-blakfy-theme=dark] .blakfy-badge{color:#777}",
+    ".blakfy-card[data-blakfy-theme=dark] .blakfy-about-brand strong{color:#f0f0f0}",
+    ".blakfy-card[data-blakfy-theme=dark] .blakfy-about-panel p{color:#aaa}",
+    ".blakfy-card[data-blakfy-theme=dark] .blakfy-about-meta{color:#666}",
+    ".blakfy-card[data-blakfy-theme=dark] .blakfy-svc-empty{color:#666}"
   ];
   var injectStyles = () => {
     if (document.getElementById(STYLE_ID)) return;
@@ -1567,7 +1599,7 @@
   };
 
   // src/ui/banner.js
-  var createBanner = ({ t, isRTL, accent, policyUrl, onAccept, onReject, onPrefs }) => {
+  var createBanner = ({ t, isRTL, accent, theme, policyUrl, onAccept, onReject, onPrefs }) => {
     const card = document.createElement("div");
     card.className = "blakfy-card";
     card.setAttribute("dir", isRTL ? "rtl" : "ltr");
@@ -1575,6 +1607,7 @@
     card.setAttribute("aria-labelledby", "blakfy-title");
     card.setAttribute("aria-describedby", "blakfy-desc");
     card.style.cssText = "--blakfy-accent:" + accent;
+    if (theme && theme !== "light") card.setAttribute("data-blakfy-theme", theme);
     const h2 = document.createElement("h2");
     h2.id = "blakfy-title";
     h2.textContent = t.title;
@@ -2123,11 +2156,12 @@
       });
     }
   };
-  var createModal = ({ t, isRTL, accent, currentState, presets, version, onSave, onAccept, onClose }) => {
+  var createModal = ({ t, isRTL, accent, theme, currentState, presets, version, onSave, onAccept, onClose }) => {
     const current = currentState || { analytics: false, marketing: false, functional: false };
     const card = el("div", { class: "blakfy-card", role: "dialog", "aria-labelledby": "blakfy-mtitle" });
     card.setAttribute("dir", isRTL ? "rtl" : "ltr");
     card.style.cssText = "--blakfy-accent:" + accent + ";position:relative";
+    if (theme && theme !== "light") card.setAttribute("data-blakfy-theme", theme);
     const closeBtn = el("button", { class: "blakfy-close", "aria-label": t.close || "Close", "data-act": "close", text: "\xD7" });
     closeBtn.addEventListener("click", () => {
       if (onClose) onClose();
@@ -3574,7 +3608,7 @@
   };
 
   // src/api.js
-  var VERSION = "2.0.4";
+  var VERSION = "2.1.0";
   var CATEGORIES2 = ["analytics", "marketing", "functional", "recording"];
   var createAPI = (ctx) => {
     const { config, emitter, deps } = ctx;
@@ -3766,6 +3800,19 @@
     const mainLang = detectMainLang({ configMainLang: config.mainLang });
     let t = getTranslation(currentLocale);
     let isRTL = RTL_LOCALES.indexOf(currentLocale) > -1;
+    const resolveTheme = (raw) => {
+      if (raw === "auto") {
+        try {
+          return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+        } catch (e) {
+          return "light";
+        }
+      }
+      if (raw === "black") return "dark";
+      if (raw === "white") return "light";
+      return raw || "light";
+    };
+    const theme = resolveTheme(config.theme);
     injectStyles();
     const emitter = createEmitter();
     let jurisdiction = "default";
@@ -3854,6 +3901,7 @@
         t,
         isRTL,
         accent: config.accent,
+        theme,
         policyUrl: config.policyUrl,
         onAccept: () => api.acceptAll(),
         onReject: () => api.rejectAll(),
@@ -3882,6 +3930,7 @@
         t: opts && opts.t || t,
         isRTL,
         accent: config.accent,
+        theme,
         currentState: state,
         presets: activePresetList,
         version: api.version,

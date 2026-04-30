@@ -17,7 +17,7 @@ const WATCH = args.has("--watch");
 const SIZE_CHECK = args.has("--size-check");
 
 const BANNER = `/*!
- * Blakfy Cookie Widget v2.0.0
+ * Blakfy Cookie Widget v2.1.0
  * https://github.com/tariktunc/blakfy-cookie
  * MIT License | (c) Blakfy Studio
  *
