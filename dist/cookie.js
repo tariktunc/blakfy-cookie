@@ -788,7 +788,7 @@
     ".blakfy-overlay.widget .blakfy-card{width:min(96vw,1100px);max-width:none;border-radius:8px;position:relative;pointer-events:auto;padding-bottom:40px}",
     // Widget butonları kart genişliğine eşit dağılımlı
     ".blakfy-overlay.widget .blakfy-actions{flex-wrap:nowrap}",
-    ".blakfy-overlay.widget .blakfy-actions .blakfy-btn{flex:1;min-width:0}",
+    ".blakfy-overlay.widget .blakfy-actions .blakfy-btn{flex:1;min-width:0;min-height:36px;padding:8px 16px}",
     // Position modifiers (widget)
     ".blakfy-overlay.widget.bottom-center{bottom:16px;left:50%;right:auto;top:auto;transform:translateX(-50%)}",
     ".blakfy-overlay.widget.bottom-right{bottom:16px;right:16px;left:auto;top:auto}",
@@ -855,7 +855,7 @@
     card.style.cssText = "--blakfy-accent:" + accent;
     const h2 = document.createElement("h2");
     h2.id = "blakfy-title";
-    h2.textContent = "\u{1F36A} " + t.title;
+    h2.textContent = t.title;
     card.appendChild(h2);
     const p = document.createElement("p");
     p.id = "blakfy-desc";

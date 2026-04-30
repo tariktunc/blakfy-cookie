@@ -11,7 +11,7 @@ export const createBanner = ({ t, isRTL, accent, policyUrl, onAccept, onReject, 
 
   const h2 = document.createElement("h2");
   h2.id = "blakfy-title";
-  h2.textContent = "🍪 " + t.title;
+  h2.textContent = t.title;
   card.appendChild(h2);
 
   const p = document.createElement("p");
