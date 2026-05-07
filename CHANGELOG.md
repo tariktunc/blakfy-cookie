@@ -4,6 +4,26 @@ All notable changes follow [Keep a Changelog](https://keepachangelog.com/) and S
 
 ---
 
+## [2.1.2] — 2026-05-07
+
+### Fixed
+- `src/api.js` `VERSION` constant `"2.1.0"` → `"2.1.2"` (önceki yayınlarda paket sürümü ile senkron değildi; `window.BlakfyCookie.version` artık doğru sürümü döner)
+
+### Docs
+- README'de `data-blakfy-position` default değeri `bottom-right` olarak yanlış belgelenmişti → düzeltildi (`bottom-center`, kodda zaten böyleydi); enum tam liste ile güncellendi
+- README Quick Start örneklerinden gereksiz `data-blakfy-position` override'ı kaldırıldı (default zaten alt-orta)
+- examples/vanilla-html.html + wordpress-snippet.php: `bottom-right` → `bottom-center` (default ile hizalama)
+- Installation bölümü eklendi (npm install + CDN seçenekleri: pinned vs auto-patch)
+- `@blakfy/cookie-next` export tablosu eklendi
+- Migration v1→v2 örneği npm CDN akışına güncellendi
+- `RELEASE.md` baştan yeniden yazıldı (npm publish akışı, granular token, iki paket için manuel publish)
+
+### Notes
+- Bu **sadece patch + docs yayınıdır**; davranış değişmedi, public API değişmedi.
+- `@2` semver tag jsDelivr CDN otomatik bu sürüme geçer.
+
+---
+
 ## [2.1.1] — 2026-05-07
 
 ### Changed

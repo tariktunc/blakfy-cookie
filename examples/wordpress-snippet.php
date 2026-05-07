@@ -40,7 +40,7 @@ if (!defined('ABSPATH')) exit; // direct access engelle
  */
 add_action('wp_head', function () { ?>
   <!-- Blakfy Cookie — Bootstrap (defaults all consent to denied) -->
-  <script src="https://cdn.jsdelivr.net/npm/@blakfy/cookie@2.1.1/dist/cookie-defaults.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@blakfy/cookie@2.1.2/dist/cookie-defaults.min.js"></script>
 <?php }, 1);
 
 /**
@@ -63,7 +63,7 @@ add_action('wp_footer', function () {
     ?>
   <!-- Blakfy Cookie — Widget -->
   <script
-    src="https://cdn.jsdelivr.net/npm/@blakfy/cookie@2.1.1/dist/cookie.min.js"
+    src="https://cdn.jsdelivr.net/npm/@blakfy/cookie@2.1.2/dist/cookie.min.js"
     data-blakfy-locale="auto"
     data-blakfy-policy-url="<?php echo esc_url($policy_url); ?>"
     data-blakfy-version="<?php echo esc_attr($policy_version); ?>"

@@ -1,10 +1,10 @@
 # Blakfy Cookie Widget
 
-> ![v2.1.1](https://img.shields.io/badge/version-2.1.1-3E5C3A) ![MIT](https://img.shields.io/badge/license-MIT-blue) ![size](https://img.shields.io/badge/size-%E2%89%A430KB-success) ![langs](https://img.shields.io/badge/languages-23-orange) ![presets](https://img.shields.io/badge/presets-18-purple)
+> ![v2.1.2](https://img.shields.io/badge/version-2.1.2-3E5C3A) ![MIT](https://img.shields.io/badge/license-MIT-blue) ![size](https://img.shields.io/badge/size-%E2%89%A430KB-success) ![langs](https://img.shields.io/badge/languages-23-orange) ![presets](https://img.shields.io/badge/presets-18-purple)
 >
 > Tek script ile **KVKK + GDPR + CCPA + Google CMv2 + Microsoft UET + Yandex Metrica + IAB TCF v2.2** uyumlu cookie consent (çerez onayı) widget. **23 dil**, **18 hazır preset** (üçüncü parti araç entegrasyonu), **3 renk teması**, **3-tab tercihler modalı** (Kategoriler / Hizmetler / Hakkında), **tag-gating** (script engelleme/serbest bırakma) dahil.
 
-**Versiyon:** 2.1.1  •  **Lisans:** MIT  •  **npm:** `@blakfy/cookie@2.1.1` · `@blakfy/cookie-next@2.1.1`  •  **CDN:** `cdn.jsdelivr.net/npm/@blakfy/cookie@2.1.1`
+**Versiyon:** 2.1.2  •  **Lisans:** MIT  •  **npm:** `@blakfy/cookie@2.1.2` · `@blakfy/cookie-next@2.1.2`  •  **CDN:** `cdn.jsdelivr.net/npm/@blakfy/cookie@2.1.2`
 
 ---
 
@@ -16,10 +16,10 @@
 
 | Strateji | URL | Ne zaman kullan |
 |---|---|---|
-| **Pinned** (sabit sürüm) | `cdn.jsdelivr.net/npm/@blakfy/cookie@2.1.1/dist/cookie.min.js` | Production — değişikliklerin gözden geçirilerek kabul edilmesini istersen |
+| **Pinned** (sabit sürüm) | `cdn.jsdelivr.net/npm/@blakfy/cookie@2.1.2/dist/cookie.min.js` | Production — değişikliklerin gözden geçirilerek kabul edilmesini istersen |
 | **Auto-patch** (semver tag) | `cdn.jsdelivr.net/npm/@blakfy/cookie@2/dist/cookie.min.js` | Otomatik güvenlik/patch güncellemeleri — major (`@3`) gelene kadar takip eder |
 
-unpkg da çalışır: `unpkg.com/@blakfy/cookie@2.1.1/dist/cookie.min.js`.
+unpkg da çalışır: `unpkg.com/@blakfy/cookie@2.1.2/dist/cookie.min.js`.
 
 ### B) npm / bundler (Vite, Webpack, Rollup, Astro)
 
@@ -47,7 +47,7 @@ Bundler ile gelen versiyonu kontrol etmek için: `import { version } from "@blak
 
 ```html
 <!-- Bootstrap: Tüm consent sinyallerini 'denied' olarak başlatır -->
-<script src="https://cdn.jsdelivr.net/npm/@blakfy/cookie@2.1.1/dist/cookie-defaults.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@blakfy/cookie@2.1.2/dist/cookie-defaults.min.js"></script>
 ```
 
 ### 2. Site içerik script'lerin (GTM/GA4/Pixel/Clarity vb.)
@@ -69,7 +69,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 
 ```html
 <script
-  src="https://cdn.jsdelivr.net/npm/@blakfy/cookie@2.1.1/dist/cookie.min.js"
+  src="https://cdn.jsdelivr.net/npm/@blakfy/cookie@2.1.2/dist/cookie.min.js"
   data-blakfy-locale="auto"
   data-blakfy-policy-url="/cerez-politikasi"
   data-blakfy-version="1.0"
@@ -267,7 +267,7 @@ Tüm `<script>` tag'i üzerine konabilen `data-blakfy-*` attribute'ları:
 
 | Metod | Sürüm | İmza | Açıklama |
 |---|---|---|---|
-| `version` | v1 | `string` | Kütüphane sürümü, örn. `"2.1.1"`. |
+| `version` | v1 | `string` | Kütüphane sürümü, örn. `"2.1.2"`. |
 | `open()` | v1 | `() => void` | Tercihler modalını aç. |
 | `acceptAll()` | v1 | `() => void` | Tüm kategorileri kabul et. |
 | `rejectAll()` | v1 | `() => void` | Tüm kategorileri reddet (essential dışında). |
