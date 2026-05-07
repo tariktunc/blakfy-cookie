@@ -37,12 +37,9 @@
   ],
   "files": [
     "dist/",
+    "docs/",
     "status.json",
     "README.md",
-    "ARCHITECTURE.md",
-    "COMPLIANCE.md",
-    "TCF-CERTIFICATION.md",
-    "MIGRATION.md",
     "CHANGELOG.md",
     "SECURITY.md",
     "LICENSE"

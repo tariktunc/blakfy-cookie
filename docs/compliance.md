@@ -92,7 +92,7 @@ Yandex'in Google gibi standart bir consent API'si yok. Yaklaşımımız:
 4. CMP ID atanır → `data-blakfy-cmp-id="123"` ile yazılır
 5. Onay öncesi widget "preview mode"da çalışır, onay sonrası prod
 
-⏱ Süreç 2-3 ay. Detay: [TCF-CERTIFICATION.md](./TCF-CERTIFICATION.md)
+⏱ Süreç 2-3 ay. Detay: [tcf-certification.md](./tcf-certification.md)
 
 ---
 

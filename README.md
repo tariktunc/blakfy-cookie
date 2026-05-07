@@ -453,7 +453,7 @@ Bu widget **çerez izni / tracking consent** için tasarlanmıştır. Aşağıda
 
 ### TCF v2.2 (AdSense / Ad Manager kullanıcıları için)
 
-`data-blakfy-tcf="true" data-blakfy-cmp-id="0"` ile preview mode'da çalışır. Production için IAB Europe sertifikasyonu gerekir (~2-3 ay, yıllık ~€2.000 ücret). Süreç ve audit gereksinimleri: [`TCF-CERTIFICATION.md`](./TCF-CERTIFICATION.md).
+`data-blakfy-tcf="true" data-blakfy-cmp-id="0"` ile preview mode'da çalışır. Production için IAB Europe sertifikasyonu gerekir (~2-3 ay, yıllık ~€2.000 ücret). Süreç ve audit gereksinimleri: [`docs/tcf-certification.md`](./docs/tcf-certification.md).
 
 ```js
 // TC string okuma
@@ -502,7 +502,7 @@ Webvisor `marketing` değil, **`recording`** kategorisi gerektirir. Modal'da bu 
 
 ### TCF preview mode'da takıldım
 
-`data-blakfy-cmp-id="0"` preview mode'dur. AdSense/Ad Manager production için IAB Europe sertifikasyonu sonrası atanan gerçek CMP ID girilmeli. Detay: [`TCF-CERTIFICATION.md`](./TCF-CERTIFICATION.md).
+`data-blakfy-cmp-id="0"` preview mode'dur. AdSense/Ad Manager production için IAB Europe sertifikasyonu sonrası atanan gerçek CMP ID girilmeli. Detay: [`docs/tcf-certification.md`](./docs/tcf-certification.md).
 
 ### "Powered by Blakfy Studio" badge'i nasıl gizlerim?
 
@@ -531,7 +531,7 @@ Tüm v1 attribute'ları korunur, kullanıcı consent cookie'si geriye uyumlu oku
 
 Bundler kullanıyorsan: `npm i @blakfy/cookie` ve `import "@blakfy/cookie"`.
 
-Detay: [`MIGRATION.md`](./MIGRATION.md).
+Detay: [`docs/migration.md`](./docs/migration.md).
 
 ---
 
@@ -551,11 +551,11 @@ Veya React:
 
 ## Diğer Kaynaklar
 
-- [`ARCHITECTURE.md`](./ARCHITECTURE.md) — modül yapısı, veri akışı, boyut bütçesi
-- [`COMPLIANCE.md`](./COMPLIANCE.md) — her yasa için detaylı uyumluluk mappingleri
+- [`docs/architecture.md`](./docs/architecture.md) — modül yapısı, veri akışı, boyut bütçesi
+- [`docs/compliance.md`](./docs/compliance.md) — her yasa için detaylı uyumluluk mappingleri
 - [`CHANGELOG.md`](./CHANGELOG.md) — sürüm notları
-- [`MIGRATION.md`](./MIGRATION.md) — v1 → v2 geçiş
-- [`TCF-CERTIFICATION.md`](./TCF-CERTIFICATION.md) — IAB Europe başvuru süreci
+- [`docs/migration.md`](./docs/migration.md) — v1 → v2 geçiş
+- [`docs/tcf-certification.md`](./docs/tcf-certification.md) — IAB Europe başvuru süreci
 - [`packages/cookie-next/README.md`](./packages/cookie-next/README.md) — npm paketi rehberi
 
 ---

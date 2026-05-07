@@ -160,7 +160,7 @@ npm üzerinde **`npm unpublish` yapma** — 72 saat içinde mümkün ama toplulu
 
 ## TCF v2.2 sertifikasyon
 
-Bkz. [TCF-CERTIFICATION.md](./TCF-CERTIFICATION.md). Sertifikasyon öncesi: `cmpId=0` (preview mode). Sonrası: atanan CMP ID'yi source'a yaz ve site'larda `data-blakfy-cmp-id` attribute'ını güncelle.
+Bkz. [tcf-certification.md](./tcf-certification.md). Sertifikasyon öncesi: `cmpId=0` (preview mode). Sonrası: atanan CMP ID'yi source'a yaz ve site'larda `data-blakfy-cmp-id` attribute'ını güncelle.
 
 ## Troubleshooting
 

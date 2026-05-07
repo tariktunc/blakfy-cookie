@@ -74,7 +74,7 @@ CI runs the same checks via `.github/workflows/test.yml` on every PR.
 ## Architecture overview
 
 The full module layout, build pipeline, and data flow are documented in
-[`ARCHITECTURE.md`](../ARCHITECTURE.md). Quick map:
+[`docs/architecture.md`](../docs/architecture.md). Quick map:
 
 - `src/core/` — consent engine, storage, events
 - `src/compliance/` — TCF v2.2, CCPA/USP, GPC, DNT, jurisdiction
@@ -131,7 +131,7 @@ Open an issue with:
 ## Releases
 
 Releases are tag-driven and run from `.github/workflows/release.yml`. See
-[`RELEASE.md`](../RELEASE.md) for the operator runbook.
+[`docs/release.md`](../docs/release.md) for the operator runbook.
 
 ## License
 
