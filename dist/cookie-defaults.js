@@ -73,4 +73,3 @@
     }
   })();
 })();
-/*! For license information please see cookie-defaults.js.LEGAL.txt */

@@ -3994,5 +3994,4 @@
   }
   var index_default = bootstrap;
 })();
-/*! For license information please see cookie.js.LEGAL.txt */
 //# sourceMappingURL=cookie.js.map

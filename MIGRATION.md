@@ -19,12 +19,16 @@ v1 son sürümü `1.2.0`'da donduruldu. Critical security patch çıkarsa `1.2.x
 
 ## v2'ye geç — 1 satır değişiklik
 
+CDN URL'i jsDelivr GitHub'dan jsDelivr npm'e geçti (npm registry kaynağı, immutable, versionlu):
+
 ```diff
 - <script src="https://cdn.jsdelivr.net/gh/tariktunc/blakfy-cookie@1/cookie.js"
-+ <script src="https://cdn.jsdelivr.net/gh/tariktunc/blakfy-cookie@v2/dist/cookie.min.js"
++ <script src="https://cdn.jsdelivr.net/npm/@blakfy/cookie@2/dist/cookie.min.js"
           data-blakfy-locale="auto"
           data-blakfy-policy-url="/cerez-politikasi"></script>
 ```
+
+Bundler kullanıyorsan: `npm i @blakfy/cookie` ve `import "@blakfy/cookie"`.
 
 Tüm v1 attribute'ları çalışmaya devam eder, kullanıcı consent'i korunur (cookie formatı uyumlu).
 

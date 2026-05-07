@@ -8,7 +8,7 @@
 
 | İlke | Karar | Neden |
 |---|---|---|
-| **Dağıtım** | jsDelivr `@2` major-pin | Kullanıcılar `@2`'ye bağlanır; biz `git tag v2.x.x` push edince anında yayılır. `@latest` yasak. |
+| **Dağıtım** | npm registry + jsDelivr `npm/@blakfy/cookie@2` major-pin | Kullanıcılar `@2`'ye bağlanır; her npm publish edince jsDelivr otomatik servise alır. `@latest` yasak (immutable versioning). |
 | **Sıfır bağımlılık** | Vanilla JS, IIFE, ES5 syntax (cookie.js); ESM build (cookie-next) | Eski tarayıcılar, çoklu stack |
 | **Geriye uyumluluk** | v1 API kontratı v2'de korunur | Mevcut `@1` entegrasyonları kırılmaz, yeni metotlar additive |
 | **Boyut bütçesi** | Core ≤ 24 KB minified+gzip (gerçek: ~23 KB) | Site performansı; rakipler 50-150 KB |

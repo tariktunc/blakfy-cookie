@@ -1,6 +1,6 @@
 # Blakfy Cookie Widget
 
-> ![v2.1.2](https://img.shields.io/badge/version-2.1.2-3E5C3A) ![MIT](https://img.shields.io/badge/license-MIT-blue) ![size](https://img.shields.io/badge/size-%E2%89%A430KB-success) ![langs](https://img.shields.io/badge/languages-23-orange) ![presets](https://img.shields.io/badge/presets-18-purple)
+> [![CI](https://github.com/tariktunc/blakfy-cookie/actions/workflows/test.yml/badge.svg)](https://github.com/tariktunc/blakfy-cookie/actions/workflows/test.yml) [![npm version](https://img.shields.io/npm/v/@blakfy/cookie.svg)](https://www.npmjs.com/package/@blakfy/cookie) [![npm downloads](https://img.shields.io/npm/dm/@blakfy/cookie.svg)](https://www.npmjs.com/package/@blakfy/cookie) ![MIT](https://img.shields.io/badge/license-MIT-blue) ![size](https://img.shields.io/badge/size-%E2%89%A432KB-success) ![langs](https://img.shields.io/badge/languages-23-orange) ![presets](https://img.shields.io/badge/presets-18-purple)
 >
 > Tek script ile **KVKK + GDPR + CCPA + Google CMv2 + Microsoft UET + Yandex Metrica + IAB TCF v2.2** uyumlu cookie consent (çerez onayı) widget. **23 dil**, **18 hazır preset** (üçüncü parti araç entegrasyonu), **3 renk teması**, **3-tab tercihler modalı** (Kategoriler / Hizmetler / Hakkında), **tag-gating** (script engelleme/serbest bırakma) dahil.
 
