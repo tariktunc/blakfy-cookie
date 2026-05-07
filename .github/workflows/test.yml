@@ -67,7 +67,7 @@ jobs:
       - name: Build cookie-next (tsup)
         run: npm run build:next
 
-      - name: Test cookie-next
+      - name: Test cookie-next (default React)
         run: npm -w @blakfy/cookie-next test --if-present
 
       # NOTE: examples/nextjs build CI'sı henüz aktif değil.
@@ -75,3 +75,47 @@ jobs:
       # link'i pack/install zincirinde Webpack resolution'a düzgün ulaşmıyor.
       # Çözüm yolu (Faz 4): root package.json workspaces'e "examples/nextjs" ekle
       # ve cookie-next dist build'i workspace install'dan ÖNCE yapacak şekilde script düzenle.
+
+  cookie-next-react-matrix:
+    name: cookie-next (react ${{ matrix.react }})
+    runs-on: ubuntu-latest
+    needs: test
+    strategy:
+      fail-fast: false
+      matrix:
+        react: ["18", "19"]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+
+      - name: Install root deps
+        run: npm ci
+
+      - name: Override React to ${{ matrix.react }}
+        # cookie-next workspace'inde React'i target sürüme zorla
+        # peer'lar ">=18 <20" olduğu için her ikisi de kabul edilebilir
+        working-directory: packages/cookie-next
+        run: |
+          npm install --no-save --no-audit --no-fund \
+            "react@^${{ matrix.react }}.0.0" \
+            "react-dom@^${{ matrix.react }}.0.0" \
+            "@types/react@^${{ matrix.react }}.0.0"
+
+      - name: Verify React version
+        working-directory: packages/cookie-next
+        run: |
+          VER=$(node -p "require('react/package.json').version")
+          echo "React version: $VER"
+          if [[ "$VER" != ${{ matrix.react }}.* ]]; then
+            echo "::error::React version mismatch: expected ${{ matrix.react }}.x, got $VER"
+            exit 1
+          fi
+
+      - name: Test cookie-next with React ${{ matrix.react }}
+        run: npm -w @blakfy/cookie-next test
