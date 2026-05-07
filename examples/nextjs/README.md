@@ -32,6 +32,6 @@ Open http://localhost:3000.
 
 ## Notes
 
-- The widget itself loads from jsDelivr (`cdn.jsdelivr.net/gh/tariktunc/blakfy-cookie@v2/dist/cookie.min.js`) at runtime via `next/script`. No bundling of the vanilla script needed.
+- The widget itself loads from jsDelivr (`cdn.jsdelivr.net/npm/@blakfy/cookie@2.1.0/dist/cookie.min.js`) at runtime via `next/script`. No bundling of the vanilla script needed. Or install via npm: `npm i @blakfy/cookie @blakfy/cookie-next`.
 - For SSR-deployed sites with ad networks, set `tcf={true}` and obtain a CMP ID via IAB Europe certification (see `TCF-CERTIFICATION.md`).
 - Replace the placeholder cookie policy text with a full KVKK + GDPR compliant statement before going live.

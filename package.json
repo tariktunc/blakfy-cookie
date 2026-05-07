@@ -1,9 +1,8 @@
 {
   "name": "@blakfy/cookie",
-  "version": "2.0.0-alpha.1",
+  "version": "2.1.0",
   "description": "Blakfy Studio — KVKK + GDPR + CCPA + Google CMv2 + Microsoft UET + Yandex + TCF v2.2 uyumlu cookie consent widget. 23 dil. 18 preset. Tag-gating dahil.",
   "type": "module",
-  "private": true,
   "workspaces": [
     "packages/*"
   ],
