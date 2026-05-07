@@ -75,7 +75,8 @@
     "prepare": "husky",
     "changeset": "changeset",
     "version-packages": "changeset version",
-    "release": "changeset publish"
+    "release": "changeset publish",
+    "typecheck": "tsc --noEmit && npm -w @blakfy/cookie-next exec tsc --noEmit"
   },
   "keywords": [
     "cookie-consent",
@@ -124,6 +125,7 @@
     "jsdom": "^26.0.0",
     "lint-staged": "^17.0.2",
     "prettier": "3.8.3",
+    "typescript": "^5.9.3",
     "vitest": "^3.2.0"
   },
   "overrides": {
