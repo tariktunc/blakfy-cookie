@@ -414,6 +414,20 @@ window.BlakfyCookie.registerCleanup({
 | **GPC** | Tarayıcı standardı | `compliance/gpc.js` | `navigator.globalPrivacyControl` → marketing/analytics auto-deny. |
 | **DNT** | Tarayıcı standardı | `compliance/dnt.js` | `navigator.doNotTrack === "1"` → UI uyarı veya auto-deny. |
 
+### ❌ Kapsam dışı (Out of Scope)
+
+Bu widget **çerez izni / tracking consent** için tasarlanmıştır. Aşağıdaki düzenlemeler **konu dışı** ve eklenti bunlara katkı sağlamaz:
+
+| Düzenleme | Neden kapsam dışı |
+|-----------|-------------------|
+| **HIPAA** (ABD - sağlık) | PHI (Protected Health Information) korunması; BAA imza, encryption, audit access log gerektirir. Hosting/uygulama katmanı sorumluluğudur (Wix Enterprise BAA, AWS BAA, Azure BAA). |
+| **FERPA** (ABD - eğitim) | Öğrenci kayıt verisi; kurumsal access control + storage encryption sorunu. |
+| **GLBA / SOX** (ABD - finans) | Finansal kayıt güvenliği; sistem-seviye audit ve encryption. |
+| **PCI-DSS** | Ödeme kartı verisi; payment processor (Stripe/Adyen) sorumluluğu. |
+| **SOC 2 / ISO 27001** | Organizasyonel security management; sertifikasyon süreçleri. |
+
+**Bir HIPAA / PCI / FERPA-altında çalışan site bu widget'ı kullanabilir** — site'in çerez consent yükümlülüğü için tasarlandığı için sorun yaratmaz. Ancak widget'ın varlığı siteni o standartlara uyumlu yapmaz; o uyumluluklar **veri işleme + altyapı katmanlarında** çözülür.
+
 ### TCF v2.2 (AdSense / Ad Manager kullanıcıları için)
 
 `data-blakfy-tcf="true" data-blakfy-cmp-id="0"` ile preview mode'da çalışır. Production için IAB Europe sertifikasyonu gerekir (~2-3 ay, yıllık ~€2.000 ücret). Süreç ve audit gereksinimleri: [`TCF-CERTIFICATION.md`](./TCF-CERTIFICATION.md).
