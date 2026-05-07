@@ -1,5 +1,5 @@
 /*!
- * Blakfy Cookie Widget v2.1.2
+ * Blakfy Cookie Widget v2.2.0
  * https://github.com/tariktunc/blakfy-cookie
  * MIT License | (c) Blakfy Studio
  *
@@ -1725,7 +1725,7 @@
   var getTranslation = (locale) => TRANSLATIONS[locale] || TRANSLATIONS[DEFAULT_LOCALE];
 
   // src/api.js
-  var VERSION = "2.1.2";
+  var VERSION = "2.2.0";
   var CATEGORIES = ["analytics", "marketing", "functional", "recording"];
   var createAPI = (ctx) => {
     const { config, emitter, deps } = ctx;

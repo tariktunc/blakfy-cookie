@@ -4,6 +4,47 @@ All notable changes follow [Keep a Changelog](https://keepachangelog.com/) and S
 
 ---
 
+## [2.2.0] — 2026-05-07
+
+### Added
+
+- **TypeScript public types** — `dist/cookie.d.ts` artık paket içinde; TS kullanıcıları `import type { BlakfyCookieAPI, BlakfyConsentState, ConsentCategory } from "@blakfy/cookie"` yapabilir. Tam IntelliSense desteği.
+- **`@blakfy/cookie-next` test kapsamı** — vitest + React Testing Library setup, 68 test (Provider/ConsentModeDefault/3 hook + SSR safety + Hydration + Pages Router compat + RSC use client lock).
+- **Modern npm packaging** — `exports`, `sideEffects`, `engines: ">=18"`, `unpkg`, `jsdelivr`, `publishConfig.provenance`, `bugs.url`, `funding` alanları.
+- **`status.json` paket içine alındı** — runtime'da widget cdn.jsdelivr.net/npm/@blakfy/cookie@2/status.json'u tüketir.
+- **Pages Router uyumluluk dokümantasyonu** — README'ye `_app.tsx` örneği. Provider hâlihazırda router-agnostik (statik test ile lock'lı).
+- **`@blakfy/cookie-next` peerDependencies range** — `next: ">=14 <16"`, `react: ">=18 <20"`, `react-dom: ">=18 <20"` (React 19 + Next 15 explicit destekli).
+
+### Changed
+
+- **`cookie-next/package.json` `module`/`main` paths** — tsup 8.x output ile hizalandı: `main: dist/index.cjs` (CJS), `module: dist/index.js` (ESM). Önceki `dist/index.mjs` referansı yanlıştı.
+- **README CDN örnekleri** — `cdn.jsdelivr.net/npm/@blakfy/cookie@2.2.0/...`.
+- **CDN_BASE banner** — `scripts/build.js` dinamik olarak `package.json` version'ını okur (manuel sync hatası önlenir).
+
+### Fixed
+
+- **`window.BlakfyCookie.version`** runtime'da artık doğru sürümü (`"2.2.0"`) döndürür (önceki sürümlerde `src/api.js` `VERSION` constant senkronize değildi).
+- **`data-blakfy-position` belgesi** — README'de yanlış olarak `bottom-right` default yazılmıştı; düzeltildi (`bottom-center`, kodda zaten 2.1.0'dan beri böyleydi).
+
+### Notes
+
+- Public API davranışı değişmedi; mevcut kullanıcılar otomatik geçiş yapabilir.
+- `@2` semver tag jsDelivr CDN otomatik bu sürüme geçer (~5-10 dk cache propagation).
+- TypeScript users: ek `@types/blakfy-cookie` paketi GEREKMEZ — types pakete dahil.
+
+### Dev Infrastructure (paket içeriğine girmez)
+
+- ESLint v9 flat config + Prettier (React/jsx-a11y/Next plugin'leri)
+- husky + lint-staged + commitlint (conventional commits)
+- changesets (monorepo versioning)
+- @vitest/coverage-v8 + threshold gate
+- CodeQL security scanning workflow
+- size-limit + PR comment action
+- GitHub templates (issue, PR, security, CoC, dependabot)
+- TypeScript infrastructure (tsconfig + types.d.ts; src/ migration deferred)
+
+---
+
 ## [2.1.2] — 2026-05-07
 
 ### Fixed

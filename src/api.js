@@ -6,7 +6,7 @@ import { scanAll } from "./gating/observer.js";
 import { normalizeLocale, RTL_LOCALES } from "./i18n/detect.js";
 import { getTranslation, DEFAULT_LOCALE } from "./i18n/index.js";
 
-const VERSION = "2.1.2";
+const VERSION = "2.2.0";
 const CATEGORIES = ["analytics", "marketing", "functional", "recording"];
 
 export const createAPI = (ctx) => {
