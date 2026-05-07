@@ -1,7 +1,11 @@
 {
   "name": "@blakfy/cookie-next",
   "version": "2.1.2",
-  "description": "Next.js / React wrapper for Blakfy Cookie Consent. SSR-safe, no FOUC.",
+  "description": "Next.js / React wrapper for Blakfy Cookie Consent. SSR-safe, no FOUC. Supports React 18+19, Next.js 14+15.",
+  "type": "module",
+  "engines": {
+    "node": ">=18"
+  },
   "main": "dist/index.js",
   "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
@@ -10,22 +14,54 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.mjs",
       "require": "./dist/index.js"
-    }
+    },
+    "./package.json": "./package.json"
   },
+  "sideEffects": false,
   "files": ["dist", "README.md"],
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch"
   },
-  "keywords": ["nextjs", "react", "cookie-consent", "blakfy", "gdpr", "kvkk", "google-consent-mode"],
+  "keywords": [
+    "nextjs",
+    "next.js",
+    "react",
+    "react-19",
+    "cookie-consent",
+    "blakfy",
+    "gdpr",
+    "kvkk",
+    "ccpa",
+    "google-consent-mode",
+    "ssr-safe",
+    "app-router",
+    "pages-router"
+  ],
   "homepage": "https://github.com/tariktunc/blakfy-cookie/tree/main/packages/cookie-next",
-  "repository": { "type": "git", "url": "https://github.com/tariktunc/blakfy-cookie.git", "directory": "packages/cookie-next" },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/tariktunc/blakfy-cookie.git",
+    "directory": "packages/cookie-next"
+  },
+  "bugs": {
+    "url": "https://github.com/tariktunc/blakfy-cookie/issues"
+  },
   "author": "Blakfy Studio <hello@blakfy.com>",
   "license": "MIT",
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
   "peerDependencies": {
-    "next": ">=14",
-    "react": ">=18",
-    "react-dom": ">=18"
+    "next": ">=14 <16",
+    "react": ">=18 <20",
+    "react-dom": ">=18 <20"
+  },
+  "peerDependenciesMeta": {
+    "next": { "optional": false },
+    "react": { "optional": false },
+    "react-dom": { "optional": false }
   },
   "devDependencies": {
     "tsup": "^8.0.0",

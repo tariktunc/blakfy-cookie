@@ -2,7 +2,7 @@
 
 import { build, context } from "esbuild";
 import { gzipSync } from "node:zlib";
-import { readFile, mkdir } from "node:fs/promises";
+import { readFile, mkdir, copyFile } from "node:fs/promises";
 import { existsSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, resolve } from "node:path";
@@ -16,8 +16,12 @@ const args = new Set(process.argv.slice(2));
 const WATCH = args.has("--watch");
 const SIZE_CHECK = args.has("--size-check");
 
+const PKG_VERSION = JSON.parse(
+  await readFile(resolve(ROOT, "package.json"), "utf8")
+).version;
+
 const BANNER = `/*!
- * Blakfy Cookie Widget v2.1.0
+ * Blakfy Cookie Widget v${PKG_VERSION}
  * https://github.com/tariktunc/blakfy-cookie
  * MIT License | (c) Blakfy Studio
  *
@@ -51,6 +55,15 @@ const ensureDist = async () => {
   if (!existsSync(DIST)) await mkdir(DIST, { recursive: true });
 };
 
+const copyTypes = async () => {
+  const src = resolve(SRC, "types.d.ts");
+  const dst = resolve(DIST, "cookie.d.ts");
+  if (existsSync(src)) {
+    await copyFile(src, dst);
+    process.stdout.write("[types]    cookie.d.ts (copied from src/types.d.ts)\n");
+  }
+};
+
 const buildAll = async () => {
   await ensureDist();
   for (let i = 0; i < TARGETS.length; i++) {
@@ -63,6 +76,7 @@ const buildAll = async () => {
       sourcemap: t.sourcemap
     });
   }
+  await copyTypes();
 };
 
 const watchAll = async () => {

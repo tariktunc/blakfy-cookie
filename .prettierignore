@@ -1,0 +1,24 @@
+# Build outputs
+dist/
+packages/*/dist/
+*.min.js
+*.LEGAL.txt
+
+# Dependencies
+node_modules/
+package-lock.json
+
+# Legacy v1 code (will be removed in Phase 4)
+legacy/
+
+# Coverage reports
+coverage/
+.vitest/
+
+# Next.js
+examples/nextjs/.next/
+examples/nextjs/next-env.d.ts
+
+# Misc
+.DS_Store
+*.log

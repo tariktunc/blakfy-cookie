@@ -3,10 +3,38 @@
   "version": "2.1.2",
   "description": "Blakfy Studio — KVKK + GDPR + CCPA + Google CMv2 + Microsoft UET + Yandex + TCF v2.2 uyumlu cookie consent widget. 23 dil. 18 preset. Tag-gating dahil.",
   "type": "module",
+  "engines": {
+    "node": ">=18"
+  },
   "workspaces": [
     "packages/*"
   ],
   "main": "dist/cookie.js",
+  "module": "dist/cookie.js",
+  "types": "dist/cookie.d.ts",
+  "unpkg": "dist/cookie.min.js",
+  "jsdelivr": "dist/cookie.min.js",
+  "exports": {
+    ".": {
+      "types": "./dist/cookie.d.ts",
+      "browser": "./dist/cookie.js",
+      "import": "./dist/cookie.js",
+      "default": "./dist/cookie.js"
+    },
+    "./defaults": {
+      "browser": "./dist/cookie-defaults.js",
+      "import": "./dist/cookie-defaults.js",
+      "default": "./dist/cookie-defaults.js"
+    },
+    "./status.json": "./status.json",
+    "./package.json": "./package.json"
+  },
+  "sideEffects": [
+    "dist/cookie.js",
+    "dist/cookie.min.js",
+    "dist/cookie-defaults.js",
+    "dist/cookie-defaults.min.js"
+  ],
   "files": [
     "dist/",
     "status.json",
@@ -16,8 +44,20 @@
     "TCF-CERTIFICATION.md",
     "MIGRATION.md",
     "CHANGELOG.md",
+    "SECURITY.md",
     "LICENSE"
   ],
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "bugs": {
+    "url": "https://github.com/tariktunc/blakfy-cookie/issues"
+  },
+  "funding": {
+    "type": "github",
+    "url": "https://github.com/sponsors/tariktunc"
+  },
   "scripts": {
     "dev": "node scripts/build.js --watch",
     "build": "node scripts/build.js",

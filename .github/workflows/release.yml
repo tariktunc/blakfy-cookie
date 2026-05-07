@@ -85,25 +85,35 @@ jobs:
             dist/cookie.js
             dist/cookie-defaults.min.js
             dist/cookie-defaults.js
+            dist/cookie.d.ts
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Purge jsDelivr cache
+      - name: Purge jsDelivr cache (npm CDN)
         run: |
           set -e
           TAG="${{ steps.tag.outputs.ref }}"
-          FILES="dist/cookie.min.js dist/cookie.js dist/cookie-defaults.min.js dist/cookie-defaults.js"
+          VER="${TAG#v}"
+          FILES="dist/cookie.min.js dist/cookie.js dist/cookie-defaults.min.js dist/cookie-defaults.js status.json"
           for f in $FILES; do
-            url="https://purge.jsdelivr.net/gh/tariktunc/blakfy-cookie@${TAG}/${f}"
-            echo "Purging $url"
-            curl -sS -X POST "$url" || echo "Warning: purge failed for $f (non-fatal)"
+            for spec in "@${VER}" "@2"; do
+              url="https://purge.jsdelivr.net/npm/@blakfy/cookie${spec}/${f}"
+              echo "Purging $url"
+              curl -sS -X POST "$url" || echo "Warning: purge failed for ${f}${spec} (non-fatal)"
+            done
           done
 
   publish-npm:
-    name: publish-npm
+    name: publish-npm (${{ matrix.pkg }})
     needs: build
     if: startsWith(github.ref, 'refs/tags/v')
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { pkg: "@blakfy/cookie",      dir: "." }
+          - { pkg: "@blakfy/cookie-next", dir: "packages/cookie-next" }
     steps:
       - name: Check NPM_TOKEN presence
         id: token
@@ -111,7 +121,7 @@ jobs:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
           if [ -z "${NPM_TOKEN}" ]; then
-            echo "::warning::NPM_TOKEN secret is not set — skipping npm publish."
+            echo "::warning::NPM_TOKEN secret is not set — skipping npm publish for ${{ matrix.pkg }}. Manual publish flow active."
             echo "present=false" >> "$GITHUB_OUTPUT"
           else
             echo "present=true" >> "$GITHUB_OUTPUT"
@@ -127,20 +137,36 @@ jobs:
         with:
           node-version: '20'
           cache: npm
-          registry-url: https://registry.npmjs.org
+          registry-url: 'https://registry.npmjs.org'
 
       - name: Install root deps
         if: steps.token.outputs.present == 'true'
         run: npm ci
 
-      - name: Build cookie-next
-        if: steps.token.outputs.present == 'true'
-        working-directory: packages/cookie-next
+      - name: Build root (cookie)
+        if: steps.token.outputs.present == 'true' && matrix.dir == '.'
         run: npm run build
 
-      - name: Publish @blakfy/cookie-next to npm
+      - name: Build cookie-next
+        if: steps.token.outputs.present == 'true' && matrix.dir == 'packages/cookie-next'
+        run: npm run build:next
+
+      - name: Verify version matches tag
         if: steps.token.outputs.present == 'true'
-        working-directory: packages/cookie-next
+        working-directory: ${{ matrix.dir }}
+        shell: bash
+        run: |
+          VER=$(node -p "require('./package.json').version")
+          TAG_VER="${GITHUB_REF#refs/tags/v}"
+          if [ "$VER" != "$TAG_VER" ]; then
+            echo "::error::version mismatch in ${{ matrix.pkg }}: package.json=$VER tag=v$TAG_VER"
+            exit 1
+          fi
+          echo "Version match: $VER"
+
+      - name: Publish ${{ matrix.pkg }} to npm
+        if: steps.token.outputs.present == 'true'
+        working-directory: ${{ matrix.dir }}
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: npm publish --access public --provenance
