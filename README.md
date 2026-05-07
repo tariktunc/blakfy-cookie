@@ -150,8 +150,35 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 | `useGating(category)`  | Hook            | Belirtilen kategori onaylı mı (`boolean`). Conditional render için.                                  |
 | `useTcf()`             | Hook            | TCF v2.2 TC string ve event listener wrapper'ı.                                                      |
 
-Tam Next.js örneği: [`examples/nextjs/`](./examples/nextjs/).
+Tam Next.js (App Router) örneği: [`examples/nextjs/`](./examples/nextjs/).
 Paket README'si: [`packages/cookie-next/README.md`](./packages/cookie-next/README.md).
+
+### Next.js Pages Router (legacy projeler)
+
+Aynı paket Pages Router ile de çalışır — provider router-agnostik. `pages/_app.tsx`:
+
+```tsx
+import type { AppProps } from "next/app";
+import { BlakfyCookieProvider, ConsentModeDefault } from "@blakfy/cookie-next";
+
+export default function App({ Component, pageProps }: AppProps) {
+  return (
+    <>
+      <ConsentModeDefault />
+      <BlakfyCookieProvider
+        locale="auto"
+        policyUrl="/cerez-politikasi"
+        policyVersion="1.0"
+        presets="ga4,gtm,facebook,clarity"
+      >
+        <Component {...pageProps} />
+      </BlakfyCookieProvider>
+    </>
+  );
+}
+```
+
+`ConsentModeDefault`'u `_document.tsx`'in `<Head>` içine de koyabilirsin (daha erken yükleme). Provider `next/script beforeInteractive` ile yüklendiği için ekstra konfig gerekmez.
 
 ### GTM ile birlikte
 

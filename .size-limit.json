@@ -1,0 +1,21 @@
+[
+  {
+    "name": "@blakfy/cookie (vanilla widget, gzipped)",
+    "path": "dist/cookie.min.js",
+    "limit": "32 KB",
+    "gzip": true
+  },
+  {
+    "name": "@blakfy/cookie/defaults (bootstrap, gzipped)",
+    "path": "dist/cookie-defaults.min.js",
+    "limit": "1.5 KB",
+    "gzip": true
+  },
+  {
+    "name": "@blakfy/cookie-next ESM (wrapper only, gzipped)",
+    "path": "packages/cookie-next/dist/index.js",
+    "limit": "5 KB",
+    "gzip": true,
+    "ignore": ["react", "react-dom", "next"]
+  }
+]

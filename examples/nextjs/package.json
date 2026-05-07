@@ -10,7 +10,7 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@blakfy/cookie-next": "file:../../packages/cookie-next",
+    "@blakfy/cookie-next": "*",
     "next": "^15.0.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
