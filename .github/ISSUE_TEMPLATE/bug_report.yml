@@ -1,0 +1,92 @@
+name: 🐛 Bug Report
+description: Bir hata bildirin
+title: "[Bug]: "
+labels: ["bug", "triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Hata bildirimi için teşekkürler! Aşağıdaki alanları doldurursanız çok daha hızlı çözebiliriz.
+
+        ⚠️ **Güvenlik açığı bulduysanız** lütfen [SECURITY.md](../SECURITY.md) yönergelerini takip edin — public issue açmayın.
+
+  - type: dropdown
+    id: package
+    attributes:
+      label: Hangi paket?
+      options:
+        - "@blakfy/cookie (vanilla)"
+        - "@blakfy/cookie-next (React/Next.js wrapper)"
+        - Her ikisi
+        - Emin değilim
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: Sürüm
+      description: "`window.BlakfyCookie.version` veya `package.json`'dan"
+      placeholder: "2.1.2"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: environment
+    attributes:
+      label: Ortam
+      multiple: true
+      options:
+        - Vanilla HTML
+        - Next.js App Router
+        - Next.js Pages Router
+        - React (Vite/CRA)
+        - WordPress
+        - Shopify
+        - Diğer
+    validations:
+      required: true
+
+  - type: input
+    id: browser
+    attributes:
+      label: Tarayıcı + sürüm
+      placeholder: "Chrome 131, Safari 18, Firefox 134"
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Hatanın açıklaması
+      description: Beklenen davranış vs gerçekleşen davranış
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Tekrar üretme adımları (reproduction)
+      description: Mümkünse minimum reproducible örnek (CodeSandbox / GitHub repo) paylaşın.
+      placeholder: |
+        1. Bir Next.js 15 App Router projesi oluştur
+        2. `npm i @blakfy/cookie-next` yap
+        3. layout.tsx'e Provider ekle
+        4. ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: console
+    attributes:
+      label: Konsol çıktısı / hatalar
+      description: DevTools Console'daki ilgili hatalar
+      render: text
+
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Onaylar
+      options:
+        - label: SECURITY.md'yi okudum, bu bir güvenlik açığı değil
+          required: true
+        - label: Mevcut issue'larda aynı sorunu aramayı denedim
+          required: true

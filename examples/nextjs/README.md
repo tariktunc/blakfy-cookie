@@ -21,14 +21,14 @@ Open http://localhost:3000.
 
 ## Files
 
-| Path | Purpose |
-|---|---|
-| `app/layout.tsx` | Root layout — provider + bootstrap |
-| `app/page.tsx` | Demo homepage with all hooks/gating examples |
-| `app/cerez-politikasi/page.tsx` | Placeholder cookie policy page |
-| `package.json` | Workspace deps (`@blakfy/cookie-next: workspace:*`) |
-| `tsconfig.json` | Standard Next 15 strict config |
-| `next.config.mjs` | Standard config |
+| Path                            | Purpose                                             |
+| ------------------------------- | --------------------------------------------------- |
+| `app/layout.tsx`                | Root layout — provider + bootstrap                  |
+| `app/page.tsx`                  | Demo homepage with all hooks/gating examples        |
+| `app/cerez-politikasi/page.tsx` | Placeholder cookie policy page                      |
+| `package.json`                  | Workspace deps (`@blakfy/cookie-next: workspace:*`) |
+| `tsconfig.json`                 | Standard Next 15 strict config                      |
+| `next.config.mjs`               | Standard config                                     |
 
 ## Notes
 

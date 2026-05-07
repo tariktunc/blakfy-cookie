@@ -1,4 +1,5 @@
 import { describe, it, expect } from "vitest";
+
 import { unblockIframes } from "../src/gating/iframe-unblocker.js";
 
 const makeIframe = (category, src, opts = {}) => {

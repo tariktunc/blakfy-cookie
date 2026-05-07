@@ -7,5 +7,5 @@ export default {
   storage: [],
   scriptHosts: ["www.google.com/recaptcha", "www.gstatic.com/recaptcha"],
   onGrant: (state) => {},
-  onRevoke: (state) => {}
+  onRevoke: (state) => {},
 };

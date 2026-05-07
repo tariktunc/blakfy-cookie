@@ -7,5 +7,5 @@ export default {
   storage: [],
   scriptHosts: ["chimpstatic.com"],
   onGrant: (state) => {},
-  onRevoke: (state) => {}
+  onRevoke: (state) => {},
 };

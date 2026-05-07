@@ -38,11 +38,18 @@ const buildCatRow = (key, t, alwaysOn, checked) => {
   const text = el("div", { class: "blakfy-cat-text" });
   const strong = el("strong", { text: c.title || key });
   text.appendChild(strong);
-  const span = el("span", { text: (c.desc || "") + (alwaysOn ? " (" + (c.always || "") + ")" : "") });
+  const span = el("span", {
+    text: (c.desc || "") + (alwaysOn ? " (" + (c.always || "") + ")" : ""),
+  });
   text.appendChild(span);
   row.appendChild(text);
 
-  const sw = el("button", { class: "blakfy-switch", role: "switch", "aria-checked": checked ? "true" : "false", "data-cat": key });
+  const sw = el("button", {
+    class: "blakfy-switch",
+    role: "switch",
+    "aria-checked": checked ? "true" : "false",
+    "data-cat": key,
+  });
   if (alwaysOn) sw.disabled = true;
   sw.addEventListener("click", () => {
     if (sw.disabled) return;
@@ -53,7 +60,11 @@ const buildCatRow = (key, t, alwaysOn, checked) => {
 };
 
 const buildCategoriesPanel = (t, current, card, onSave, onAccept) => {
-  const panel = el("div", { class: "blakfy-tab-panel", "data-panel": "categories", "aria-hidden": "false" });
+  const panel = el("div", {
+    class: "blakfy-tab-panel",
+    "data-panel": "categories",
+    "aria-hidden": "false",
+  });
 
   panel.appendChild(buildCatRow("essential", t, true, true));
   panel.appendChild(buildCatRow("analytics", t, false, !!current.analytics));
@@ -76,8 +87,14 @@ const buildCategoriesPanel = (t, current, card, onSave, onAccept) => {
   });
   actions.appendChild(btnSave);
 
-  const btnAccept = el("button", { class: "blakfy-btn blakfy-btn-primary", "data-act": "accept", text: t.acceptAll || "Accept All" });
-  btnAccept.addEventListener("click", () => { if (onAccept) onAccept(); });
+  const btnAccept = el("button", {
+    class: "blakfy-btn blakfy-btn-primary",
+    "data-act": "accept",
+    text: t.acceptAll || "Accept All",
+  });
+  btnAccept.addEventListener("click", () => {
+    if (onAccept) onAccept();
+  });
   actions.appendChild(btnAccept);
 
   panel.appendChild(actions);
@@ -111,32 +128,67 @@ const buildServiceCard = (presetKey, meta, t) => {
   };
 
   addRow(s.description || "Description", meta.description);
-  addRow(s.processor || "Data Processor", meta.processor && meta.processor.name ? meta.processor.name : "");
-  addRow(s.address || "Address", meta.processor && meta.processor.address ? meta.processor.address : "");
+  addRow(
+    s.processor || "Data Processor",
+    meta.processor && meta.processor.name ? meta.processor.name : ""
+  );
+  addRow(
+    s.address || "Address",
+    meta.processor && meta.processor.address ? meta.processor.address : ""
+  );
   if (meta.processor && meta.processor.dpo && meta.processor.dpo.indexOf("http") !== 0) {
     addRow(s.dpo || "DPO Contact", meta.processor.dpo);
   }
-  addRow(s.purposes || "Purposes", meta.purposes && meta.purposes.length ? meta.purposes.join(", ") : "");
-  addRow(s.technologies || "Technologies Used", meta.technologies && meta.technologies.length ? meta.technologies.join(", ") : "");
-  addRow(s.dataCollected || "Data Collected", meta.dataCollected && meta.dataCollected.length ? meta.dataCollected.join(", ") : "");
+  addRow(
+    s.purposes || "Purposes",
+    meta.purposes && meta.purposes.length ? meta.purposes.join(", ") : ""
+  );
+  addRow(
+    s.technologies || "Technologies Used",
+    meta.technologies && meta.technologies.length ? meta.technologies.join(", ") : ""
+  );
+  addRow(
+    s.dataCollected || "Data Collected",
+    meta.dataCollected && meta.dataCollected.length ? meta.dataCollected.join(", ") : ""
+  );
 
   const lbv = safeGet(t, "service.legalBasisValues", {});
-  const lbLabel = lbv[meta.legalBasis] || (s.legalBasisValues && s.legalBasisValues[meta.legalBasis]) || meta.legalBasis || "";
+  const lbLabel =
+    lbv[meta.legalBasis] ||
+    (s.legalBasisValues && s.legalBasisValues[meta.legalBasis]) ||
+    meta.legalBasis ||
+    "";
   addRow(s.legalBasis || "Legal Basis", lbLabel);
 
   addRow(s.retention || "Retention Period", meta.retention);
-  addRow(s.transferCountries || "Transfer Countries", meta.transferCountries && meta.transferCountries.length ? meta.transferCountries.join(", ") : "");
+  addRow(
+    s.transferCountries || "Transfer Countries",
+    meta.transferCountries && meta.transferCountries.length ? meta.transferCountries.join(", ") : ""
+  );
 
   body.appendChild(dl);
 
-  if ((meta.privacyUrl && meta.privacyUrl.length) || (meta.cookiePolicyUrl && meta.cookiePolicyUrl.length)) {
+  if (
+    (meta.privacyUrl && meta.privacyUrl.length) ||
+    (meta.cookiePolicyUrl && meta.cookiePolicyUrl.length)
+  ) {
     const links = el("div", { class: "blakfy-service-links" });
     if (meta.privacyUrl) {
-      const a = el("a", { href: meta.privacyUrl, target: "_blank", rel: "noopener noreferrer", text: s.privacyPolicy || "Privacy Policy" });
+      const a = el("a", {
+        href: meta.privacyUrl,
+        target: "_blank",
+        rel: "noopener noreferrer",
+        text: s.privacyPolicy || "Privacy Policy",
+      });
       links.appendChild(a);
     }
     if (meta.cookiePolicyUrl) {
-      const a = el("a", { href: meta.cookiePolicyUrl, target: "_blank", rel: "noopener noreferrer", text: s.cookiePolicy || "Cookie Policy" });
+      const a = el("a", {
+        href: meta.cookiePolicyUrl,
+        target: "_blank",
+        rel: "noopener noreferrer",
+        text: s.cookiePolicy || "Cookie Policy",
+      });
       links.appendChild(a);
     }
     body.appendChild(links);
@@ -154,11 +206,18 @@ const buildServiceCard = (presetKey, meta, t) => {
 };
 
 const buildServicesPanel = (activePresets, t) => {
-  const panel = el("div", { class: "blakfy-tab-panel", "data-panel": "services", "aria-hidden": "true" });
+  const panel = el("div", {
+    class: "blakfy-tab-panel",
+    "data-panel": "services",
+    "aria-hidden": "true",
+  });
   const list = el("div", { class: "blakfy-service-list" });
 
   if (!activePresets || activePresets.length === 0) {
-    const empty = el("p", { class: "blakfy-svc-empty", text: safeGet(t, "service.noServices", "No services configured.") });
+    const empty = el("p", {
+      class: "blakfy-svc-empty",
+      text: safeGet(t, "service.noServices", "No services configured."),
+    });
     list.appendChild(empty);
   } else {
     for (let i = 0; i < activePresets.length; i++) {
@@ -174,7 +233,11 @@ const buildServicesPanel = (activePresets, t) => {
 // ── About tab ─────────────────────────────────────────────────────────────────
 
 const buildAboutPanel = (t, version) => {
-  const panel = el("div", { class: "blakfy-tab-panel", "data-panel": "about", "aria-hidden": "true" });
+  const panel = el("div", {
+    class: "blakfy-tab-panel",
+    "data-panel": "about",
+    "aria-hidden": "true",
+  });
   const content = el("div", { class: "blakfy-about-panel" });
 
   const brand = el("div", { class: "blakfy-about-brand" });
@@ -185,14 +248,23 @@ const buildAboutPanel = (t, version) => {
 
   if (ab.title) content.appendChild(el("p", { text: "" })).textContent = ab.title ? "" : "";
 
-  const desc = el("p", { text: ab.description || "This website uses Blakfy Cookie Management Platform (CMP) to manage your consent preferences." });
+  const desc = el("p", {
+    text:
+      ab.description ||
+      "This website uses Blakfy Cookie Management Platform (CMP) to manage your consent preferences.",
+  });
   content.appendChild(desc);
 
   const meta = el("p", { class: "blakfy-about-meta" });
   meta.textContent = (ab.version || "Version") + ": " + (version || "");
   content.appendChild(meta);
 
-  const a = el("a", { href: "https://blakfy.com", target: "_blank", rel: "noopener noreferrer", text: ab.learnMore || "Learn more at blakfy.com" });
+  const a = el("a", {
+    href: "https://blakfy.com",
+    target: "_blank",
+    rel: "noopener noreferrer",
+    text: ab.learnMore || "Learn more at blakfy.com",
+  });
   content.appendChild(a);
 
   panel.appendChild(content);
@@ -213,44 +285,81 @@ const initTabs = (card) => {
       else btns[i].classList.remove("blakfy-tab-btn--active");
     }
     for (let i = 0; i < panels.length; i++) {
-      panels[i].setAttribute("aria-hidden", panels[i].getAttribute("data-panel") === target ? "false" : "true");
+      panels[i].setAttribute(
+        "aria-hidden",
+        panels[i].getAttribute("data-panel") === target ? "false" : "true"
+      );
     }
   };
 
   for (let i = 0; i < btns.length; i++) {
-    btns[i].addEventListener("click", function () { switchTab(this.getAttribute("data-tab")); });
+    btns[i].addEventListener("click", function () {
+      switchTab(this.getAttribute("data-tab"));
+    });
   }
 };
 
 // ── Public factory ────────────────────────────────────────────────────────────
 
-export const createModal = ({ t, isRTL, accent, theme, currentState, presets, version, onSave, onAccept, onClose }) => {
+export const createModal = ({
+  t,
+  isRTL,
+  accent,
+  theme,
+  currentState,
+  presets,
+  version,
+  onSave,
+  onAccept,
+  onClose,
+}) => {
   const current = currentState || { analytics: false, marketing: false, functional: false };
 
-  const card = el("div", { class: "blakfy-card", role: "dialog", "aria-labelledby": "blakfy-mtitle" });
+  const card = el("div", {
+    class: "blakfy-card",
+    role: "dialog",
+    "aria-labelledby": "blakfy-mtitle",
+  });
   card.setAttribute("dir", isRTL ? "rtl" : "ltr");
   card.style.cssText = "--blakfy-accent:" + accent + ";position:relative";
   if (theme && theme !== "light") card.setAttribute("data-blakfy-theme", theme);
 
-  const closeBtn = el("button", { class: "blakfy-close", "aria-label": t.close || "Close", "data-act": "close", text: "×" });
-  closeBtn.addEventListener("click", () => { if (onClose) onClose(); });
+  const closeBtn = el("button", {
+    class: "blakfy-close",
+    "aria-label": t.close || "Close",
+    "data-act": "close",
+    text: "×",
+  });
+  closeBtn.addEventListener("click", () => {
+    if (onClose) onClose();
+  });
   card.appendChild(closeBtn);
 
   const h2 = el("h2", { id: "blakfy-mtitle", text: t.title || "Cookie Preferences" });
   card.appendChild(h2);
 
   // Tab bar
-  const tabs = safeGet(t, "tabs", { categories: "Categories", services: "Services", about: "About" });
+  const tabs = safeGet(t, "tabs", {
+    categories: "Categories",
+    services: "Services",
+    about: "About",
+  });
   const tabBar = el("nav", { class: "blakfy-tabs", role: "tablist" });
 
   const makeTabBtn = (id, label, active) => {
-    const btn = el("button", { class: "blakfy-tab-btn" + (active ? " blakfy-tab-btn--active" : ""), role: "tab", "data-tab": id, "aria-selected": active ? "true" : "false", text: label });
+    const btn = el("button", {
+      class: "blakfy-tab-btn" + (active ? " blakfy-tab-btn--active" : ""),
+      role: "tab",
+      "data-tab": id,
+      "aria-selected": active ? "true" : "false",
+      text: label,
+    });
     return btn;
   };
 
   tabBar.appendChild(makeTabBtn("categories", tabs.categories || "Categories", true));
-  tabBar.appendChild(makeTabBtn("services",   tabs.services   || "Services",   false));
-  tabBar.appendChild(makeTabBtn("about",      tabs.about      || "About",      false));
+  tabBar.appendChild(makeTabBtn("services", tabs.services || "Services", false));
+  tabBar.appendChild(makeTabBtn("about", tabs.about || "About", false));
   card.appendChild(tabBar);
 
   // Enrich active presets with metadata
@@ -258,7 +367,8 @@ export const createModal = ({ t, isRTL, accent, theme, currentState, presets, ve
   if (presets && presets.length) {
     for (let i = 0; i < presets.length; i++) {
       const key = typeof presets[i] === "string" ? presets[i] : presets[i].key;
-      const meta = SERVICE_METADATA[key] || (typeof presets[i] === "object" ? presets[i].meta : null);
+      const meta =
+        SERVICE_METADATA[key] || (typeof presets[i] === "object" ? presets[i].meta : null);
       if (meta) enriched.push({ key, meta });
     }
   }

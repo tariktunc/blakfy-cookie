@@ -4,11 +4,11 @@
 
 Aşağıdaki sürümler güvenlik düzeltmeleri alır:
 
-| Version | Supported          | End of life |
-| ------- | ------------------ | ----------- |
-| 2.1.x   | ✅ Aktif desteklenir | TBD         |
-| 2.0.x   | ⚠️ Sadece kritik (90 gün) | 2026-08-07 |
-| < 2.0   | ❌ Desteklenmez    | —           |
+| Version | Supported                 | End of life |
+| ------- | ------------------------- | ----------- |
+| 2.1.x   | ✅ Aktif desteklenir      | TBD         |
+| 2.0.x   | ⚠️ Sadece kritik (90 gün) | 2026-08-07  |
+| < 2.0   | ❌ Desteklenmez           | —           |
 
 `@blakfy/cookie` ve `@blakfy/cookie-next` paketleri aynı sürüm matrisini takip eder.
 
@@ -19,6 +19,7 @@ Bir güvenlik açığı bulduğunda **lütfen public GitHub issue açma**. Bunun
 📧 **E-posta:** security@blakfy.com
 
 Aşağıdaki bilgileri eklersen yararlı olur:
+
 - Açığın tipi (XSS, prototype pollution, supply chain, vb.)
 - Etkilenen sürüm(ler)
 - Reproducible test case veya proof-of-concept
@@ -26,12 +27,12 @@ Aşağıdaki bilgileri eklersen yararlı olur:
 
 ## Response Timeline
 
-| Süre | Aksiyon |
-|------|---------|
-| 72 saat | İlk yanıt + onay (alındı / inceleniyor) |
-| 7 gün | Açığın doğrulanması ve severity scoring (CVSS) |
-| 30 gün | Kritik / yüksek öncelik için yama yayını |
-| 90 gün | Public disclosure (yamadan sonra) |
+| Süre    | Aksiyon                                        |
+| ------- | ---------------------------------------------- |
+| 72 saat | İlk yanıt + onay (alındı / inceleniyor)        |
+| 7 gün   | Açığın doğrulanması ve severity scoring (CVSS) |
+| 30 gün  | Kritik / yüksek öncelik için yama yayını       |
+| 90 gün  | Public disclosure (yamadan sonra)              |
 
 Coordinated disclosure tercih edilir. Bildirimi yapan araştırmacıların isimleri (rıza dahilinde) yama notlarında credit edilir.
 

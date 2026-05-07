@@ -7,5 +7,5 @@ export default {
   storage: [],
   scriptHosts: ["embed.tawk.to"],
   onGrant: (state) => {},
-  onRevoke: (state) => {}
+  onRevoke: (state) => {},
 };

@@ -4,30 +4,40 @@ export const SERVICE_METADATA = {
   ga4: {
     displayName: "Google Analytics 4",
     category: "analytics",
-    description: "Website analytics service that collects and reports traffic data to help website owners understand how visitors interact with their site.",
+    description:
+      "Website analytics service that collects and reports traffic data to help website owners understand how visitors interact with their site.",
     processor: {
       name: "Google Ireland Limited",
       address: "Gordon House, Barrow St, Dublin 4, Ireland",
-      dpo: "https://support.google.com/policies/contact/general_privacy_form"
+      dpo: "https://support.google.com/policies/contact/general_privacy_form",
     },
     purposes: ["Analytics", "Performance measurement", "User behavior analysis"],
     technologies: ["Cookies", "JavaScript"],
-    dataCollected: ["IP address", "Browser information", "Usage data", "Device information", "Geographic location", "Date and time of visit", "Pages visited"],
+    dataCollected: [
+      "IP address",
+      "Browser information",
+      "Usage data",
+      "Device information",
+      "Geographic location",
+      "Date and time of visit",
+      "Pages visited",
+    ],
     legalBasis: "consent",
     retention: "14 months",
     transferCountries: ["United States of America"],
     privacyUrl: "https://policies.google.com/privacy",
-    cookiePolicyUrl: "https://policies.google.com/technologies/cookies"
+    cookiePolicyUrl: "https://policies.google.com/technologies/cookies",
   },
 
   gtm: {
     displayName: "Google Tag Manager",
     category: "analytics",
-    description: "Tag management system that allows website owners to manage and deploy marketing and analytics tags without modifying the website code.",
+    description:
+      "Tag management system that allows website owners to manage and deploy marketing and analytics tags without modifying the website code.",
     processor: {
       name: "Google Ireland Limited",
       address: "Gordon House, Barrow St, Dublin 4, Ireland",
-      dpo: "https://support.google.com/policies/contact/general_privacy_form"
+      dpo: "https://support.google.com/policies/contact/general_privacy_form",
     },
     purposes: ["Tag management", "Analytics", "Marketing"],
     technologies: ["Website tags", "JavaScript"],
@@ -36,150 +46,206 @@ export const SERVICE_METADATA = {
     retention: "14 days",
     transferCountries: ["United States of America", "Singapore", "Chile", "Taiwan"],
     privacyUrl: "https://business.safety.google/privacy/",
-    cookiePolicyUrl: "https://policies.google.com/technologies/cookies"
+    cookiePolicyUrl: "https://policies.google.com/technologies/cookies",
   },
 
   facebook: {
     displayName: "Facebook Pixel",
     category: "marketing",
-    description: "Tracking technology by Meta that measures ad effectiveness and enables retargeting of users who have visited the website.",
+    description:
+      "Tracking technology by Meta that measures ad effectiveness and enables retargeting of users who have visited the website.",
     processor: {
       name: "Meta Platforms Ireland Ltd.",
       address: "4 Grand Canal Square, Grand Canal Harbour, Dublin 2, Ireland",
-      dpo: "https://www.facebook.com/help/contact/1650115808681298"
+      dpo: "https://www.facebook.com/help/contact/1650115808681298",
     },
     purposes: ["Analytics", "Marketing", "Retargeting", "Advertisement", "Conversion tracking"],
     technologies: ["Cookies", "Pixel"],
-    dataCollected: ["IP address", "Browser information", "Device information", "Pages visited", "Pixel ID", "Ads viewed", "Usage behaviour", "Referrer URL"],
+    dataCollected: [
+      "IP address",
+      "Browser information",
+      "Device information",
+      "Pages visited",
+      "Pixel ID",
+      "Ads viewed",
+      "Usage behaviour",
+      "Referrer URL",
+    ],
     legalBasis: "consent",
     retention: "180 days",
     transferCountries: ["United States of America", "Singapore", "United Kingdom"],
     privacyUrl: "https://www.facebook.com/privacy/explanation",
-    cookiePolicyUrl: "https://www.facebook.com/policies/cookies"
+    cookiePolicyUrl: "https://www.facebook.com/policies/cookies",
   },
 
   clarity: {
     displayName: "Microsoft Clarity",
     category: "analytics",
-    description: "Behavioral analytics tool that records user sessions and generates heatmaps to help understand how visitors interact with the website.",
+    description:
+      "Behavioral analytics tool that records user sessions and generates heatmaps to help understand how visitors interact with the website.",
     processor: {
       name: "Microsoft Ireland Operations Ltd.",
       address: "One Microsoft Place, South County Business Park, Leopardstown, Dublin 18, Ireland",
-      dpo: "https://aka.ms/privacyresponse"
+      dpo: "https://aka.ms/privacyresponse",
     },
     purposes: ["Analytics", "Heatmaps", "Session recording"],
     technologies: ["Cookies", "JavaScript"],
-    dataCollected: ["IP address", "Mouse movements", "Clicks", "Scrolls", "Browser information", "Device information", "Referrer URL"],
+    dataCollected: [
+      "IP address",
+      "Mouse movements",
+      "Clicks",
+      "Scrolls",
+      "Browser information",
+      "Device information",
+      "Referrer URL",
+    ],
     legalBasis: "consent",
     retention: "13 months",
     transferCountries: ["United States of America"],
     privacyUrl: "https://privacy.microsoft.com/en-us/privacystatement",
-    cookiePolicyUrl: ""
+    cookiePolicyUrl: "",
   },
 
   hotjar: {
     displayName: "Hotjar",
     category: "analytics",
-    description: "User experience analytics platform providing heatmaps, session recordings, and feedback tools to understand visitor behavior.",
+    description:
+      "User experience analytics platform providing heatmaps, session recordings, and feedback tools to understand visitor behavior.",
     processor: {
       name: "Hotjar Ltd.",
       address: "Dragonara Business Centre, 5th Floor, Dragonara Road, St. Julian's STJ 3141, Malta",
-      dpo: "privacy@hotjar.com"
+      dpo: "privacy@hotjar.com",
     },
     purposes: ["Analytics", "Heatmaps", "User feedback", "Session recording"],
     technologies: ["Cookies", "Pixel", "JavaScript"],
-    dataCollected: ["IP address", "Usage data", "Mouse movements", "Click behavior", "Device information", "Browser information"],
+    dataCollected: [
+      "IP address",
+      "Usage data",
+      "Mouse movements",
+      "Click behavior",
+      "Device information",
+      "Browser information",
+    ],
     legalBasis: "consent",
     retention: "365 days",
     transferCountries: [],
     privacyUrl: "https://www.hotjar.com/legal/policies/privacy/",
-    cookiePolicyUrl: "https://www.hotjar.com/legal/policies/cookie/"
+    cookiePolicyUrl: "https://www.hotjar.com/legal/policies/cookie/",
   },
 
   youtube: {
     displayName: "YouTube",
     category: "marketing",
-    description: "Video hosting service by Google. When enabled, YouTube videos embedded on the website can be played and related cookies are set.",
+    description:
+      "Video hosting service by Google. When enabled, YouTube videos embedded on the website can be played and related cookies are set.",
     processor: {
       name: "Google Ireland Limited",
       address: "Gordon House, Barrow St, Dublin 4, Ireland",
-      dpo: "https://support.google.com/policies/contact/general_privacy_form"
+      dpo: "https://support.google.com/policies/contact/general_privacy_form",
     },
     purposes: ["Marketing", "Video content delivery", "Personalisation"],
     technologies: ["Cookies", "Pixel"],
-    dataCollected: ["IP address", "Browser information", "Usage data", "Video viewing data", "Device information"],
+    dataCollected: [
+      "IP address",
+      "Browser information",
+      "Usage data",
+      "Video viewing data",
+      "Device information",
+    ],
     legalBasis: "consent",
     retention: "180 days",
     transferCountries: ["United States of America"],
     privacyUrl: "https://policies.google.com/privacy",
-    cookiePolicyUrl: "https://policies.google.com/technologies/cookies"
+    cookiePolicyUrl: "https://policies.google.com/technologies/cookies",
   },
 
   vimeo: {
     displayName: "Vimeo",
     category: "marketing",
-    description: "Video hosting and sharing platform. When enabled, Vimeo videos embedded on the website can be played.",
+    description:
+      "Video hosting and sharing platform. When enabled, Vimeo videos embedded on the website can be played.",
     processor: {
       name: "Vimeo, Inc.",
       address: "555 West 18th Street, New York, NY 10011, USA",
-      dpo: "privacy@vimeo.com"
+      dpo: "privacy@vimeo.com",
     },
     purposes: ["Marketing", "Video content delivery"],
     technologies: ["Cookies", "JavaScript"],
-    dataCollected: ["IP address", "Browser information", "Video viewing data", "Device information"],
+    dataCollected: [
+      "IP address",
+      "Browser information",
+      "Video viewing data",
+      "Device information",
+    ],
     legalBasis: "consent",
     retention: "2 years",
     transferCountries: ["United States of America"],
     privacyUrl: "https://vimeo.com/privacy",
-    cookiePolicyUrl: "https://vimeo.com/cookie_policy"
+    cookiePolicyUrl: "https://vimeo.com/cookie_policy",
   },
 
   linkedin: {
     displayName: "LinkedIn Insight Tag",
     category: "marketing",
-    description: "Analytics and retargeting tag by LinkedIn that enables conversion tracking and retargeting of website visitors through LinkedIn Ads.",
+    description:
+      "Analytics and retargeting tag by LinkedIn that enables conversion tracking and retargeting of website visitors through LinkedIn Ads.",
     processor: {
       name: "LinkedIn Ireland Unlimited Company",
       address: "Wilton Plaza, Wilton Place, Dublin 2, Ireland",
-      dpo: "privacy@linkedin.com"
+      dpo: "privacy@linkedin.com",
     },
     purposes: ["Marketing", "Analytics", "Retargeting", "Conversion tracking"],
     technologies: ["Cookies", "Pixel"],
-    dataCollected: ["IP address", "Device information", "Pages visited", "Referrer URL", "Professional data"],
+    dataCollected: [
+      "IP address",
+      "Device information",
+      "Pages visited",
+      "Referrer URL",
+      "Professional data",
+    ],
     legalBasis: "consent",
     retention: "90 days",
     transferCountries: ["United States of America"],
     privacyUrl: "https://www.linkedin.com/legal/privacy-policy",
-    cookiePolicyUrl: "https://www.linkedin.com/legal/cookie-policy"
+    cookiePolicyUrl: "https://www.linkedin.com/legal/cookie-policy",
   },
 
   yandex: {
     displayName: "Yandex Metrica",
     category: "analytics",
-    description: "Web analytics service that collects and evaluates statistical data on user behavior for optimization and marketing purposes.",
+    description:
+      "Web analytics service that collects and evaluates statistical data on user behavior for optimization and marketing purposes.",
     processor: {
       name: "Yandex LLC",
       address: "16 Lva Tolstogo St., Moscow 119021, Russia",
-      dpo: ""
+      dpo: "",
     },
     purposes: ["Analytics", "Optimization"],
     technologies: ["Cookies", "Web beacons", "Pixel"],
-    dataCollected: ["IP address", "Browser information", "Usage data", "Device information", "Date and time of visit", "Geographic location"],
+    dataCollected: [
+      "IP address",
+      "Browser information",
+      "Usage data",
+      "Device information",
+      "Date and time of visit",
+      "Geographic location",
+    ],
     legalBasis: "consent",
     retention: "As long as necessary",
     transferCountries: ["Russia"],
     privacyUrl: "https://yandex.com/legal/confidential/",
-    cookiePolicyUrl: ""
+    cookiePolicyUrl: "",
   },
 
   bing: {
     displayName: "Bing Ads UET",
     category: "marketing",
-    description: "Universal Event Tracking tag by Microsoft Bing that enables conversion tracking and audience targeting for Bing Ads campaigns.",
+    description:
+      "Universal Event Tracking tag by Microsoft Bing that enables conversion tracking and audience targeting for Bing Ads campaigns.",
     processor: {
       name: "Microsoft Corporation",
       address: "One Microsoft Way, Redmond, WA 98052, USA",
-      dpo: "https://aka.ms/privacyresponse"
+      dpo: "https://aka.ms/privacyresponse",
     },
     purposes: ["Marketing", "Conversion tracking", "Audience targeting"],
     technologies: ["Cookies", "Pixel"],
@@ -188,36 +254,44 @@ export const SERVICE_METADATA = {
     retention: "180 days",
     transferCountries: ["United States of America"],
     privacyUrl: "https://privacy.microsoft.com/en-us/privacystatement",
-    cookiePolicyUrl: ""
+    cookiePolicyUrl: "",
   },
 
   tiktok: {
     displayName: "TikTok Pixel",
     category: "marketing",
-    description: "Tracking pixel by TikTok that measures ad performance and enables retargeting for TikTok advertising campaigns.",
+    description:
+      "Tracking pixel by TikTok that measures ad performance and enables retargeting for TikTok advertising campaigns.",
     processor: {
       name: "TikTok Information Technologies UK Limited",
       address: "6th Floor, One London Wall, London EC2Y 5EB, United Kingdom",
-      dpo: "privacy@tiktok.com"
+      dpo: "privacy@tiktok.com",
     },
     purposes: ["Marketing", "Retargeting", "Conversion tracking"],
     technologies: ["Cookies", "Pixel"],
-    dataCollected: ["IP address", "Browser information", "Usage data", "Device information", "Pages visited"],
+    dataCollected: [
+      "IP address",
+      "Browser information",
+      "Usage data",
+      "Device information",
+      "Pages visited",
+    ],
     legalBasis: "consent",
     retention: "13 months",
     transferCountries: ["United States of America", "Singapore"],
     privacyUrl: "https://www.tiktok.com/legal/page/row/privacy-policy/en",
-    cookiePolicyUrl: "https://www.tiktok.com/legal/page/row/cookie-policy/en"
+    cookiePolicyUrl: "https://www.tiktok.com/legal/page/row/cookie-policy/en",
   },
 
   pinterest: {
     displayName: "Pinterest Tag",
     category: "marketing",
-    description: "Analytics and retargeting tag by Pinterest that tracks conversions and enables targeting of website visitors through Pinterest Ads.",
+    description:
+      "Analytics and retargeting tag by Pinterest that tracks conversions and enables targeting of website visitors through Pinterest Ads.",
     processor: {
       name: "Pinterest Europe Ltd.",
       address: "Palmerston House, 2nd Floor, Fenian Street, Dublin 2, Ireland",
-      dpo: "privacy@pinterest.com"
+      dpo: "privacy@pinterest.com",
     },
     purposes: ["Marketing", "Retargeting", "Conversion tracking"],
     technologies: ["Cookies", "Pixel"],
@@ -226,93 +300,124 @@ export const SERVICE_METADATA = {
     retention: "1 year",
     transferCountries: ["United States of America"],
     privacyUrl: "https://policy.pinterest.com/en/privacy-policy",
-    cookiePolicyUrl: "https://policy.pinterest.com/en/cookies"
+    cookiePolicyUrl: "https://policy.pinterest.com/en/cookies",
   },
 
   tawkto: {
     displayName: "Tawk.to",
     category: "functional",
-    description: "Live chat widget that allows website visitors to communicate in real time with website support agents.",
+    description:
+      "Live chat widget that allows website visitors to communicate in real time with website support agents.",
     processor: {
       name: "Tawk.to, Inc.",
       address: "2880 Zanker Road Suite 203, San Jose, CA 95134, USA",
-      dpo: "privacy@tawk.to"
+      dpo: "privacy@tawk.to",
     },
     purposes: ["Functional", "Live chat", "Customer support"],
     technologies: ["Cookies", "JavaScript"],
-    dataCollected: ["IP address", "Browser information", "Chat messages", "Usage data", "Device information"],
+    dataCollected: [
+      "IP address",
+      "Browser information",
+      "Chat messages",
+      "Usage data",
+      "Device information",
+    ],
     legalBasis: "consent",
     retention: "2 years",
     transferCountries: ["United States of America"],
     privacyUrl: "https://www.tawk.to/privacy-policy/",
-    cookiePolicyUrl: ""
+    cookiePolicyUrl: "",
   },
 
   intercom: {
     displayName: "Intercom",
     category: "functional",
-    description: "Customer messaging platform providing live chat, in-app messaging, and customer support tools.",
+    description:
+      "Customer messaging platform providing live chat, in-app messaging, and customer support tools.",
     processor: {
       name: "Intercom R&D Unlimited Company",
       address: "2nd Floor, Stephen Court, 18-21 St. Stephen's Green, Dublin 2, Ireland",
-      dpo: "privacy@intercom.io"
+      dpo: "privacy@intercom.io",
     },
     purposes: ["Functional", "Customer support", "Marketing"],
     technologies: ["Cookies", "JavaScript"],
-    dataCollected: ["IP address", "Browser information", "Chat messages", "Usage data", "Device information", "Email address"],
+    dataCollected: [
+      "IP address",
+      "Browser information",
+      "Chat messages",
+      "Usage data",
+      "Device information",
+      "Email address",
+    ],
     legalBasis: "consent",
     retention: "2 years",
     transferCountries: ["United States of America"],
     privacyUrl: "https://www.intercom.com/legal/privacy",
-    cookiePolicyUrl: ""
+    cookiePolicyUrl: "",
   },
 
   hubspot: {
     displayName: "HubSpot",
     category: "marketing",
-    description: "CRM and marketing automation platform. Tracks website visitor behavior to enable lead generation and marketing automation.",
+    description:
+      "CRM and marketing automation platform. Tracks website visitor behavior to enable lead generation and marketing automation.",
     processor: {
       name: "HubSpot, Inc.",
       address: "25 First Street, Cambridge, MA 02141, USA",
-      dpo: "privacy@hubspot.com"
+      dpo: "privacy@hubspot.com",
     },
     purposes: ["Marketing", "Analytics", "CRM", "Lead generation"],
     technologies: ["Cookies", "Pixel", "JavaScript"],
-    dataCollected: ["IP address", "Browser information", "Form submissions", "Pages visited", "Usage data", "Email address"],
+    dataCollected: [
+      "IP address",
+      "Browser information",
+      "Form submissions",
+      "Pages visited",
+      "Usage data",
+      "Email address",
+    ],
     legalBasis: "consent",
     retention: "13 months",
     transferCountries: ["United States of America"],
     privacyUrl: "https://legal.hubspot.com/privacy-policy",
-    cookiePolicyUrl: "https://legal.hubspot.com/cookie-policy"
+    cookiePolicyUrl: "https://legal.hubspot.com/cookie-policy",
   },
 
   mailchimp: {
     displayName: "Mailchimp",
     category: "marketing",
-    description: "Email marketing and automation platform. Tracks email campaign interactions and website activity for subscriber management.",
+    description:
+      "Email marketing and automation platform. Tracks email campaign interactions and website activity for subscriber management.",
     processor: {
       name: "The Rocket Science Group LLC (Mailchimp)",
       address: "675 Ponce de Leon Ave NE, Suite 5000, Atlanta, GA 30308, USA",
-      dpo: "privacy@mailchimp.com"
+      dpo: "privacy@mailchimp.com",
     },
     purposes: ["Marketing", "Email campaigns", "Analytics"],
     technologies: ["Cookies", "Pixel", "Web beacons"],
-    dataCollected: ["IP address", "Email behaviour", "Form submissions", "Device information", "Browser information"],
+    dataCollected: [
+      "IP address",
+      "Email behaviour",
+      "Form submissions",
+      "Device information",
+      "Browser information",
+    ],
     legalBasis: "consent",
     retention: "2 years",
     transferCountries: ["United States of America"],
     privacyUrl: "https://mailchimp.com/legal/privacy/",
-    cookiePolicyUrl: "https://mailchimp.com/legal/cookies/"
+    cookiePolicyUrl: "https://mailchimp.com/legal/cookies/",
   },
 
   maps: {
     displayName: "Google Maps",
     category: "functional",
-    description: "Interactive maps service by Google embedded on the website to display locations and provide directions.",
+    description:
+      "Interactive maps service by Google embedded on the website to display locations and provide directions.",
     processor: {
       name: "Google Ireland Limited",
       address: "Gordon House, Barrow St, Dublin 4, Ireland",
-      dpo: "https://support.google.com/policies/contact/general_privacy_form"
+      dpo: "https://support.google.com/policies/contact/general_privacy_form",
     },
     purposes: ["Functional", "Maps display", "Location services"],
     technologies: ["Cookies", "JavaScript"],
@@ -321,25 +426,32 @@ export const SERVICE_METADATA = {
     retention: "6 months",
     transferCountries: ["United States of America"],
     privacyUrl: "https://policies.google.com/privacy",
-    cookiePolicyUrl: "https://policies.google.com/technologies/cookies"
+    cookiePolicyUrl: "https://policies.google.com/technologies/cookies",
   },
 
   recaptcha: {
     displayName: "Google reCAPTCHA",
     category: "functional",
-    description: "Bot detection and security service by Google that protects forms and interactive elements from automated abuse.",
+    description:
+      "Bot detection and security service by Google that protects forms and interactive elements from automated abuse.",
     processor: {
       name: "Google Ireland Limited",
       address: "Gordon House, Barrow St, Dublin 4, Ireland",
-      dpo: "https://support.google.com/policies/contact/general_privacy_form"
+      dpo: "https://support.google.com/policies/contact/general_privacy_form",
     },
     purposes: ["Functional", "Security", "Bot detection"],
     technologies: ["Cookies", "JavaScript"],
-    dataCollected: ["IP address", "Browser fingerprint", "Usage data", "Device information", "Mouse behaviour"],
+    dataCollected: [
+      "IP address",
+      "Browser fingerprint",
+      "Usage data",
+      "Device information",
+      "Mouse behaviour",
+    ],
     legalBasis: "consent",
     retention: "6 months",
     transferCountries: ["United States of America"],
     privacyUrl: "https://policies.google.com/privacy",
-    cookiePolicyUrl: "https://policies.google.com/technologies/cookies"
-  }
+    cookiePolicyUrl: "https://policies.google.com/technologies/cookies",
+  },
 };

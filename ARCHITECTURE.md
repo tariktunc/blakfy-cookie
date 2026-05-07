@@ -6,15 +6,15 @@
 
 ## Tasarım İlkeleri
 
-| İlke | Karar | Neden |
-|---|---|---|
-| **Dağıtım** | npm registry + jsDelivr `npm/@blakfy/cookie@2` major-pin | Kullanıcılar `@2`'ye bağlanır; her npm publish edince jsDelivr otomatik servise alır. `@latest` yasak (immutable versioning). |
-| **Sıfır bağımlılık** | Vanilla JS, IIFE, ES5 syntax (cookie.js); ESM build (cookie-next) | Eski tarayıcılar, çoklu stack |
-| **Geriye uyumluluk** | v1 API kontratı v2'de korunur | Mevcut `@1` entegrasyonları kırılmaz, yeni metotlar additive |
-| **Boyut bütçesi** | Core ≤ 24 KB minified+gzip (gerçek: ~23 KB) | Site performansı; rakipler 50-150 KB |
-| **Re-consent disiplini** | Sadece `data-blakfy-version` (policyVersion) re-consent tetikler | `cookie.js` bump'ı kullanıcıyı etkilemez |
-| **Branding** | "Powered by Blakfy Studio" badge — kapatılamaz, anti-tampering korumalı | Marka koruması |
-| **Compliance kapsamı** | Google CMv2 + Microsoft UET + Yandex Metrica + IAB TCF v2.2 + CCPA + GPC + DNT | Üç büyük arama motoru + AB + ABD yasal uyumluluk |
+| İlke                     | Karar                                                                          | Neden                                                                                                                         |
+| ------------------------ | ------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------- |
+| **Dağıtım**              | npm registry + jsDelivr `npm/@blakfy/cookie@2` major-pin                       | Kullanıcılar `@2`'ye bağlanır; her npm publish edince jsDelivr otomatik servise alır. `@latest` yasak (immutable versioning). |
+| **Sıfır bağımlılık**     | Vanilla JS, IIFE, ES5 syntax (cookie.js); ESM build (cookie-next)              | Eski tarayıcılar, çoklu stack                                                                                                 |
+| **Geriye uyumluluk**     | v1 API kontratı v2'de korunur                                                  | Mevcut `@1` entegrasyonları kırılmaz, yeni metotlar additive                                                                  |
+| **Boyut bütçesi**        | Core ≤ 24 KB minified+gzip (gerçek: ~23 KB)                                    | Site performansı; rakipler 50-150 KB                                                                                          |
+| **Re-consent disiplini** | Sadece `data-blakfy-version` (policyVersion) re-consent tetikler               | `cookie.js` bump'ı kullanıcıyı etkilemez                                                                                      |
+| **Branding**             | "Powered by Blakfy Studio" badge — kapatılamaz, anti-tampering korumalı        | Marka koruması                                                                                                                |
+| **Compliance kapsamı**   | Google CMv2 + Microsoft UET + Yandex Metrica + IAB TCF v2.2 + CCPA + GPC + DNT | Üç büyük arama motoru + AB + ABD yasal uyumluluk                                                                              |
 
 ---
 
@@ -98,31 +98,31 @@ blakfy-cookie/
 ### v1 Uyumluluğu (kırılmaz)
 
 ```js
-window.BlakfyCookie.open() / acceptAll() / rejectAll()
-window.BlakfyCookie.getConsent("analytics")
-window.BlakfyCookie.getState() / onChange(fn) / setLocale("ar")
-window.BlakfyCookie.version
+window.BlakfyCookie.open() / acceptAll() / rejectAll();
+window.BlakfyCookie.getConsent("analytics");
+window.BlakfyCookie.getState() / onChange(fn) / setLocale("ar");
+window.BlakfyCookie.version;
 ```
 
 ### v2 Yeni API
 
 ```js
 // Tag-gating
-BlakfyCookie.onConsent("marketing", granted => {})
-BlakfyCookie.registerCleanup({ category, cookies, storage })
-BlakfyCookie.unblock("marketing")
-BlakfyCookie.scan()
-BlakfyCookie.usePreset("google-analytics")
+BlakfyCookie.onConsent("marketing", (granted) => {});
+BlakfyCookie.registerCleanup({ category, cookies, storage });
+BlakfyCookie.unblock("marketing");
+BlakfyCookie.scan();
+BlakfyCookie.usePreset("google-analytics");
 
 // IAB TCF v2.2
-window.__tcfapi("getTCData", 2, callback)
-BlakfyCookie.tcf.getTCString()
+window.__tcfapi("getTCData", 2, callback);
+BlakfyCookie.tcf.getTCString();
 
 // CCPA / CPRA
-BlakfyCookie.ccpa.optOut() / isOptedOut()
+BlakfyCookie.ccpa.optOut() / isOptedOut();
 
 // Jurisdiction
-BlakfyCookie.getJurisdiction()  // "GDPR" | "CCPA" | "LGPD" | "default"
+BlakfyCookie.getJurisdiction(); // "GDPR" | "CCPA" | "LGPD" | "default"
 ```
 
 ---
@@ -133,7 +133,7 @@ Tek tetikleyici: `data-blakfy-version` (politika versiyonu) değişimi.
 
 ```js
 // Cookie okuma
-if (s.version !== config.policyVersion) return null;  // re-consent
+if (s.version !== config.policyVersion) return null; // re-consent
 // blakfy version (kütüphane sürümü) artık karşılaştırılmıyor — v1 bug fix
 ```
 
@@ -155,12 +155,12 @@ Test: `tests/badge-anti-tamper.test.js` — silme, CSS injection, attribute tamp
 
 ## Boyut Bütçesi
 
-| Katman | Hedef (gzip) |
-|---|---|
-| Core (consent + UI + i18n + badge) | ≤ 14 KB |
-| Compliance toplamı (lazy) | ≤ 6 KB |
-| 18 Preset (lazy) | ≤ 4 KB |
-| **TOPLAM (her şey aktif)** | **≤ 22 KB** |
+| Katman                             | Hedef (gzip) |
+| ---------------------------------- | ------------ |
+| Core (consent + UI + i18n + badge) | ≤ 14 KB      |
+| Compliance toplamı (lazy)          | ≤ 6 KB       |
+| 18 Preset (lazy)                   | ≤ 4 KB       |
+| **TOPLAM (her şey aktif)**         | **≤ 22 KB**  |
 
 `scripts/build.js` her release'de boyut kontrolü yapar; bütçeyi aşan PR'lar CI'da fail olur.
 
@@ -178,6 +178,7 @@ npm run size             # bundle size guard
 ```
 
 Release:
+
 ```bash
 git tag v2.0.0
 git push --tags

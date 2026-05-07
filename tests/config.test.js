@@ -1,4 +1,5 @@
 import { describe, it, expect } from "vitest";
+
 import { readConfig, DEFAULTS, CDN_BASE } from "../src/core/config.js";
 
 const makeScript = (attrs) => {
@@ -22,19 +23,21 @@ describe("config readConfig", () => {
   });
 
   it("overrides defaults with data-blakfy-* attributes", () => {
-    const cfg = readConfig(makeScript({
-      "data-blakfy-locale": "en",
-      "data-blakfy-policy-url": "/privacy",
-      "data-blakfy-version": "2.5",
-      "data-blakfy-position": "top-left",
-      "data-blakfy-theme": "dark",
-      "data-blakfy-accent": "#ff0000",
-      "data-blakfy-tcf": "true",
-      "data-blakfy-cmp-id": "42",
-      "data-blakfy-ccpa": "always",
-      "data-blakfy-gpc": "ignore",
-      "data-blakfy-presets": "ga4,ads"
-    }));
+    const cfg = readConfig(
+      makeScript({
+        "data-blakfy-locale": "en",
+        "data-blakfy-policy-url": "/privacy",
+        "data-blakfy-version": "2.5",
+        "data-blakfy-position": "top-left",
+        "data-blakfy-theme": "dark",
+        "data-blakfy-accent": "#ff0000",
+        "data-blakfy-tcf": "true",
+        "data-blakfy-cmp-id": "42",
+        "data-blakfy-ccpa": "always",
+        "data-blakfy-gpc": "ignore",
+        "data-blakfy-presets": "ga4,ads",
+      })
+    );
     expect(cfg.locale).toBe("en");
     expect(cfg.policyUrl).toBe("/privacy");
     expect(cfg.policyVersion).toBe("2.5");

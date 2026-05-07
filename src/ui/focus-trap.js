@@ -1,6 +1,7 @@
 // blakfy-cookie/src/ui/focus-trap.js — Tab/Shift+Tab cycling and Escape handling for any root element
 
-const FOCUSABLE = 'button:not([disabled]),a[href],input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])';
+const FOCUSABLE =
+  'button:not([disabled]),a[href],input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])';
 
 let activeRoot = null;
 let activeHandler = null;

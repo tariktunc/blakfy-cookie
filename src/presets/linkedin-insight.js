@@ -7,5 +7,5 @@ export default {
   storage: [],
   scriptHosts: ["snap.licdn.com", "px.ads.linkedin.com"],
   onGrant: (state) => {},
-  onRevoke: (state) => {}
+  onRevoke: (state) => {},
 };

@@ -8,29 +8,25 @@ import { useBlakfyConsent, useGating } from "@blakfy/cookie-next";
 export default function HomePage() {
   return (
     <main>
-      <h1 style={{ color: "#3E5C3A" }}>
-        Blakfy Cookie — Next.js Demo
-      </h1>
+      <h1 style={{ color: "#3E5C3A" }}>Blakfy Cookie — Next.js Demo</h1>
       <p>
-        Bu sayfa <code>@blakfy/cookie-next</code> entegrasyonunun canlı bir
-        örneğini gösterir. Sağ alt köşedeki banner'dan onay verince diğer
-        bölümler aktif olur.
+        Bu sayfa <code>@blakfy/cookie-next</code> entegrasyonunun canlı bir örneğini gösterir. Sağ
+        alt köşedeki banner'dan onay verince diğer bölümler aktif olur.
       </p>
 
       <Section title="1. Tag-gated YouTube embed (useGating)">
         <p>
-          <code>useGating(&quot;marketing&quot;)</code> hook'u kullanıcının
-          marketing kategori onayına göre içeriği koşullu render eder.
+          <code>useGating(&quot;marketing&quot;)</code> hook'u kullanıcının marketing kategori
+          onayına göre içeriği koşullu render eder.
         </p>
         <YouTubeEmbed id="dQw4w9WgXcQ" />
       </Section>
 
       <Section title="2. Tag-gated <Script type='text/plain'>">
         <p>
-          Bu <code>next/script</code> kullanıcı <strong>analytics</strong>{" "}
-          kabul edene kadar çalışmaz. Tarayıcı{" "}
-          <code>type=&quot;text/plain&quot;</code>'i çalıştırmaz; widget
-          observer onay sonrası tipi <code>text/javascript</code>'e çevirir.
+          Bu <code>next/script</code> kullanıcı <strong>analytics</strong> kabul edene kadar
+          çalışmaz. Tarayıcı <code>type=&quot;text/plain&quot;</code>'i çalıştırmaz; widget observer
+          onay sonrası tipi <code>text/javascript</code>'e çevirir.
         </p>
         <Script
           id="example-analytics-tag"
@@ -47,10 +43,7 @@ export default function HomePage() {
       </Section>
 
       <Section title="4. Footer linki">
-        <p>
-          Kullanıcılar tercihlerini değiştirebilmek için kalıcı bir link
-          olmalı:
-        </p>
+        <p>Kullanıcılar tercihlerini değiştirebilmek için kalıcı bir link olmalı:</p>
         <PreferencesButton />
         {" — veya — "}
         <Link href="/cerez-politikasi">Çerez Politikası</Link>
@@ -59,13 +52,7 @@ export default function HomePage() {
   );
 }
 
-function Section({
-  title,
-  children,
-}: {
-  title: string;
-  children: React.ReactNode;
-}) {
+function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <section
       style={{
@@ -96,8 +83,8 @@ function YouTubeEmbed({ id }: { id: string }) {
           textAlign: "center",
         }}
       >
-        Bu içerik YouTube'dan geliyor ve <strong>marketing</strong> çerezleri
-        gerektiriyor. Banner'dan onay verdikten sonra video burada belirir.
+        Bu içerik YouTube'dan geliyor ve <strong>marketing</strong> çerezleri gerektiriyor.
+        Banner'dan onay verdikten sonra video burada belirir.
       </div>
     );
   }
@@ -115,8 +102,7 @@ function YouTubeEmbed({ id }: { id: string }) {
 }
 
 function ConsentControls() {
-  const { state, jurisdiction, open, acceptAll, rejectAll, getConsent } =
-    useBlakfyConsent();
+  const { state, jurisdiction, open, acceptAll, rejectAll, getConsent } = useBlakfyConsent();
 
   const btn: React.CSSProperties = {
     background: "#3E5C3A",

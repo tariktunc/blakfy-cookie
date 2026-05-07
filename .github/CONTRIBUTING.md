@@ -23,6 +23,7 @@ npm run dev
 ```
 
 Optional:
+
 - `npm run size` — bundle size budget check (core ≤ 22 KB min+gzip)
 - `npm run build:next` — build the Next.js wrapper (`packages/cookie-next`)
 - `npm run build:all` — both
@@ -43,7 +44,7 @@ Example: `feat/preset-tiktok`, `fix/tcf-vendor-list`.
 ## Commit messages
 
 We use [Conventional Commits](https://www.conventionalcommits.org/). Keep the
-subject under ~72 chars; use the body for the *why*.
+subject under ~72 chars; use the body for the _why_.
 
 ```
 feat(presets): add TikTok Pixel preset
@@ -120,6 +121,7 @@ detector falls back from the more specific tag to the base tag automatically.
 ## Reporting bugs / requesting features
 
 Open an issue with:
+
 - Reproduction steps or a minimal example
 - Browser / Node version, package version (`@blakfy/cookie@x.y.z`)
 - Expected vs. actual behavior

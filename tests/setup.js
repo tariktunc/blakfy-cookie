@@ -17,7 +17,11 @@ let uuidCounter = 0;
 beforeEach(() => {
   clearAllCookies();
   if (typeof localStorage !== "undefined") {
-    try { localStorage.clear(); } catch (e) { /* ignore */ }
+    try {
+      localStorage.clear();
+    } catch (e) {
+      /* ignore */
+    }
   }
   if (typeof document !== "undefined") {
     document.body.innerHTML = "";

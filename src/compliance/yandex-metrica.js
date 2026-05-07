@@ -8,7 +8,9 @@ export const installDefaults = () => {
   defaultsInstalled = true;
 
   if (typeof window.ym !== "function") {
-    window.ym = function () { /* swallow until consent */ };
+    window.ym = function () {
+      /* swallow until consent */
+    };
     window.ym.__blakfyStub = true;
   }
 };

@@ -7,5 +7,5 @@ export default {
   storage: [],
   scriptHosts: ["bat.bing.com"],
   onGrant: (state) => {},
-  onRevoke: (state) => {}
+  onRevoke: (state) => {},
 };

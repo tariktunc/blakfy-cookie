@@ -1,5 +1,11 @@
 import { describe, it, expect } from "vitest";
-import { normalizeLocale, detectLocale, RTL_LOCALES, SUPPORTED_LOCALES } from "../src/i18n/detect.js";
+
+import {
+  normalizeLocale,
+  detectLocale,
+  RTL_LOCALES,
+  SUPPORTED_LOCALES,
+} from "../src/i18n/detect.js";
 
 describe("normalizeLocale", () => {
   it("returns exact match: zh-TW", () => {
@@ -34,7 +40,7 @@ describe("detectLocale", () => {
     const origHref = window.location.href;
     Object.defineProperty(window, "location", {
       configurable: true,
-      value: { ...window.location, href: "https://example.test/?lang=fr", search: "?lang=fr" }
+      value: { ...window.location, href: "https://example.test/?lang=fr", search: "?lang=fr" },
     });
     document.documentElement.lang = "de";
     Object.defineProperty(navigator, "language", { configurable: true, value: "es" });
@@ -43,7 +49,7 @@ describe("detectLocale", () => {
 
     Object.defineProperty(window, "location", {
       configurable: true,
-      value: { ...window.location, href: origHref, search: "" }
+      value: { ...window.location, href: origHref, search: "" },
     });
   });
 

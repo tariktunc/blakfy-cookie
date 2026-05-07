@@ -10,7 +10,10 @@ const isSkippedAttr = (name) => {
 
 export const unblockScripts = (category) => {
   if (typeof document === "undefined" || !category) return 0;
-  const sel = 'script[type="text/plain"][data-blakfy-category="' + category + '"]:not([data-blakfy-unblocked="true"])';
+  const sel =
+    'script[type="text/plain"][data-blakfy-category="' +
+    category +
+    '"]:not([data-blakfy-unblocked="true"])';
   const nodes = document.querySelectorAll(sel);
   let count = 0;
 
@@ -22,7 +25,11 @@ export const unblockScripts = (category) => {
     for (let j = 0; j < attrs.length; j++) {
       const a = attrs[j];
       if (isSkippedAttr(a.name)) continue;
-      try { fresh.setAttribute(a.name, a.value); } catch (e) { /* ignore */ }
+      try {
+        fresh.setAttribute(a.name, a.value);
+      } catch (e) {
+        /* ignore */
+      }
     }
 
     const blakfySrc = orig.getAttribute("data-blakfy-src");

@@ -66,7 +66,16 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "size": "node scripts/build.js --size-check",
-    "release:dry": "echo 'Run: git tag v2.x.x && git push --tags'"
+    "release:dry": "echo 'Run: git tag v2.x.x && git push --tags'",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "test:coverage": "vitest run --coverage",
+    "prepare": "husky",
+    "changeset": "changeset",
+    "version-packages": "changeset version",
+    "release": "changeset publish"
   },
   "keywords": [
     "cookie-consent",
@@ -93,13 +102,41 @@
   "author": "Blakfy Studio <hello@blakfy.com>",
   "license": "MIT",
   "devDependencies": {
+    "@changesets/cli": "^2.31.0",
+    "@commitlint/cli": "^20.5.3",
+    "@commitlint/config-conventional": "^20.5.3",
+    "@eslint/js": "9.39.4",
+    "@typescript-eslint/eslint-plugin": "8.59.2",
+    "@typescript-eslint/parser": "8.59.2",
+    "@vitest/coverage-v8": "3.2.4",
+    "@vitest/ui": "^3.2.0",
     "esbuild": "^0.25.0",
-    "vitest": "^3.2.0",
+    "eslint": "9.39.4",
+    "eslint-config-prettier": "10.1.8",
+    "eslint-plugin-import": "2.32.0",
+    "eslint-plugin-jsx-a11y": "6.10.2",
+    "eslint-plugin-n": "18.0.1",
+    "eslint-plugin-promise": "7.3.0",
+    "eslint-plugin-react": "7.37.5",
+    "eslint-plugin-react-hooks": "7.1.1",
+    "globals": "17.6.0",
+    "husky": "^9.1.7",
     "jsdom": "^26.0.0",
-    "@vitest/ui": "^3.2.0"
+    "lint-staged": "^17.0.2",
+    "prettier": "3.8.3",
+    "vitest": "^3.2.0"
   },
   "overrides": {
     "postcss": "^8.5.10",
     "esbuild": "^0.25.0"
+  },
+  "lint-staged": {
+    "*.{js,ts,tsx,jsx}": [
+      "eslint --fix --max-warnings=999",
+      "prettier --write"
+    ],
+    "*.{json,md,yml,yaml}": [
+      "prettier --write"
+    ]
   }
 }

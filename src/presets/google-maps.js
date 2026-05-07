@@ -7,5 +7,5 @@ export default {
   storage: [],
   scriptHosts: ["maps.googleapis.com", "maps.gstatic.com"],
   onGrant: (state) => {},
-  onRevoke: (state) => {}
+  onRevoke: (state) => {},
 };

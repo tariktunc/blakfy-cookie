@@ -2,25 +2,30 @@
 
 let optedOutFlag = false;
 let noticeGiven = true;
-let cmpVersion = 1;
-let listeners = [];
+const cmpVersion = 1;
+const listeners = [];
 let installed = false;
 
 export const buildUSPString = (opts) => {
   const o = opts || {};
   const version = o.version || 1;
-  const notice = o.notice === false ? "N" : (o.notice === null ? "-" : "Y");
-  const optOut = o.optedOut === true ? "Y" : (o.optedOut === null ? "-" : "N");
-  const lspa = o.lspa === true ? "Y" : (o.lspa === null ? "-" : "N");
+  const notice = o.notice === false ? "N" : o.notice === null ? "-" : "Y";
+  const optOut = o.optedOut === true ? "Y" : o.optedOut === null ? "-" : "N";
+  const lspa = o.lspa === true ? "Y" : o.lspa === null ? "-" : "N";
   return String(version) + notice + optOut + lspa;
 };
 
-const currentString = () => buildUSPString({ version: cmpVersion, notice: noticeGiven, optedOut: optedOutFlag, lspa: false });
+const currentString = () =>
+  buildUSPString({ version: cmpVersion, notice: noticeGiven, optedOut: optedOutFlag, lspa: false });
 
 const fireListeners = () => {
   const data = { version: cmpVersion, uspString: currentString() };
   for (let i = 0; i < listeners.length; i++) {
-    try { listeners[i].cb(data, true); } catch (e) { /* noop */ }
+    try {
+      listeners[i].cb(data, true);
+    } catch (e) {
+      /* noop */
+    }
   }
 };
 
@@ -42,13 +47,18 @@ export const installUSP = (opts) => {
     callback(null, false);
   };
 
-  if (typeof document !== "undefined" && !document.querySelector('iframe[name="__uspapiLocator"]')) {
+  if (
+    typeof document !== "undefined" &&
+    !document.querySelector('iframe[name="__uspapiLocator"]')
+  ) {
     try {
       const iframe = document.createElement("iframe");
       iframe.style.cssText = "display:none;position:absolute;width:0;height:0;border:0";
       iframe.name = "__uspapiLocator";
       (document.body || document.documentElement).appendChild(iframe);
-    } catch (e) { /* noop */ }
+    } catch (e) {
+      /* noop */
+    }
   }
 };
 
@@ -57,7 +67,13 @@ export const optOut = () => {
   noticeGiven = true;
   fireListeners();
   if (typeof window !== "undefined") {
-    try { window.dispatchEvent(new CustomEvent("blakfy:ccpa:optout", { detail: { uspString: currentString() } })); } catch (e) { /* noop */ }
+    try {
+      window.dispatchEvent(
+        new CustomEvent("blakfy:ccpa:optout", { detail: { uspString: currentString() } })
+      );
+    } catch (e) {
+      /* noop */
+    }
   }
 };
 

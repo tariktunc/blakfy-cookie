@@ -1,11 +1,39 @@
 // blakfy-cookie/src/geo/jurisdiction.js — jurisdiction detection (GDPR / CCPA / LGPD / default)
 
 export const EU_COUNTRIES = [
-  "AT","BE","BG","HR","CY","CZ","DK","EE","FI","FR","DE","GR","HU","IE","IT",
-  "LV","LT","LU","MT","NL","PL","PT","RO","SK","SI","ES","SE",
-  "NO","IS","LI",
-  "GB","UK",
-  "CH"
+  "AT",
+  "BE",
+  "BG",
+  "HR",
+  "CY",
+  "CZ",
+  "DK",
+  "EE",
+  "FI",
+  "FR",
+  "DE",
+  "GR",
+  "HU",
+  "IE",
+  "IT",
+  "LV",
+  "LT",
+  "LU",
+  "MT",
+  "NL",
+  "PL",
+  "PT",
+  "RO",
+  "SK",
+  "SI",
+  "ES",
+  "SE",
+  "NO",
+  "IS",
+  "LI",
+  "GB",
+  "UK",
+  "CH",
 ];
 
 export const mapCountryToJurisdiction = (country, region) => {
@@ -35,7 +63,12 @@ const tzGuess = () => {
 export const detectJurisdiction = async (opts) => {
   const o = opts || {};
 
-  if (typeof document !== "undefined" && document.documentElement && document.documentElement.dataset && document.documentElement.dataset.jurisdiction) {
+  if (
+    typeof document !== "undefined" &&
+    document.documentElement &&
+    document.documentElement.dataset &&
+    document.documentElement.dataset.jurisdiction
+  ) {
     const v = document.documentElement.dataset.jurisdiction;
     if (v === "GDPR" || v === "CCPA" || v === "LGPD" || v === "default") return v;
   }
@@ -47,7 +80,9 @@ export const detectJurisdiction = async (opts) => {
         const data = await res.json();
         return mapCountryToJurisdiction(data && data.country, data && data.region);
       }
-    } catch (e) { /* fall through */ }
+    } catch (e) {
+      /* fall through */
+    }
   }
 
   return tzGuess();

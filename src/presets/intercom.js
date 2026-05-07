@@ -7,5 +7,5 @@ export default {
   storage: [],
   scriptHosts: ["widget.intercom.io", "js.intercomcdn.com"],
   onGrant: (state) => {},
-  onRevoke: (state) => {}
+  onRevoke: (state) => {},
 };

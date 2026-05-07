@@ -8,9 +8,11 @@
 
 ```html
 <!-- Bu çalışmaya devam ediyor, kırılmıyor -->
-<script src="https://cdn.jsdelivr.net/gh/tariktunc/blakfy-cookie@1/cookie.js"
-        data-blakfy-locale="auto"
-        data-blakfy-policy-url="/cerez-politikasi"></script>
+<script
+  src="https://cdn.jsdelivr.net/gh/tariktunc/blakfy-cookie@1/cookie.js"
+  data-blakfy-locale="auto"
+  data-blakfy-policy-url="/cerez-politikasi"
+></script>
 ```
 
 v1 son sürümü `1.2.0`'da donduruldu. Critical security patch çıkarsa `1.2.x` patch sürümleri devam edebilir.
@@ -37,14 +39,18 @@ Tüm v1 attribute'ları çalışmaya devam eder, kullanıcı consent'i korunur (
 ## Yeni Özellikleri Aktif Et (opsiyonel)
 
 ### Tag-gating
+
 ```html
 <!-- 3rd-party script'leri sar -->
-<script type="text/plain"
-        data-blakfy-category="marketing"
-        data-blakfy-src="https://connect.facebook.net/en_US/fbevents.js"></script>
+<script
+  type="text/plain"
+  data-blakfy-category="marketing"
+  data-blakfy-src="https://connect.facebook.net/en_US/fbevents.js"
+></script>
 ```
 
 ### Preset kullan
+
 ```diff
   <script src="...@2/dist/cookie.min.js"
           data-blakfy-locale="auto"
@@ -52,15 +58,19 @@ Tüm v1 attribute'ları çalışmaya devam eder, kullanıcı consent'i korunur (
 ```
 
 ### TCF v2.2
+
 ```diff
 + <script ... data-blakfy-tcf="true" data-blakfy-cmp-id="0"></script>
 ```
+
 (CMP ID `0` preview mode, sertifikasyon onayı sonrası gerçek ID girilir.)
 
 ### CCPA
+
 ```diff
 + <script ... data-blakfy-ccpa="auto"></script>
 ```
+
 (Otomatik jurisdiction tespitiyle Kaliforniya kullanıcılarına "Do Not Sell" linki gösterilir.)
 
 ---
@@ -71,7 +81,7 @@ Tüm v1 attribute'ları çalışmaya devam eder, kullanıcı consent'i korunur (
 
 ```tsx
 // Eski
-import { BlakfyCookieProvider } from "@blakfy/cookie-next";  // ham .tsx
+import { BlakfyCookieProvider } from "@blakfy/cookie-next"; // ham .tsx
 ```
 
 ### v2 (npm public paketi)
@@ -86,8 +96,8 @@ import {
   BlakfyCookieProvider,
   ConsentModeDefault,
   useBlakfyConsent,
-  useGating,        // YENİ
-  useTcf,           // YENİ
+  useGating, // YENİ
+  useTcf, // YENİ
 } from "@blakfy/cookie-next";
 ```
 
@@ -106,19 +116,19 @@ function YouTubeEmbed({ id }: { id: string }) {
 
 ## API Değişiklikleri
 
-| API | v1 | v2 | Not |
-|---|---|---|---|
-| `acceptAll/rejectAll/open` | ✅ | ✅ | aynı |
-| `getConsent/getState` | ✅ | ✅ | aynı |
-| `onChange` | ✅ | ✅ | aynı |
-| `setLocale` | 9 dil | 23 dil | TS tipi genişletildi |
-| `onConsent(cat, fn)` | ❌ | ✅ | YENİ |
-| `registerCleanup` | ❌ | ✅ | YENİ |
-| `unblock/scan/usePreset` | ❌ | ✅ | YENİ |
-| `tcf.*` | ❌ | ✅ | YENİ |
-| `ccpa.*` | ❌ | ✅ | YENİ |
-| `getJurisdiction` | ❌ | ✅ | YENİ |
-| `getMainLang` | ✅ | ✅ | aynı |
+| API                        | v1    | v2     | Not                  |
+| -------------------------- | ----- | ------ | -------------------- |
+| `acceptAll/rejectAll/open` | ✅    | ✅     | aynı                 |
+| `getConsent/getState`      | ✅    | ✅     | aynı                 |
+| `onChange`                 | ✅    | ✅     | aynı                 |
+| `setLocale`                | 9 dil | 23 dil | TS tipi genişletildi |
+| `onConsent(cat, fn)`       | ❌    | ✅     | YENİ                 |
+| `registerCleanup`          | ❌    | ✅     | YENİ                 |
+| `unblock/scan/usePreset`   | ❌    | ✅     | YENİ                 |
+| `tcf.*`                    | ❌    | ✅     | YENİ                 |
+| `ccpa.*`                   | ❌    | ✅     | YENİ                 |
+| `getJurisdiction`          | ❌    | ✅     | YENİ                 |
+| `getMainLang`              | ✅    | ✅     | aynı                 |
 
 ---
 
@@ -141,9 +151,11 @@ Eski `hash` alanı v2'de okunmaz ama silinmez (geri dönüş güvenliği).
 ## Re-consent Davranışı
 
 ### v1 (BUG)
+
 `cookie.js` her sürüm güncellendiğinde **tüm kullanıcılar yeniden onay vermek zorundaydı**. Bu KVKK/GDPR uyumlu davranış değildi.
 
 ### v2 (DÜZELDİ)
+
 Sadece `data-blakfy-version` (politika versiyonu) değişimi re-consent tetikler. `cookie.js` patch/minor güncellemeleri kullanıcıyı etkilemez.
 
 ```js

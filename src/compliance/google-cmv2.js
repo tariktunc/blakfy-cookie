@@ -9,7 +9,9 @@ export const installDefaults = () => {
 
   window.dataLayer = window.dataLayer || [];
   if (typeof window.gtag !== "function") {
-    window.gtag = function () { window.dataLayer.push(arguments); };
+    window.gtag = function () {
+      window.dataLayer.push(arguments);
+    };
   }
 
   window.gtag("consent", "default", {
@@ -20,7 +22,7 @@ export const installDefaults = () => {
     functionality_storage: "denied",
     personalization_storage: "denied",
     security_storage: "granted",
-    wait_for_update: 500
+    wait_for_update: 500,
   });
 };
 
@@ -38,6 +40,6 @@ export const pushGCM = (state) => {
     analytics_storage: a,
     functionality_storage: f,
     personalization_storage: f,
-    security_storage: "granted"
+    security_storage: "granted",
   });
 };

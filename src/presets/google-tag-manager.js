@@ -7,5 +7,5 @@ export default {
   storage: [],
   scriptHosts: ["www.googletagmanager.com"],
   onGrant: (state) => {},
-  onRevoke: (state) => {}
+  onRevoke: (state) => {},
 };

@@ -8,7 +8,9 @@ const fmt = (tpl, vars) => {
 export const createPlaceholder = ({ category, srcUrl, t, onAccept }) => {
   const ph = (t && t.placeholder) || {};
   const titleText = ph.title || "Content blocked";
-  const descText = fmt(ph.desc || "Allow {category} cookies to view this content.", { category: category || "" });
+  const descText = fmt(ph.desc || "Allow {category} cookies to view this content.", {
+    category: category || "",
+  });
   const ctaText = ph.cta || "Allow";
 
   const wrap = document.createElement("div");
@@ -32,7 +34,7 @@ export const createPlaceholder = ({ category, srcUrl, t, onAccept }) => {
     "font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif",
     "font-size:14px",
     "line-height:1.5",
-    "text-align:center"
+    "text-align:center",
   ].join(";");
 
   const icon = document.createElement("div");
@@ -77,11 +79,15 @@ export const createPlaceholder = ({ category, srcUrl, t, onAccept }) => {
     "font-weight:600",
     "font-size:14px",
     "cursor:pointer",
-    "margin-top:4px"
+    "margin-top:4px",
   ].join(";");
   cta.addEventListener("click", () => {
     if (typeof onAccept === "function") {
-      try { onAccept(category); } catch (e) { /* swallow */ }
+      try {
+        onAccept(category);
+      } catch (e) {
+        /* swallow */
+      }
     }
   });
   wrap.appendChild(cta);

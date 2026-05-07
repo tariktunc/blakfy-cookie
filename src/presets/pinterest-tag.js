@@ -7,5 +7,5 @@ export default {
   storage: [],
   scriptHosts: ["s.pinimg.com", "ct.pinterest.com"],
   onGrant: (state) => {},
-  onRevoke: (state) => {}
+  onRevoke: (state) => {},
 };

@@ -7,5 +7,5 @@ export default {
   storage: [],
   scriptHosts: ["connect.facebook.net"],
   onGrant: (state) => {},
-  onRevoke: (state) => {}
+  onRevoke: (state) => {},
 };

@@ -1,6 +1,15 @@
 // blakfy-cookie/src/ui/banner.js — first-visit consent banner DOM factory
 
-export const createBanner = ({ t, isRTL, accent, theme, policyUrl, onAccept, onReject, onPrefs }) => {
+export const createBanner = ({
+  t,
+  isRTL,
+  accent,
+  theme,
+  policyUrl,
+  onAccept,
+  onReject,
+  onPrefs,
+}) => {
   const card = document.createElement("div");
   card.className = "blakfy-card";
   card.setAttribute("dir", isRTL ? "rtl" : "ltr");
@@ -31,21 +40,27 @@ export const createBanner = ({ t, isRTL, accent, theme, policyUrl, onAccept, onR
   btnReject.className = "blakfy-btn";
   btnReject.setAttribute("data-act", "reject");
   btnReject.textContent = t.rejectAll;
-  btnReject.addEventListener("click", () => { if (onReject) onReject(); });
+  btnReject.addEventListener("click", () => {
+    if (onReject) onReject();
+  });
   actions.appendChild(btnReject);
 
   const btnPrefs = document.createElement("button");
   btnPrefs.className = "blakfy-btn";
   btnPrefs.setAttribute("data-act", "prefs");
   btnPrefs.textContent = t.preferences;
-  btnPrefs.addEventListener("click", () => { if (onPrefs) onPrefs(); });
+  btnPrefs.addEventListener("click", () => {
+    if (onPrefs) onPrefs();
+  });
   actions.appendChild(btnPrefs);
 
   const btnAccept = document.createElement("button");
   btnAccept.className = "blakfy-btn blakfy-btn-primary";
   btnAccept.setAttribute("data-act", "accept");
   btnAccept.textContent = t.acceptAll;
-  btnAccept.addEventListener("click", () => { if (onAccept) onAccept(); });
+  btnAccept.addEventListener("click", () => {
+    if (onAccept) onAccept();
+  });
   actions.appendChild(btnAccept);
 
   card.appendChild(actions);

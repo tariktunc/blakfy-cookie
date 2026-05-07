@@ -1,8 +1,9 @@
 "use client";
 // blakfy-cookie/packages/cookie-next/src/BlakfyCookieProvider.tsx — SSR-safe provider via next/script beforeInteractive
 
-import { useEffect } from "react";
 import Script from "next/script";
+import { useEffect } from "react";
+
 import type { BlakfyCookieConfig, BlakfyLocale } from "./types";
 
 interface Props extends BlakfyCookieConfig {
@@ -47,7 +48,8 @@ export function BlakfyCookieProvider({
     };
   }, [locale]);
 
-  const src = srcOverride || `https://cdn.jsdelivr.net/npm/@blakfy/cookie@${cdnVersion}/dist/cookie.min.js`;
+  const src =
+    srcOverride || `https://cdn.jsdelivr.net/npm/@blakfy/cookie@${cdnVersion}/dist/cookie.min.js`;
 
   const dataAttrs: Record<string, string> = {};
   dataAttrs["data-blakfy-locale"] = locale;

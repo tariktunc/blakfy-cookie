@@ -8,7 +8,19 @@ import { installDefaults as installYandex } from "./compliance/yandex-metrica.js
   if (typeof window === "undefined") return;
   if (window.__blakfyConsentDefaultsLoaded) return;
   window.__blakfyConsentDefaultsLoaded = true;
-  try { installGCM(); } catch (e) { /* ignore */ }
-  try { installUET(); } catch (e) { /* ignore */ }
-  try { installYandex(); } catch (e) { /* ignore */ }
+  try {
+    installGCM();
+  } catch (e) {
+    /* ignore */
+  }
+  try {
+    installUET();
+  } catch (e) {
+    /* ignore */
+  }
+  try {
+    installYandex();
+  } catch (e) {
+    /* ignore */
+  }
 })();

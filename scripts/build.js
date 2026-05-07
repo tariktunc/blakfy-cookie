@@ -1,11 +1,12 @@
 // blakfy-cookie/scripts/build.js — esbuild driver for cookie.js + cookie-defaults.js with size budget guard
 
-import { build, context } from "esbuild";
-import { gzipSync } from "node:zlib";
-import { readFile, mkdir, copyFile } from "node:fs/promises";
 import { existsSync } from "node:fs";
-import { fileURLToPath } from "node:url";
+import { readFile, mkdir, copyFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
+import { gzipSync } from "node:zlib";
+
+import { build, context } from "esbuild";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(__dirname, "..");
@@ -16,9 +17,7 @@ const args = new Set(process.argv.slice(2));
 const WATCH = args.has("--watch");
 const SIZE_CHECK = args.has("--size-check");
 
-const PKG_VERSION = JSON.parse(
-  await readFile(resolve(ROOT, "package.json"), "utf8")
-).version;
+const PKG_VERSION = JSON.parse(await readFile(resolve(ROOT, "package.json"), "utf8")).version;
 
 const BANNER = `/*!
  * Blakfy Cookie Widget v${PKG_VERSION}
@@ -36,19 +35,39 @@ const baseOpts = {
   format: "iife",
   legalComments: "linked",
   banner: { js: BANNER },
-  logLevel: "info"
+  logLevel: "info",
 };
 
 const TARGETS = [
-  { entry: resolve(SRC, "index.js"),           outfile: resolve(DIST, "cookie.js"),               minify: false, sourcemap: true  },
-  { entry: resolve(SRC, "index.js"),           outfile: resolve(DIST, "cookie.min.js"),           minify: true,  sourcemap: false },
-  { entry: resolve(SRC, "cookie-defaults.js"), outfile: resolve(DIST, "cookie-defaults.js"),      minify: false, sourcemap: false },
-  { entry: resolve(SRC, "cookie-defaults.js"), outfile: resolve(DIST, "cookie-defaults.min.js"),  minify: true,  sourcemap: false }
+  {
+    entry: resolve(SRC, "index.js"),
+    outfile: resolve(DIST, "cookie.js"),
+    minify: false,
+    sourcemap: true,
+  },
+  {
+    entry: resolve(SRC, "index.js"),
+    outfile: resolve(DIST, "cookie.min.js"),
+    minify: true,
+    sourcemap: false,
+  },
+  {
+    entry: resolve(SRC, "cookie-defaults.js"),
+    outfile: resolve(DIST, "cookie-defaults.js"),
+    minify: false,
+    sourcemap: false,
+  },
+  {
+    entry: resolve(SRC, "cookie-defaults.js"),
+    outfile: resolve(DIST, "cookie-defaults.min.js"),
+    minify: true,
+    sourcemap: false,
+  },
 ];
 
 const BUDGETS = {
-  "cookie.min.js":          32 * 1024,   // raised: service-metadata DB + 3-tab modal added
-  "cookie-defaults.min.js":  1.5 * 1024
+  "cookie.min.js": 32 * 1024, // raised: service-metadata DB + 3-tab modal added
+  "cookie-defaults.min.js": 1.5 * 1024,
 };
 
 const ensureDist = async () => {
@@ -73,7 +92,7 @@ const buildAll = async () => {
       entryPoints: [t.entry],
       outfile: t.outfile,
       minify: t.minify,
-      sourcemap: t.sourcemap
+      sourcemap: t.sourcemap,
     });
   }
   await copyTypes();
@@ -89,7 +108,7 @@ const watchAll = async () => {
       entryPoints: [t.entry],
       outfile: t.outfile,
       minify: t.minify,
-      sourcemap: t.sourcemap
+      sourcemap: t.sourcemap,
     });
     await c.watch();
     ctxs.push(c);
@@ -117,7 +136,7 @@ const sizeCheck = async () => {
       raw: fmtKB(buf.length),
       gzip: fmtKB(gz.length),
       budget: budget ? fmtKB(budget) : "-",
-      status: budget ? (pass ? "PASS" : "FAIL") : "-"
+      status: budget ? (pass ? "PASS" : "FAIL") : "-",
     });
   }
 
@@ -127,11 +146,16 @@ const sizeCheck = async () => {
   for (let i = 0; i < rows.length; i++) {
     const r = rows[i];
     process.stdout.write(
-      r.file.padEnd(26) + " " +
-      r.raw.padEnd(11) + " " +
-      r.gzip.padEnd(11) + " " +
-      r.budget.padEnd(11) + " " +
-      r.status + "\n"
+      r.file.padEnd(26) +
+        " " +
+        r.raw.padEnd(11) +
+        " " +
+        r.gzip.padEnd(11) +
+        " " +
+        r.budget.padEnd(11) +
+        " " +
+        r.status +
+        "\n"
     );
   }
 
@@ -151,6 +175,6 @@ const run = async () => {
 };
 
 run().catch((err) => {
-  process.stderr.write((err && err.stack) ? err.stack + "\n" : String(err) + "\n");
+  process.stderr.write(err && err.stack ? err.stack + "\n" : String(err) + "\n");
   process.exit(1);
 });

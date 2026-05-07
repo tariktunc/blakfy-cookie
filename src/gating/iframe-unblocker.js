@@ -4,7 +4,10 @@ import { createPlaceholder } from "./placeholder.js";
 
 export const unblockIframes = (category) => {
   if (typeof document === "undefined" || !category) return 0;
-  const sel = 'iframe[data-blakfy-src][data-blakfy-category="' + category + '"]:not([data-blakfy-unblocked="true"])';
+  const sel =
+    'iframe[data-blakfy-src][data-blakfy-category="' +
+    category +
+    '"]:not([data-blakfy-unblocked="true"])';
   const nodes = document.querySelectorAll(sel);
   let count = 0;
 
@@ -31,7 +34,8 @@ export const unblockIframes = (category) => {
 
 export const installPlaceholders = (t, onAccept) => {
   if (typeof document === "undefined") return 0;
-  const sel = 'iframe[data-blakfy-src][data-blakfy-category][data-blakfy-placeholder="auto"]:not([data-blakfy-unblocked="true"]):not([data-blakfy-placeholder-installed="true"])';
+  const sel =
+    'iframe[data-blakfy-src][data-blakfy-category][data-blakfy-placeholder="auto"]:not([data-blakfy-unblocked="true"]):not([data-blakfy-placeholder-installed="true"])';
   const nodes = document.querySelectorAll(sel);
   let count = 0;
 
@@ -44,7 +48,7 @@ export const installPlaceholders = (t, onAccept) => {
       category: category,
       srcUrl: srcUrl,
       t: t,
-      onAccept: onAccept
+      onAccept: onAccept,
     });
 
     const phId = "blakfy-ph-" + Math.random().toString(36).slice(2, 10);

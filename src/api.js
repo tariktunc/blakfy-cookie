@@ -1,10 +1,10 @@
 // blakfy-cookie/src/api.js — public window.BlakfyCookie surface (v1 contract preserved + v2 additions)
 
-import { writeCookie, buildState } from "./core/consent-store.js";
 import { postAudit } from "./core/audit.js";
-import { getTranslation, DEFAULT_LOCALE } from "./i18n/index.js";
-import { normalizeLocale, RTL_LOCALES } from "./i18n/detect.js";
+import { writeCookie, buildState } from "./core/consent-store.js";
 import { scanAll } from "./gating/observer.js";
+import { normalizeLocale, RTL_LOCALES } from "./i18n/detect.js";
+import { getTranslation, DEFAULT_LOCALE } from "./i18n/index.js";
 
 const VERSION = "2.1.2";
 const CATEGORIES = ["analytics", "marketing", "functional", "recording"];
@@ -13,8 +13,8 @@ export const createAPI = (ctx) => {
   const { config, emitter, deps } = ctx;
   let state = ctx.state || null;
   let currentLocale = ctx.locale;
-  let mainLang = ctx.mainLang;
-  let jurisdiction = ctx.jurisdiction || "default";
+  const mainLang = ctx.mainLang;
+  const jurisdiction = ctx.jurisdiction || "default";
   let t = getTranslation(currentLocale);
 
   let modalRoot = null;
@@ -64,12 +64,16 @@ export const createAPI = (ctx) => {
       jurisdiction: jurisdiction,
       tcString: deps && typeof deps.getTCString === "function" ? deps.getTCString() : null,
       uspString: null,
-      prevId: prevState && prevState.id
+      prevId: prevState && prevState.id,
     });
 
     state = next;
 
-    try { writeCookie(state); } catch (e) { /* ignore */ }
+    try {
+      writeCookie(state);
+    } catch (e) {
+      /* ignore */
+    }
 
     if (config.auditEndpoint) {
       postAudit(config.auditEndpoint, {
@@ -82,8 +86,8 @@ export const createAPI = (ctx) => {
           analytics: state.analytics,
           marketing: state.marketing,
           functional: state.functional,
-          recording: state.recording
-        }
+          recording: state.recording,
+        },
       });
     }
 
@@ -95,7 +99,7 @@ export const createAPI = (ctx) => {
           if (deps.unblockScripts) deps.unblockScripts(cat);
           if (deps.unblockIframes) deps.unblockIframes(cat);
         },
-        runCleanup: deps.runCleanup
+        runCleanup: deps.runCleanup,
       });
     }
 
@@ -125,19 +129,31 @@ export const createAPI = (ctx) => {
     closeUI();
   };
 
-  const acceptAll = () => commit({ analytics: true, marketing: true, functional: true, recording: true }, "accept_all");
-  const rejectAll = () => commit({ analytics: false, marketing: false, functional: false, recording: false }, "reject_all");
+  const acceptAll = () =>
+    commit({ analytics: true, marketing: true, functional: true, recording: true }, "accept_all");
+  const rejectAll = () =>
+    commit(
+      { analytics: false, marketing: false, functional: false, recording: false },
+      "reject_all"
+    );
 
   const open = () => {
-    if (deps && typeof deps.openModal === "function") deps.openModal({ commit: commit, t: t, currentLocale: currentLocale, state: state });
+    if (deps && typeof deps.openModal === "function")
+      deps.openModal({ commit: commit, t: t, currentLocale: currentLocale, state: state });
   };
 
-  const onChange = (fn) => { emitter.on("change", fn); };
+  const onChange = (fn) => {
+    emitter.on("change", fn);
+  };
 
   const onConsent = (category, fn) => {
     if (typeof fn !== "function") return;
     if (getConsent(category)) {
-      try { fn(true); } catch (e) { /* swallow */ }
+      try {
+        fn(true);
+      } catch (e) {
+        /* swallow */
+      }
     }
     emitter.on("consent:" + category, fn);
   };
@@ -176,12 +192,15 @@ export const createAPI = (ctx) => {
   };
 
   const tcf = {
-    getTCString: () => (deps && typeof deps.getTCString === "function" ? deps.getTCString() : "")
+    getTCString: () => (deps && typeof deps.getTCString === "function" ? deps.getTCString() : ""),
   };
 
   const ccpa = {
-    optOut: () => { if (deps && typeof deps.optOutCCPA === "function") deps.optOutCCPA(); },
-    isOptedOut: () => (deps && typeof deps.isOptedOutCCPA === "function" ? !!deps.isOptedOutCCPA() : false)
+    optOut: () => {
+      if (deps && typeof deps.optOutCCPA === "function") deps.optOutCCPA();
+    },
+    isOptedOut: () =>
+      deps && typeof deps.isOptedOutCCPA === "function" ? !!deps.isOptedOutCCPA() : false,
   };
 
   return {
@@ -202,6 +221,6 @@ export const createAPI = (ctx) => {
     tcf: tcf,
     ccpa: ccpa,
     getJurisdiction: getJurisdiction,
-    __internal: { commit: commit, setUI: setUI, closeUI: closeUI }
+    __internal: { commit: commit, setUI: setUI, closeUI: closeUI },
   };
 };

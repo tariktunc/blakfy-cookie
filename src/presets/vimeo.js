@@ -7,5 +7,5 @@ export default {
   storage: [],
   scriptHosts: ["player.vimeo.com", "vimeo.com"],
   onGrant: (state) => {},
-  onRevoke: (state) => {}
+  onRevoke: (state) => {},
 };

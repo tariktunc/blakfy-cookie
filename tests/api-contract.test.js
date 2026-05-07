@@ -1,4 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
+
 import { createAPI } from "../src/api.js";
 import { createEmitter } from "../src/core/events.js";
 
@@ -18,7 +19,7 @@ const makeCtx = (overrides = {}) => {
     applyPreset: vi.fn(),
     openModal: vi.fn(),
     removeFocusTrap: vi.fn(),
-    ...(overrides.deps || {})
+    ...(overrides.deps || {}),
   };
   return {
     config: { policyVersion: "1.0", auditEndpoint: null, ...(overrides.config || {}) },
@@ -27,7 +28,7 @@ const makeCtx = (overrides = {}) => {
     state: overrides.state || null,
     locale: "en",
     mainLang: "en",
-    jurisdiction: "EEA"
+    jurisdiction: "EEA",
   };
 };
 

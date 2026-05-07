@@ -7,5 +7,5 @@ export default {
   storage: [],
   scriptHosts: ["static.hotjar.com", "script.hotjar.com"],
   onGrant: (state) => {},
-  onRevoke: (state) => {}
+  onRevoke: (state) => {},
 };

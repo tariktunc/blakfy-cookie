@@ -1,4 +1,5 @@
 import { describe, it, expect } from "vitest";
+
 import { readCookie, writeCookie, buildState, COOKIE_NAME } from "../src/core/consent-store.js";
 
 describe("consent-store readCookie", () => {
@@ -40,8 +41,12 @@ describe("consent-store writeCookie", () => {
     const orig = Object.getOwnPropertyDescriptor(Document.prototype, "cookie");
     Object.defineProperty(document, "cookie", {
       configurable: true,
-      get() { return ""; },
-      set(v) { captured = v; }
+      get() {
+        return "";
+      },
+      set(v) {
+        captured = v;
+      },
     });
     writeCookie({ version: "1.0", essential: true });
     if (orig) Object.defineProperty(document, "cookie", orig);
@@ -53,21 +58,25 @@ describe("consent-store writeCookie", () => {
     const orig = Object.getOwnPropertyDescriptor(Document.prototype, "cookie");
     Object.defineProperty(document, "cookie", {
       configurable: true,
-      get() { return ""; },
-      set(v) { captured = v; }
+      get() {
+        return "";
+      },
+      set(v) {
+        captured = v;
+      },
     });
 
     const origLoc = window.location;
     Object.defineProperty(window, "location", {
       configurable: true,
-      value: { ...origLoc, protocol: "http:" }
+      value: { ...origLoc, protocol: "http:" },
     });
     writeCookie({ version: "1.0", essential: true });
     expect(captured).not.toContain("Secure");
 
     Object.defineProperty(window, "location", {
       configurable: true,
-      value: { ...origLoc, protocol: "https:" }
+      value: { ...origLoc, protocol: "https:" },
     });
     writeCookie({ version: "1.0", essential: true });
     expect(captured).toContain("Secure");
@@ -85,7 +94,13 @@ describe("consent-store buildState", () => {
   });
 
   it("preserves prevId when provided", () => {
-    const s = buildState({ prefs: {}, currentLocale: "en", mainLang: "en", policyVersion: "1.0", prevId: "keep-this-id" });
+    const s = buildState({
+      prefs: {},
+      currentLocale: "en",
+      mainLang: "en",
+      policyVersion: "1.0",
+      prevId: "keep-this-id",
+    });
     expect(s.id).toBe("keep-this-id");
   });
 
@@ -97,7 +112,7 @@ describe("consent-store buildState", () => {
       policyVersion: "1.0",
       jurisdiction: "EEA",
       tcString: "abc",
-      uspString: "1YNN"
+      uspString: "1YNN",
     });
     expect(s.jurisdiction).toBe("EEA");
     expect(s.tcString).toBe("abc");

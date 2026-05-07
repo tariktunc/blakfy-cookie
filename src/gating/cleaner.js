@@ -12,7 +12,7 @@ export const registerCleanup = ({ category, cookies, storage }) => {
   const list = ensure(category);
   list.push({
     cookies: Array.isArray(cookies) ? cookies.slice() : [],
-    storage: Array.isArray(storage) ? storage.slice() : []
+    storage: Array.isArray(storage) ? storage.slice() : [],
   });
 };
 
@@ -29,14 +29,24 @@ const expireCookie = (name) => {
   const root = getRootDomain(host);
   const past = "Thu, 01 Jan 1970 00:00:00 GMT";
 
-  try { document.cookie = name + "=; expires=" + past + "; path=/"; } catch (e) {}
+  try {
+    document.cookie = name + "=; expires=" + past + "; path=/";
+  } catch (e) {}
   if (host) {
-    try { document.cookie = name + "=; expires=" + past + "; path=/; domain=" + host; } catch (e) {}
-    try { document.cookie = name + "=; expires=" + past + "; path=/; domain=." + host; } catch (e) {}
+    try {
+      document.cookie = name + "=; expires=" + past + "; path=/; domain=" + host;
+    } catch (e) {}
+    try {
+      document.cookie = name + "=; expires=" + past + "; path=/; domain=." + host;
+    } catch (e) {}
   }
   if (root && root !== host) {
-    try { document.cookie = name + "=; expires=" + past + "; path=/; domain=" + root; } catch (e) {}
-    try { document.cookie = name + "=; expires=" + past + "; path=/; domain=." + root; } catch (e) {}
+    try {
+      document.cookie = name + "=; expires=" + past + "; path=/; domain=" + root;
+    } catch (e) {}
+    try {
+      document.cookie = name + "=; expires=" + past + "; path=/; domain=." + root;
+    } catch (e) {}
   }
 };
 
@@ -86,7 +96,9 @@ export const runCleanup = (category) => {
           localStorage.removeItem(storageKeys[k]);
           storageCount++;
         }
-      } catch (e) { /* ignore */ }
+      } catch (e) {
+        /* ignore */
+      }
     }
   }
 

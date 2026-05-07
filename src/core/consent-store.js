@@ -19,8 +19,13 @@ export const writeCookie = (state) => {
   const expires = new Date(Date.now() + COOKIE_TTL_DAYS * 86400000).toUTCString();
   const secure = window.location.protocol === "https:" ? "; Secure" : "";
   document.cookie =
-    COOKIE_NAME + "=" + encodeURIComponent(JSON.stringify(state)) +
-    "; expires=" + expires + "; path=/; SameSite=Strict" + secure;
+    COOKIE_NAME +
+    "=" +
+    encodeURIComponent(JSON.stringify(state)) +
+    "; expires=" +
+    expires +
+    "; path=/; SameSite=Strict" +
+    secure;
 };
 
 const newId = () => {

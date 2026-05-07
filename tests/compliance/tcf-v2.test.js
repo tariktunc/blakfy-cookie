@@ -7,7 +7,9 @@ const importFresh = async () => {
 
 const makeEmitter = () => {
   const handlers = {};
-  const on = vi.fn((evt, fn) => { (handlers[evt] = handlers[evt] || []).push(fn); });
+  const on = vi.fn((evt, fn) => {
+    (handlers[evt] = handlers[evt] || []).push(fn);
+  });
   const fire = (evt, ...args) => (handlers[evt] || []).forEach((fn) => fn(...args));
   return { on, fire };
 };

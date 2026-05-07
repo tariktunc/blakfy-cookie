@@ -3,10 +3,10 @@
 import { RTL_LOCALES } from "../i18n/detect.js";
 
 const STATUS_COLORS = {
-  info:        "#1a56db",
-  warning:     "#b45309",
-  error:       "#dc2626",
-  success:     "#057a55",
+  info: "#1a56db",
+  warning: "#b45309",
+  error: "#dc2626",
+  success: "#057a55",
   maintenance: "#6d28d9",
 };
 
@@ -16,18 +16,18 @@ let statusData = null;
 const resolveStatusMessage = (data, currentLocale, mainLang) => {
   const msgs = data && data.message;
   if (!msgs) return null;
-  return msgs[currentLocale] ||
-         msgs[mainLang] ||
-         msgs["en"] ||
-         msgs[Object.keys(msgs)[0]] ||
-         null;
+  return msgs[currentLocale] || msgs[mainLang] || msgs["en"] || msgs[Object.keys(msgs)[0]] || null;
 };
 
 const dismissKey = (data) => "blakfy_status_" + ((data && data._id) || "default");
 
 export const dismissStatus = () => {
   if (!statusRoot) return;
-  try { sessionStorage.setItem(dismissKey(statusData), "1"); } catch (e) { /* ignore */ }
+  try {
+    sessionStorage.setItem(dismissKey(statusData), "1");
+  } catch (e) {
+    /* ignore */
+  }
   if (statusRoot.parentNode) statusRoot.parentNode.removeChild(statusRoot);
   statusRoot = null;
   statusData = null;
@@ -39,7 +39,9 @@ export const renderStatus = ({ data, currentLocale, mainLang }) => {
 
   try {
     if (sessionStorage.getItem(dismissKey(data)) === "1") return;
-  } catch (e) { /* ignore */ }
+  } catch (e) {
+    /* ignore */
+  }
 
   const rtl = RTL_LOCALES.indexOf(currentLocale) > -1;
   const bg = STATUS_COLORS[data.type] || STATUS_COLORS.info;

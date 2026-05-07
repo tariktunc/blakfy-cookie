@@ -32,12 +32,7 @@ export type BlakfyLocale =
 export type Jurisdiction = "GDPR" | "CCPA" | "LGPD" | "default";
 
 /** Consent kategorileri — `essential` her zaman `true` */
-export type ConsentCategory =
-  | "essential"
-  | "analytics"
-  | "marketing"
-  | "functional"
-  | "recording";
+export type ConsentCategory = "essential" | "analytics" | "marketing" | "functional" | "recording";
 
 /** Banner / modal konum seçenekleri (default: bottom-center) */
 export type BlakfyPosition =

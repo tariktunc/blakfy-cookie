@@ -7,6 +7,7 @@
 ## Neden Sertifikasyon Lazım?
 
 Eğer site sahibi:
+
 - Google AdSense
 - Google Ad Manager (DV360, Google Ads — re-marketing dahil)
 - Major SSP'ler (Magnite, Index Exchange, Xandr...)
@@ -18,12 +19,15 @@ kullanıyorsa, **Mart 2024'ten beri** TCF v2.2 sertifikalı bir CMP zorunlu. Ser
 ## Süreç (5 Adım)
 
 ### 1. Başvuru
+
 - URL: https://iabeurope.eu/cmp-list/
 - Form: CMP adı, URL, teknik temas kişisi, audit dokümanları
 - Süre: 1 hafta cevap
 
 ### 2. Teknik Audit
+
 IAB Europe denetçisi şunları kontrol eder:
+
 - `__tcfapi` global fonksiyonun varlığı ve doğru komut yüzeyi (✅ kodda var)
 - TC string formatı (Base64URL, doğru segment yapısı) (✅)
 - Vendor List senkronizasyonu (GVL fetch) (✅)
@@ -32,10 +36,12 @@ IAB Europe denetçisi şunları kontrol eder:
 - Consent withdrawal her zaman mümkün mü (✅ widget her zaman erişilebilir)
 
 ### 3. Ücret
+
 - **Annual fee**: ~€2.000 (CMP boyutuna göre değişir)
 - Faturalama: Yıllık peşin
 
 ### 4. CMP ID Atama
+
 - Audit geçince IAB Europe bir **numeric CMP ID** atar (örn. `123`)
 - Bu ID widget'a yazılır:
   ```html
@@ -44,6 +50,7 @@ IAB Europe denetçisi şunları kontrol eder:
 - ID `0` = preview/test mode (audit öncesi)
 
 ### 5. Yıllık Yenileme
+
 - Her yıl re-audit (kod değişikliği varsa)
 - Yenileme ücreti aynı
 
@@ -84,11 +91,13 @@ Kütüphane güncellemesi gerekmez — `data-blakfy-cmp-id="0"` (preview) ile `d
 ## DSAR (Data Subject Access Request) Akışı
 
 GDPR Art. 15 + 17 gereği kullanıcı:
+
 - Verilerine **erişim** isteyebilir → site sahibi audit log'tan döndürür
 - **Silme** isteyebilir → audit log + cookie temizlenir
 - **Onay geri çekme** isteyebilir → widget her zaman açık (`BlakfyCookie.open()`)
 
 Site sahibinin yapması gereken:
+
 - `data-blakfy-audit-endpoint` ile DSAR taleplerini sorgulayabileceği bir endpoint kurmak
 - Privacy policy sayfasında DSAR talimatları yazmak (örnek README'de)
 
@@ -96,11 +105,11 @@ Site sahibinin yapması gereken:
 
 ## Maliyet Özeti
 
-| Kalem | Yıllık |
-|---|---|
-| IAB Europe sertifikasyon ücreti | ~€2.000 |
-| Audit hazırlık (developer saati) | bir kerelik, dahil |
-| GVL CDN serving (Cloudflare) | ücretsiz (consensu.org host eder) |
-| **TOPLAM** | **~€2.000/yıl** |
+| Kalem                            | Yıllık                            |
+| -------------------------------- | --------------------------------- |
+| IAB Europe sertifikasyon ücreti  | ~€2.000                           |
+| Audit hazırlık (developer saati) | bir kerelik, dahil                |
+| GVL CDN serving (Cloudflare)     | ücretsiz (consensu.org host eder) |
+| **TOPLAM**                       | **~€2.000/yıl**                   |
 
 Eğer site AdSense/Ad Manager kullanmıyorsa **sertifikasyona gerek yok**, kod yine de hazır kalır.

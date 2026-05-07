@@ -118,23 +118,23 @@ export function TcfDebug() {
 
 All `BlakfyCookieConfig` fields are optional except behaviour you want to override.
 
-| Prop | Type | Default | Notes |
-|---|---|---|---|
-| `locale` | `BlakfyLocale \| "auto"` | `"auto"` | 23 BCP47 locales. `auto` detects from browser. |
-| `mainLang` | `BlakfyLocale` | — | Site's primary language for audit log. |
-| `policyUrl` | `string` | `"/cerez-politikasi"` | Cookie policy page. |
-| `policyVersion` | `string` | `"1.0"` | Bumping triggers re-consent for all users. |
-| `auditEndpoint` | `string` | — | POST endpoint for KVKK/GDPR consent log. |
-| `position` | `"bottom-right" \| "bottom-left" \| "bottom" \| "top" \| "center"` | `"bottom-right"` | Banner placement. |
-| `theme` | `"light" \| "dark" \| "auto"` | `"auto"` | UI theme. |
-| `accent` | `string` (hex) | `"#3E5C3A"` | Button colour. |
-| `presets` | `string` | — | Comma list, e.g. `"ga4,gtm,facebook"`. 18 presets total. |
-| `tcf` | `boolean` | `false` | Enable IAB TCF v2.2 (`__tcfapi`). |
-| `cmpId` | `number \| string` | `0` | TCF CMP ID. `0` = preview/test mode. |
-| `ccpa` | `"auto" \| "true" \| "false"` | `"auto"` | Auto-detect California or force on/off. |
-| `gpc` | `"respect" \| "ignore"` | `"respect"` | Auto-deny on `navigator.globalPrivacyControl`. |
-| `dnt` | `"respect" \| "auto-deny"` | `"respect"` | Do Not Track behaviour. |
-| `cdnVersion` | `string` | `"2"` | jsDelivr major-pin (do not change unless pinning). |
+| Prop            | Type                                                               | Default               | Notes                                                    |
+| --------------- | ------------------------------------------------------------------ | --------------------- | -------------------------------------------------------- |
+| `locale`        | `BlakfyLocale \| "auto"`                                           | `"auto"`              | 23 BCP47 locales. `auto` detects from browser.           |
+| `mainLang`      | `BlakfyLocale`                                                     | —                     | Site's primary language for audit log.                   |
+| `policyUrl`     | `string`                                                           | `"/cerez-politikasi"` | Cookie policy page.                                      |
+| `policyVersion` | `string`                                                           | `"1.0"`               | Bumping triggers re-consent for all users.               |
+| `auditEndpoint` | `string`                                                           | —                     | POST endpoint for KVKK/GDPR consent log.                 |
+| `position`      | `"bottom-right" \| "bottom-left" \| "bottom" \| "top" \| "center"` | `"bottom-right"`      | Banner placement.                                        |
+| `theme`         | `"light" \| "dark" \| "auto"`                                      | `"auto"`              | UI theme.                                                |
+| `accent`        | `string` (hex)                                                     | `"#3E5C3A"`           | Button colour.                                           |
+| `presets`       | `string`                                                           | —                     | Comma list, e.g. `"ga4,gtm,facebook"`. 18 presets total. |
+| `tcf`           | `boolean`                                                          | `false`               | Enable IAB TCF v2.2 (`__tcfapi`).                        |
+| `cmpId`         | `number \| string`                                                 | `0`                   | TCF CMP ID. `0` = preview/test mode.                     |
+| `ccpa`          | `"auto" \| "true" \| "false"`                                      | `"auto"`              | Auto-detect California or force on/off.                  |
+| `gpc`           | `"respect" \| "ignore"`                                            | `"respect"`           | Auto-deny on `navigator.globalPrivacyControl`.           |
+| `dnt`           | `"respect" \| "auto-deny"`                                         | `"respect"`           | Do Not Track behaviour.                                  |
+| `cdnVersion`    | `string`                                                           | `"2"`                 | jsDelivr major-pin (do not change unless pinning).       |
 
 `BlakfyLocale` union: `"tr" | "en" | "ar" | "fa" | "ur" | "fr" | "ru" | "de" | "he" | "uk" | "es" | "it" | "pt" | "nl" | "pl" | "sv" | "cs" | "zh" | "zh-TW" | "ja" | "ko" | "id" | "hi"`.
 

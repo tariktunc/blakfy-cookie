@@ -1,0 +1,46 @@
+name: ✨ Feature Request
+description: Yeni özellik veya iyileştirme öner
+title: "[Feature]: "
+labels: ["enhancement", "triage"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Çözmek istediğin sorun
+      description: "Şu an neden işe yaramıyor / hangi senaryoda zorlanıyorsun?"
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: Önerdiğin çözüm
+      description: API tasarımı veya kullanım örneği ekleyebilirsin
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatifler
+      description: Başka çözüm yollarını düşündün mü?
+
+  - type: dropdown
+    id: scope
+    attributes:
+      label: Hangi alan?
+      options:
+        - UI / banner / modal
+        - Compliance (GDPR/KVKK/CCPA/TCF/CMv2)
+        - Tag-gating
+        - Yeni preset (üçüncü parti araç)
+        - i18n (yeni dil)
+        - Cookie-next (React/Next.js wrapper)
+        - Build / dev experience
+        - Documentation
+        - Diğer
+
+  - type: checkboxes
+    id: contribute
+    attributes:
+      label: PR açabilir misin?
+      options:
+        - label: Evet, bu özellik için PR açmaya istekliyim

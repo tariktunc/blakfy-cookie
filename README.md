@@ -4,7 +4,7 @@
 >
 > Tek script ile **KVKK + GDPR + CCPA + Google CMv2 + Microsoft UET + Yandex Metrica + IAB TCF v2.2** uyumlu cookie consent (çerez onayı) widget. **23 dil**, **18 hazır preset** (üçüncü parti araç entegrasyonu), **3 renk teması**, **3-tab tercihler modalı** (Kategoriler / Hizmetler / Hakkında), **tag-gating** (script engelleme/serbest bırakma) dahil.
 
-**Versiyon:** 2.1.2  •  **Lisans:** MIT  •  **npm:** `@blakfy/cookie@2.1.2` · `@blakfy/cookie-next@2.1.2`  •  **CDN:** `cdn.jsdelivr.net/npm/@blakfy/cookie@2.1.2`
+**Versiyon:** 2.1.2 • **Lisans:** MIT • **npm:** `@blakfy/cookie@2.1.2` · `@blakfy/cookie-next@2.1.2` • **CDN:** `cdn.jsdelivr.net/npm/@blakfy/cookie@2.1.2`
 
 ---
 
@@ -14,10 +14,10 @@
 
 ### A) CDN (önerilen — sıfır konfigürasyon)
 
-| Strateji | URL | Ne zaman kullan |
-|---|---|---|
-| **Pinned** (sabit sürüm) | `cdn.jsdelivr.net/npm/@blakfy/cookie@2.1.2/dist/cookie.min.js` | Production — değişikliklerin gözden geçirilerek kabul edilmesini istersen |
-| **Auto-patch** (semver tag) | `cdn.jsdelivr.net/npm/@blakfy/cookie@2/dist/cookie.min.js` | Otomatik güvenlik/patch güncellemeleri — major (`@3`) gelene kadar takip eder |
+| Strateji                    | URL                                                            | Ne zaman kullan                                                               |
+| --------------------------- | -------------------------------------------------------------- | ----------------------------------------------------------------------------- |
+| **Pinned** (sabit sürüm)    | `cdn.jsdelivr.net/npm/@blakfy/cookie@2.1.2/dist/cookie.min.js` | Production — değişikliklerin gözden geçirilerek kabul edilmesini istersen     |
+| **Auto-patch** (semver tag) | `cdn.jsdelivr.net/npm/@blakfy/cookie@2/dist/cookie.min.js`     | Otomatik güvenlik/patch güncellemeleri — major (`@3`) gelene kadar takip eder |
 
 unpkg da çalışır: `unpkg.com/@blakfy/cookie@2.1.2/dist/cookie.min.js`.
 
@@ -57,11 +57,16 @@ Bunlar olduğu gibi kalır. Bootstrap zaten consent default'larını `denied` ol
 ```html
 <!-- Örnek: Google Tag Manager (değişiklik gerektirmez) -->
 <script>
-(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-})(window,document,'script','dataLayer','GTM-XXXXXX');
+  (function (w, d, s, l, i) {
+    w[l] = w[l] || [];
+    w[l].push({ "gtm.start": new Date().getTime(), event: "gtm.js" });
+    var f = d.getElementsByTagName(s)[0],
+      j = d.createElement(s),
+      dl = l != "dataLayer" ? "&l=" + l : "";
+    j.async = true;
+    j.src = "https://www.googletagmanager.com/gtm.js?id=" + i + dl;
+    f.parentNode.insertBefore(j, f);
+  })(window, document, "script", "dataLayer", "GTM-XXXXXX");
 </script>
 ```
 
@@ -77,9 +82,9 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
   data-blakfy-ccpa="auto"
   data-blakfy-tcf="false"
   data-blakfy-theme="auto"
-  data-blakfy-accent="#3E5C3A"></script>
+  data-blakfy-accent="#3E5C3A"
+></script>
 <!-- Konum varsayılanı: alt-orta (bottom-center). İstersen data-blakfy-position="bottom-right" / "top-center" vb. ile değiştir. -->
-
 ```
 
 **Bittiğinde:** Sayfa yüklendiğinde **alt-orta**'da (varsayılan) consent banner ve "Powered by Blakfy Studio" badge belirir. Konumu değiştirmek için `data-blakfy-position` ile `bottom-right`, `bottom-left`, `top-center`, `top-right`, `top-left` seçeneklerinden birini ver. Kullanıcı bir karar verene kadar GTM/GA4/Facebook Pixel/Clarity tag'leri çalışmaz; karar verildiğinde otomatik aktif olur.
@@ -137,13 +142,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
 **`@blakfy/cookie-next` export'ları:**
 
-| Export | Tip | Açıklama |
-|---|---|---|
+| Export                 | Tip             | Açıklama                                                                                             |
+| ---------------------- | --------------- | ---------------------------------------------------------------------------------------------------- |
 | `BlakfyCookieProvider` | React component | Widget'ı `next/script beforeInteractive` ile yükler. Tüm `data-blakfy-*` attribute'ları prop olarak. |
-| `ConsentModeDefault` | React component | Bootstrap script'i (gtag/uetq/ym defaults `denied`). `<head>` içinde kullan. |
-| `useBlakfyConsent()` | Hook | Mevcut consent state'i döndürür, değişimde re-render. |
-| `useGating(category)` | Hook | Belirtilen kategori onaylı mı (`boolean`). Conditional render için. |
-| `useTcf()` | Hook | TCF v2.2 TC string ve event listener wrapper'ı. |
+| `ConsentModeDefault`   | React component | Bootstrap script'i (gtag/uetq/ym defaults `denied`). `<head>` içinde kullan.                         |
+| `useBlakfyConsent()`   | Hook            | Mevcut consent state'i döndürür, değişimde re-render.                                                |
+| `useGating(category)`  | Hook            | Belirtilen kategori onaylı mı (`boolean`). Conditional render için.                                  |
+| `useTcf()`             | Hook            | TCF v2.2 TC string ve event listener wrapper'ı.                                                      |
 
 Tam Next.js örneği: [`examples/nextjs/`](./examples/nextjs/).
 Paket README'si: [`packages/cookie-next/README.md`](./packages/cookie-next/README.md).
@@ -154,7 +159,7 @@ GTM, default `denied` ile başlar (bootstrap sayesinde). Trigger'larında "Conse
 
 ```js
 // Doğrulama (DevTools console)
-window.dataLayer.find(e => e[0] === 'consent');
+window.dataLayer.find((e) => e[0] === "consent");
 // → ["consent", "default", { ad_storage: "denied", ... }]
 window.BlakfyCookie.acceptAll();
 // → ["consent", "update", { ad_storage: "granted", ... }]
@@ -167,12 +172,25 @@ UET tag'ini olduğu gibi koy — bootstrap `window.uetq.push('consent','default'
 ```html
 <!-- UET tag — değişiklik gerektirmez -->
 <script>
-(function(w,d,t,r,u){var f,n,i;w[u]=w[u]||[],f=function(){var o={ti:"XXXXXXX"};
-o.q=w[u],w[u]=new UET(o),w[u].push("pageLoad")},n=d.createElement(t),n.src=r,
-n.async=1,n.onload=n.onreadystatechange=function(){var s=this.readyState;
-s&&s!=="loaded"&&s!=="complete"||(f(),n.onload=n.onreadystatechange=null)},
-i=d.getElementsByTagName(t)[0],i.parentNode.insertBefore(n,i);
-})(window,document,"script","//bat.bing.com/bat.js","uetq");
+  (function (w, d, t, r, u) {
+    var f, n, i;
+    ((w[u] = w[u] || []),
+      (f = function () {
+        var o = { ti: "XXXXXXX" };
+        ((o.q = w[u]), (w[u] = new UET(o)), w[u].push("pageLoad"));
+      }),
+      (n = d.createElement(t)),
+      (n.src = r),
+      (n.async = 1),
+      (n.onload = n.onreadystatechange =
+        function () {
+          var s = this.readyState;
+          (s && s !== "loaded" && s !== "complete") ||
+            (f(), (n.onload = n.onreadystatechange = null));
+        }),
+      (i = d.getElementsByTagName(t)[0]),
+      i.parentNode.insertBefore(n, i));
+  })(window, document, "script", "//bat.bing.com/bat.js", "uetq");
 </script>
 ```
 
@@ -182,11 +200,11 @@ Yandex'in standart consent API'si yoktur, tag-gating kullanılır. Metrica embed
 
 ```html
 <script type="text/plain" data-blakfy-category="analytics">
-(function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
-m[i].l=1*new Date();k=e.createElement(t),a=e.getElementsByTagName(t)[0],
-k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})
-(window,document,"script","https://mc.yandex.ru/metrica/tag.js","ym");
-ym(XXXXXXXX, "init", { clickmap:true, trackLinks:true, accurateTrackBitrate:true });
+  (function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
+  m[i].l=1*new Date();k=e.createElement(t),a=e.getElementsByTagName(t)[0],
+  k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})
+  (window,document,"script","https://mc.yandex.ru/metrica/tag.js","ym");
+  ym(XXXXXXXX, "init", { clickmap:true, trackLinks:true, accurateTrackBitrate:true });
 </script>
 ```
 
@@ -198,11 +216,11 @@ ym(XXXXXXXX, "init", { clickmap:true, trackLinks:true, accurateTrackBitrate:true
 
 "Tercihler" veya `window.BlakfyCookie.open()` çağrıldığında açılan modal 3 sekmeden oluşur:
 
-| Sekme | İçerik |
-|---|---|
-| **Kategoriler** | Zorunlu / Analitik / Pazarlama / Fonksiyonel toggle switch'leri. "Seçimleri Kaydet" ve "Tümünü Kabul Et" butonları. |
-| **Hizmetler** | Aktif preset'lere göre accordion kartlar. Her kart: açıklama, veri işleyici, adres, amaçlar, teknolojiler, toplanan veriler, hukuki dayanak, saklama süresi, aktarım ülkeleri, gizlilik politikası linki. GDPR Madde 13/14 + KVKK Madde 10 zorunlu bilgi ifşası. |
-| **Hakkında** | CMP kimliği (Blakfy Studio), platform açıklaması (GDPR / KVKK / CCPA), sürüm numarası. |
+| Sekme           | İçerik                                                                                                                                                                                                                                                           |
+| --------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Kategoriler** | Zorunlu / Analitik / Pazarlama / Fonksiyonel toggle switch'leri. "Seçimleri Kaydet" ve "Tümünü Kabul Et" butonları.                                                                                                                                              |
+| **Hizmetler**   | Aktif preset'lere göre accordion kartlar. Her kart: açıklama, veri işleyici, adres, amaçlar, teknolojiler, toplanan veriler, hukuki dayanak, saklama süresi, aktarım ülkeleri, gizlilik politikası linki. GDPR Madde 13/14 + KVKK Madde 10 zorunlu bilgi ifşası. |
+| **Hakkında**    | CMP kimliği (Blakfy Studio), platform açıklaması (GDPR / KVKK / CCPA), sürüm numarası.                                                                                                                                                                           |
 
 > **Yasal dayanak:** Hizmetler sekmesindeki bilgiler GDPR Madde 13/14 (bilgi yükümlülüğü) ve KVKK Madde 10 (aydınlatma yükümlülüğü) gerekliliklerini karşılar. Presets kullanmadan da her site kendi hizmet bilgilerini `SERVICE_METADATA` yapısına ekleyebilir.
 
@@ -212,12 +230,12 @@ ym(XXXXXXXX, "init", { clickmap:true, trackLinks:true, accurateTrackBitrate:true
 
 3 hazır tema, `data-blakfy-theme` ile seçilir:
 
-| Tema | Açıklama | Attribute değeri |
-|---|---|---|
-| **Beyaz** (varsayılan) | Beyaz arka plan, koyu metin | `light` veya atlanabilir |
-| **Açık gri** | `#f0f0f0` arka plan, koyu metin | `gray` |
-| **Siyah** | `#1a1a1a` arka plan, açık metin | `dark` |
-| **Otomatik** | Sistem `prefers-color-scheme` ayarını okur | `auto` |
+| Tema                   | Açıklama                                   | Attribute değeri         |
+| ---------------------- | ------------------------------------------ | ------------------------ |
+| **Beyaz** (varsayılan) | Beyaz arka plan, koyu metin                | `light` veya atlanabilir |
+| **Açık gri**           | `#f0f0f0` arka plan, koyu metin            | `gray`                   |
+| **Siyah**              | `#1a1a1a` arka plan, açık metin            | `dark`                   |
+| **Otomatik**           | Sistem `prefers-color-scheme` ayarını okur | `auto`                   |
 
 ```html
 <!-- Açık gri tema -->
@@ -238,24 +256,24 @@ Tüm temalarda `--blakfy-accent` CSS değişkeni geçerliliğini korur — buton
 
 Tüm `<script>` tag'i üzerine konabilen `data-blakfy-*` attribute'ları:
 
-| Attribute | Default | Tip | Açıklama |
-|---|---|---|---|
-| `data-blakfy-locale` | `auto` | BCP47 ya da `auto` | Dil. `auto` → tarayıcıdan tespit. 23 desteklenen dil aşağıda. |
-| `data-blakfy-main-lang` | `null` | BCP47 | Sitenin **birincil dili** (audit log için). Boşsa locale ile aynı. |
-| `data-blakfy-policy-url` | `/cerez-politikasi` | URL | "Çerez Politikası" linki için hedef. |
-| `data-blakfy-version` | `1.0` | string | **Politika versiyonu**. Bunu artırırsan tüm kullanıcılar tekrar onay vermek zorunda (re-consent). |
-| `data-blakfy-audit-endpoint` | `null` | URL | Consent kararı bu endpoint'e POST edilir (KVKK Md.12 / GDPR Art.7(1) kanıt). |
-| `data-blakfy-position` | `bottom-center` | enum | `bottom-center` \| `bottom-right` \| `bottom-left` \| `top-center` \| `top-right` \| `top-left` |
-| `data-blakfy-theme` | `auto` | enum | **`light`** (beyaz) \| **`gray`** (açık gri) \| **`dark`** (siyah) \| `auto` (`prefers-color-scheme`) |
-| `data-blakfy-accent` | `#3E5C3A` | hex | Buton ve vurgu rengi. |
-| `data-blakfy-presets` | `null` | virgül listesi | Etkinleştirilecek preset key'leri. Örn: `ga4,gtm,facebook,clarity`. Aşağıda 18 preset listesi. |
-| `data-blakfy-tcf` | `false` | bool | IAB TCF v2.2 modülünü aç (`__tcfapi` global). |
-| `data-blakfy-cmp-id` | `0` | int | TCF CMP ID. `0` = preview/test mode. Sertifikasyon sonrası gerçek ID. |
-| `data-blakfy-ccpa` | `auto` | enum | `auto` (jurisdiction tespiti), `true` (her zaman aç), `false` (kapat) |
-| `data-blakfy-gpc` | `respect` | enum | `respect` (tarayıcı GPC'si auto-deny say) \| `ignore` |
-| `data-blakfy-dnt` | `respect` | enum | `respect` (UI'da uyar) \| `auto-deny` (auto-reject) |
-| `data-blakfy-status-url` | `cdn.jsdelivr.net/npm/@blakfy/cookie@2/status.json` | URL | Status bar mesajları için kaynak. Kendi domain'inde host'lamak için override et. |
-| `data-blakfy-status` | `true` | bool | `false` ise status bar render edilmez. |
+| Attribute                    | Default                                             | Tip                | Açıklama                                                                                              |
+| ---------------------------- | --------------------------------------------------- | ------------------ | ----------------------------------------------------------------------------------------------------- |
+| `data-blakfy-locale`         | `auto`                                              | BCP47 ya da `auto` | Dil. `auto` → tarayıcıdan tespit. 23 desteklenen dil aşağıda.                                         |
+| `data-blakfy-main-lang`      | `null`                                              | BCP47              | Sitenin **birincil dili** (audit log için). Boşsa locale ile aynı.                                    |
+| `data-blakfy-policy-url`     | `/cerez-politikasi`                                 | URL                | "Çerez Politikası" linki için hedef.                                                                  |
+| `data-blakfy-version`        | `1.0`                                               | string             | **Politika versiyonu**. Bunu artırırsan tüm kullanıcılar tekrar onay vermek zorunda (re-consent).     |
+| `data-blakfy-audit-endpoint` | `null`                                              | URL                | Consent kararı bu endpoint'e POST edilir (KVKK Md.12 / GDPR Art.7(1) kanıt).                          |
+| `data-blakfy-position`       | `bottom-center`                                     | enum               | `bottom-center` \| `bottom-right` \| `bottom-left` \| `top-center` \| `top-right` \| `top-left`       |
+| `data-blakfy-theme`          | `auto`                                              | enum               | **`light`** (beyaz) \| **`gray`** (açık gri) \| **`dark`** (siyah) \| `auto` (`prefers-color-scheme`) |
+| `data-blakfy-accent`         | `#3E5C3A`                                           | hex                | Buton ve vurgu rengi.                                                                                 |
+| `data-blakfy-presets`        | `null`                                              | virgül listesi     | Etkinleştirilecek preset key'leri. Örn: `ga4,gtm,facebook,clarity`. Aşağıda 18 preset listesi.        |
+| `data-blakfy-tcf`            | `false`                                             | bool               | IAB TCF v2.2 modülünü aç (`__tcfapi` global).                                                         |
+| `data-blakfy-cmp-id`         | `0`                                                 | int                | TCF CMP ID. `0` = preview/test mode. Sertifikasyon sonrası gerçek ID.                                 |
+| `data-blakfy-ccpa`           | `auto`                                              | enum               | `auto` (jurisdiction tespiti), `true` (her zaman aç), `false` (kapat)                                 |
+| `data-blakfy-gpc`            | `respect`                                           | enum               | `respect` (tarayıcı GPC'si auto-deny say) \| `ignore`                                                 |
+| `data-blakfy-dnt`            | `respect`                                           | enum               | `respect` (UI'da uyar) \| `auto-deny` (auto-reject)                                                   |
+| `data-blakfy-status-url`     | `cdn.jsdelivr.net/npm/@blakfy/cookie@2/status.json` | URL                | Status bar mesajları için kaynak. Kendi domain'inde host'lamak için override et.                      |
+| `data-blakfy-status`         | `true`                                              | bool               | `false` ise status bar render edilmez.                                                                |
 
 **Desteklenen 23 dil:** `tr`, `en`, `ar`, `fa`, `ur`, `fr`, `ru`, `de`, `he`, `uk`, `es`, `it`, `pt`, `nl`, `pl`, `sv`, `cs`, `zh`, `zh-TW`, `ja`, `ko`, `id`, `hi` (RTL: `ar`, `fa`, `ur`, `he`).
 
@@ -265,27 +283,27 @@ Tüm `<script>` tag'i üzerine konabilen `data-blakfy-*` attribute'ları:
 
 `window.BlakfyCookie` global olarak erişilebilir. Tüm v1 metodları korunmuştur, v2'de yeni metodlar eklendi.
 
-| Metod | Sürüm | İmza | Açıklama |
-|---|---|---|---|
-| `version` | v1 | `string` | Kütüphane sürümü, örn. `"2.1.2"`. |
-| `open()` | v1 | `() => void` | Tercihler modalını aç. |
-| `acceptAll()` | v1 | `() => void` | Tüm kategorileri kabul et. |
-| `rejectAll()` | v1 | `() => void` | Tüm kategorileri reddet (essential dışında). |
-| `getConsent(cat)` | v1 | `(c: ConsentCategory) => boolean` | Kategori onaylı mı. `essential` her zaman `true`. |
-| `getState()` | v1 | `() => BlakfyConsentState \| null` | Tam consent state objesi. |
-| `onChange(fn)` | v1 | `(fn: (state) => void) => void` | State değişince çağrılır. |
-| `setLocale(loc)` | v1 | `(loc: BlakfyLocale) => void` | Dili değiştir (UI re-render). |
-| `getMainLang()` | v1 | `() => BlakfyLocale` | Audit log için ayarlanan birincil dil. |
-| `onConsent(cat, fn)` | **v2** | `(c, fn: (granted: boolean) => void) => void` | Kategori-bazlı listener. Mevcut state ile **anında** çağrılır, sonra her değişimde tekrar. |
-| `registerCleanup(opts)` | **v2** | `(opts: { category, cookies?, storage? }) => void` | Onay geri çekildiğinde silinecek cookie'leri/localStorage anahtarlarını kaydet. |
-| `unblock(cat)` | **v2** | `(c: ConsentCategory) => void` | Kategori için tag-gating'i manuel aç. |
-| `scan()` | **v2** | `() => ConsentCategory[]` | DOM'u tekrar tara (SPA navigasyonu sonrası). |
-| `usePreset(name)` | **v2** | `(name: string) => Preset \| null` | Hazır preset'i runtime'da uygula. |
-| `tcf.getTCString()` | **v2** | `() => string` | IAB TCF v2.2 TC string. |
-| `ccpa.optOut()` | **v2** | `() => void` | CCPA "Do Not Sell" opt-out. |
-| `ccpa.isOptedOut()` | **v2** | `() => boolean` | CCPA opt-out durumu. |
-| `getJurisdiction()` | **v2** | `() => "GDPR" \| "CCPA" \| "LGPD" \| "default"` | Tespit edilen yetki alanı. |
-| `window.__tcfapi(...)` | **v2** | IAB standart | `getTCData`, `addEventListener`, `removeEventListener` (TCF v2.2 spec). |
+| Metod                   | Sürüm  | İmza                                               | Açıklama                                                                                   |
+| ----------------------- | ------ | -------------------------------------------------- | ------------------------------------------------------------------------------------------ |
+| `version`               | v1     | `string`                                           | Kütüphane sürümü, örn. `"2.1.2"`.                                                          |
+| `open()`                | v1     | `() => void`                                       | Tercihler modalını aç.                                                                     |
+| `acceptAll()`           | v1     | `() => void`                                       | Tüm kategorileri kabul et.                                                                 |
+| `rejectAll()`           | v1     | `() => void`                                       | Tüm kategorileri reddet (essential dışında).                                               |
+| `getConsent(cat)`       | v1     | `(c: ConsentCategory) => boolean`                  | Kategori onaylı mı. `essential` her zaman `true`.                                          |
+| `getState()`            | v1     | `() => BlakfyConsentState \| null`                 | Tam consent state objesi.                                                                  |
+| `onChange(fn)`          | v1     | `(fn: (state) => void) => void`                    | State değişince çağrılır.                                                                  |
+| `setLocale(loc)`        | v1     | `(loc: BlakfyLocale) => void`                      | Dili değiştir (UI re-render).                                                              |
+| `getMainLang()`         | v1     | `() => BlakfyLocale`                               | Audit log için ayarlanan birincil dil.                                                     |
+| `onConsent(cat, fn)`    | **v2** | `(c, fn: (granted: boolean) => void) => void`      | Kategori-bazlı listener. Mevcut state ile **anında** çağrılır, sonra her değişimde tekrar. |
+| `registerCleanup(opts)` | **v2** | `(opts: { category, cookies?, storage? }) => void` | Onay geri çekildiğinde silinecek cookie'leri/localStorage anahtarlarını kaydet.            |
+| `unblock(cat)`          | **v2** | `(c: ConsentCategory) => void`                     | Kategori için tag-gating'i manuel aç.                                                      |
+| `scan()`                | **v2** | `() => ConsentCategory[]`                          | DOM'u tekrar tara (SPA navigasyonu sonrası).                                               |
+| `usePreset(name)`       | **v2** | `(name: string) => Preset \| null`                 | Hazır preset'i runtime'da uygula.                                                          |
+| `tcf.getTCString()`     | **v2** | `() => string`                                     | IAB TCF v2.2 TC string.                                                                    |
+| `ccpa.optOut()`         | **v2** | `() => void`                                       | CCPA "Do Not Sell" opt-out.                                                                |
+| `ccpa.isOptedOut()`     | **v2** | `() => boolean`                                    | CCPA opt-out durumu.                                                                       |
+| `getJurisdiction()`     | **v2** | `() => "GDPR" \| "CCPA" \| "LGPD" \| "default"`    | Tespit edilen yetki alanı.                                                                 |
+| `window.__tcfapi(...)`  | **v2** | IAB standart                                       | `getTCData`, `addEventListener`, `removeEventListener` (TCF v2.2 spec).                    |
 
 **ConsentCategory:** `"essential"` | `"analytics"` | `"marketing"` | `"functional"` | `"recording"`
 
@@ -301,10 +319,12 @@ Tüm `<script>` tag'i üzerine konabilen `data-blakfy-*` attribute'ları:
 
 ```html
 <!-- type="text/plain" → tarayıcı çalıştırmaz -->
-<script type="text/plain"
-        data-blakfy-category="marketing"
-        data-blakfy-src="https://connect.facebook.net/en_US/fbevents.js"
-        async></script>
+<script
+  type="text/plain"
+  data-blakfy-category="marketing"
+  data-blakfy-src="https://connect.facebook.net/en_US/fbevents.js"
+  async
+></script>
 ```
 
 Onay verildiğinde widget script'in `type` attribute'unu `text/javascript`'e çevirir, `data-blakfy-src` → `src` taşır ve DOM'a yeniden ekler.
@@ -321,13 +341,16 @@ Onay verildiğinde widget script'in `type` attribute'unu `text/javascript`'e çe
 ### Iframe (YouTube, Vimeo, harita, vb.)
 
 ```html
-<iframe data-blakfy-src="https://www.youtube.com/embed/VIDEO_ID"
-        data-blakfy-category="marketing"
-        data-blakfy-placeholder="auto"
-        width="560" height="315"
-        title="YouTube video"
-        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope"
-        allowfullscreen></iframe>
+<iframe
+  data-blakfy-src="https://www.youtube.com/embed/VIDEO_ID"
+  data-blakfy-category="marketing"
+  data-blakfy-placeholder="auto"
+  width="560"
+  height="315"
+  title="YouTube video"
+  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope"
+  allowfullscreen
+></iframe>
 ```
 
 `data-blakfy-placeholder="auto"` → otomatik "Çerez onayı bekleniyor" placeholder UI'ı gösterilir.
@@ -365,26 +388,26 @@ export function YouTubeEmbed({ id }: { id: string }) {
 
 `data-blakfy-presets="ga4,gtm,facebook,clarity"` gibi virgüllü liste ile aktive edilir. Preset; cookie'leri ve localStorage anahtarlarını otomatik **registerCleanup**'a kaydeder, böylece kullanıcı onayı geri çekince bunlar otomatik silinir.
 
-| Key | Araç | Kategori | Örnek Cookie / Storage |
-|---|---|---|---|
-| `ga4` | Google Analytics 4 | analytics | `_ga`, `_ga_*`, `_gid`, `_gat` |
-| `gtm` | Google Tag Manager | analytics | `_dc_gtm_*` |
-| `maps` | Google Maps | functional | `NID`, `SID`, `HSID` |
-| `recaptcha` | Google reCAPTCHA | functional | `_GRECAPTCHA` |
-| `facebook` | Facebook Pixel | marketing | `_fbp`, `_fbc`, `fr` |
-| `youtube` | YouTube embed | marketing | `VISITOR_INFO1_LIVE`, `YSC`, `PREF` |
-| `vimeo` | Vimeo embed | marketing | `vuid`, `_ga` |
-| `hotjar` | Hotjar | analytics | `_hjSession*`, `_hjid` |
-| `clarity` | Microsoft Clarity | analytics | `_clck`, `_clsk`, `MUID` |
-| `linkedin` | LinkedIn Insight | marketing | `li_sugr`, `bcookie`, `lidc`, `UserMatchHistory` |
-| `yandex` | Yandex Metrica | analytics + recording | `_ym_*`, `yandexuid`, `yabs-frequency` |
-| `bing` | Bing Ads (UET) | marketing | `MUID`, `_uetsid`, `_uetvid` |
-| `tiktok` | TikTok Pixel | marketing | `tt_*`, `_ttp` |
-| `pinterest` | Pinterest Tag | marketing | `_pinterest_*`, `_pin_unauth` |
-| `tawkto` | Tawk.to chat | functional | `__tawkUUID`, `Tawk_*` |
-| `intercom` | Intercom | functional | `intercom-*` |
-| `hubspot` | HubSpot | marketing | `__hssc`, `__hssrc`, `__hstc`, `hubspotutk` |
-| `mailchimp` | Mailchimp | marketing | `_mcid`, `mc_*` |
+| Key         | Araç               | Kategori              | Örnek Cookie / Storage                           |
+| ----------- | ------------------ | --------------------- | ------------------------------------------------ |
+| `ga4`       | Google Analytics 4 | analytics             | `_ga`, `_ga_*`, `_gid`, `_gat`                   |
+| `gtm`       | Google Tag Manager | analytics             | `_dc_gtm_*`                                      |
+| `maps`      | Google Maps        | functional            | `NID`, `SID`, `HSID`                             |
+| `recaptcha` | Google reCAPTCHA   | functional            | `_GRECAPTCHA`                                    |
+| `facebook`  | Facebook Pixel     | marketing             | `_fbp`, `_fbc`, `fr`                             |
+| `youtube`   | YouTube embed      | marketing             | `VISITOR_INFO1_LIVE`, `YSC`, `PREF`              |
+| `vimeo`     | Vimeo embed        | marketing             | `vuid`, `_ga`                                    |
+| `hotjar`    | Hotjar             | analytics             | `_hjSession*`, `_hjid`                           |
+| `clarity`   | Microsoft Clarity  | analytics             | `_clck`, `_clsk`, `MUID`                         |
+| `linkedin`  | LinkedIn Insight   | marketing             | `li_sugr`, `bcookie`, `lidc`, `UserMatchHistory` |
+| `yandex`    | Yandex Metrica     | analytics + recording | `_ym_*`, `yandexuid`, `yabs-frequency`           |
+| `bing`      | Bing Ads (UET)     | marketing             | `MUID`, `_uetsid`, `_uetvid`                     |
+| `tiktok`    | TikTok Pixel       | marketing             | `tt_*`, `_ttp`                                   |
+| `pinterest` | Pinterest Tag      | marketing             | `_pinterest_*`, `_pin_unauth`                    |
+| `tawkto`    | Tawk.to chat       | functional            | `__tawkUUID`, `Tawk_*`                           |
+| `intercom`  | Intercom           | functional            | `intercom-*`                                     |
+| `hubspot`   | HubSpot            | marketing             | `__hssc`, `__hssrc`, `__hstc`, `hubspotutk`      |
+| `mailchimp` | Mailchimp          | marketing             | `_mcid`, `mc_*`                                  |
 
 **Manuel ekleme** (preset'sız):
 
@@ -392,7 +415,7 @@ export function YouTubeEmbed({ id }: { id: string }) {
 window.BlakfyCookie.registerCleanup({
   category: "marketing",
   cookies: ["my_custom_pixel", /^_track_/],
-  storage: ["myAppMarketingCache"]
+  storage: ["myAppMarketingCache"],
 });
 ```
 
@@ -400,31 +423,31 @@ window.BlakfyCookie.registerCleanup({
 
 ## Compliance
 
-| Yasa / Standart | Yetki Alanı | Modül | Ne yapar |
-|---|---|---|---|
-| **GDPR** | AB | `core/` + `ui/` | Eşit prominence kabul/red butonu, pre-tick yok, granular kategori onayı. |
-| **ePrivacy Directive** | AB | `core/consent-store` | Onay öncesi cookie yazılmaz. |
-| **KVKK** | Türkiye | `core/audit.js` | Md.12 ispat yükümlülüğü için audit log POST. |
-| **CCPA / CPRA** | Kaliforniya | `compliance/ccpa.js` | "Do Not Sell" linki, USP string `1YYY`, GPC saygısı. |
-| **LGPD** | Brezilya | `i18n/pt.js` + `geo/` | Portekizce UI, jurisdiction tespiti (v2.1'de tam destek). |
-| **Google Consent Mode v2** | Google ekosistemi | `compliance/google-cmv2.js` | `gtag('consent','update', {...})` 7 sinyal. |
-| **Microsoft UET** | Bing Ads + Clarity | `compliance/microsoft-uet.js` | `uetq.push('consent','update', {ad_storage})` |
-| **Yandex Metrica** | Yandex ekosistemi | `compliance/yandex-metrica.js` | Tag-gating + Webvisor ayrı `recording` kategori. |
-| **IAB TCF v2.2** | AB AdTech (AdSense) | `compliance/tcf-v2.js` | `__tcfapi`, TC string, GVL fetch. |
-| **GPC** | Tarayıcı standardı | `compliance/gpc.js` | `navigator.globalPrivacyControl` → marketing/analytics auto-deny. |
-| **DNT** | Tarayıcı standardı | `compliance/dnt.js` | `navigator.doNotTrack === "1"` → UI uyarı veya auto-deny. |
+| Yasa / Standart            | Yetki Alanı         | Modül                          | Ne yapar                                                                 |
+| -------------------------- | ------------------- | ------------------------------ | ------------------------------------------------------------------------ |
+| **GDPR**                   | AB                  | `core/` + `ui/`                | Eşit prominence kabul/red butonu, pre-tick yok, granular kategori onayı. |
+| **ePrivacy Directive**     | AB                  | `core/consent-store`           | Onay öncesi cookie yazılmaz.                                             |
+| **KVKK**                   | Türkiye             | `core/audit.js`                | Md.12 ispat yükümlülüğü için audit log POST.                             |
+| **CCPA / CPRA**            | Kaliforniya         | `compliance/ccpa.js`           | "Do Not Sell" linki, USP string `1YYY`, GPC saygısı.                     |
+| **LGPD**                   | Brezilya            | `i18n/pt.js` + `geo/`          | Portekizce UI, jurisdiction tespiti (v2.1'de tam destek).                |
+| **Google Consent Mode v2** | Google ekosistemi   | `compliance/google-cmv2.js`    | `gtag('consent','update', {...})` 7 sinyal.                              |
+| **Microsoft UET**          | Bing Ads + Clarity  | `compliance/microsoft-uet.js`  | `uetq.push('consent','update', {ad_storage})`                            |
+| **Yandex Metrica**         | Yandex ekosistemi   | `compliance/yandex-metrica.js` | Tag-gating + Webvisor ayrı `recording` kategori.                         |
+| **IAB TCF v2.2**           | AB AdTech (AdSense) | `compliance/tcf-v2.js`         | `__tcfapi`, TC string, GVL fetch.                                        |
+| **GPC**                    | Tarayıcı standardı  | `compliance/gpc.js`            | `navigator.globalPrivacyControl` → marketing/analytics auto-deny.        |
+| **DNT**                    | Tarayıcı standardı  | `compliance/dnt.js`            | `navigator.doNotTrack === "1"` → UI uyarı veya auto-deny.                |
 
 ### ❌ Kapsam dışı (Out of Scope)
 
 Bu widget **çerez izni / tracking consent** için tasarlanmıştır. Aşağıdaki düzenlemeler **konu dışı** ve eklenti bunlara katkı sağlamaz:
 
-| Düzenleme | Neden kapsam dışı |
-|-----------|-------------------|
-| **HIPAA** (ABD - sağlık) | PHI (Protected Health Information) korunması; BAA imza, encryption, audit access log gerektirir. Hosting/uygulama katmanı sorumluluğudur (Wix Enterprise BAA, AWS BAA, Azure BAA). |
-| **FERPA** (ABD - eğitim) | Öğrenci kayıt verisi; kurumsal access control + storage encryption sorunu. |
-| **GLBA / SOX** (ABD - finans) | Finansal kayıt güvenliği; sistem-seviye audit ve encryption. |
-| **PCI-DSS** | Ödeme kartı verisi; payment processor (Stripe/Adyen) sorumluluğu. |
-| **SOC 2 / ISO 27001** | Organizasyonel security management; sertifikasyon süreçleri. |
+| Düzenleme                     | Neden kapsam dışı                                                                                                                                                                  |
+| ----------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **HIPAA** (ABD - sağlık)      | PHI (Protected Health Information) korunması; BAA imza, encryption, audit access log gerektirir. Hosting/uygulama katmanı sorumluluğudur (Wix Enterprise BAA, AWS BAA, Azure BAA). |
+| **FERPA** (ABD - eğitim)      | Öğrenci kayıt verisi; kurumsal access control + storage encryption sorunu.                                                                                                         |
+| **GLBA / SOX** (ABD - finans) | Finansal kayıt güvenliği; sistem-seviye audit ve encryption.                                                                                                                       |
+| **PCI-DSS**                   | Ödeme kartı verisi; payment processor (Stripe/Adyen) sorumluluğu.                                                                                                                  |
+| **SOC 2 / ISO 27001**         | Organizasyonel security management; sertifikasyon süreçleri.                                                                                                                       |
 
 **Bir HIPAA / PCI / FERPA-altında çalışan site bu widget'ı kullanabilir** — site'in çerez consent yükümlülüğü için tasarlandığı için sorun yaratmaz. Ancak widget'ın varlığı siteni o standartlara uyumlu yapmaz; o uyumluluklar **veri işleme + altyapı katmanlarında** çözülür.
 
@@ -515,9 +538,7 @@ Detay: [`MIGRATION.md`](./MIGRATION.md).
 ## Footer "Çerez Tercihleri" linki
 
 ```html
-<a href="#" onclick="event.preventDefault(); window.BlakfyCookie.open();">
-  Çerez Tercihleri
-</a>
+<a href="#" onclick="event.preventDefault(); window.BlakfyCookie.open();"> Çerez Tercihleri </a>
 ```
 
 Veya React:

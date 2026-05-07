@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 🔒 Security Vulnerability
+    url: https://github.com/tariktunc/blakfy-cookie/security/policy
+    about: Güvenlik açıkları için SECURITY.md'deki email adresini kullanın, public issue açmayın.
+  - name: 📚 Documentation
+    url: https://github.com/tariktunc/blakfy-cookie#readme
+    about: Kullanım, kurulum, API referansı README'de.
+  - name: 💬 Discussions
+    url: https://github.com/tariktunc/blakfy-cookie/discussions
+    about: Soru / fikir paylaşımı için (issue açmadan önce buraya bakın).

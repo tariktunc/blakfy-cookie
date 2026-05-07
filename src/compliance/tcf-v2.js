@@ -30,14 +30,27 @@ const bigIntToBits = (n, width) => {
 };
 
 const charToBits = (c) => intToBits(c.toUpperCase().charCodeAt(0) - 65, 6);
-const langToBits = (lang) => charToBits((lang || "EN").charAt(0)) + charToBits((lang || "EN").charAt(1));
+const langToBits = (lang) =>
+  charToBits((lang || "EN").charAt(0)) + charToBits((lang || "EN").charAt(1));
 
 const buildPurposes = (state) => {
   const out = new Array(24).fill(0);
   out[0] = 1;
-  if (state && state.analytics) { out[1] = 1; out[2] = 1; out[3] = 1; }
-  if (state && state.marketing) { out[4] = 1; out[5] = 1; out[6] = 1; out[7] = 1; out[8] = 1; }
-  if (state && state.functional) { out[9] = 1; }
+  if (state && state.analytics) {
+    out[1] = 1;
+    out[2] = 1;
+    out[3] = 1;
+  }
+  if (state && state.marketing) {
+    out[4] = 1;
+    out[5] = 1;
+    out[6] = 1;
+    out[7] = 1;
+    out[8] = 1;
+  }
+  if (state && state.functional) {
+    out[9] = 1;
+  }
   return out.join("");
 };
 
@@ -68,7 +81,8 @@ export const buildTCString = (opts) => {
     purposesConsent +
     purposesLI +
     "0" +
-    charToBits("A") + charToBits("A") +
+    charToBits("A") +
+    charToBits("A") +
     intToBits(0, 16) +
     intToBits(0, 16) +
     "1" +
@@ -82,17 +96,34 @@ export const buildTCString = (opts) => {
 };
 
 export const getTCString = () => lastTCString;
-export const setVendorList = (vl) => { vendorList = vl; };
+export const setVendorList = (vl) => {
+  vendorList = vl;
+};
 
 const buildPurposeMap = (state) => {
   const consents = {};
   const li = {};
   const s = state || {};
-  for (let i = 1; i <= 11; i++) { consents[i] = false; li[i] = false; }
+  for (let i = 1; i <= 11; i++) {
+    consents[i] = false;
+    li[i] = false;
+  }
   consents[1] = true;
-  if (s.analytics) { consents[2] = true; consents[3] = true; consents[4] = true; }
-  if (s.marketing) { consents[5] = true; consents[6] = true; consents[7] = true; consents[8] = true; consents[9] = true; }
-  if (s.functional) { consents[10] = true; }
+  if (s.analytics) {
+    consents[2] = true;
+    consents[3] = true;
+    consents[4] = true;
+  }
+  if (s.marketing) {
+    consents[5] = true;
+    consents[6] = true;
+    consents[7] = true;
+    consents[8] = true;
+    consents[9] = true;
+  }
+  if (s.functional) {
+    consents[10] = true;
+  }
   return { consents: consents, legitimateInterests: li };
 };
 
@@ -122,7 +153,7 @@ export const installTCFAPI = (opts) => {
       listenerId: typeof listenerId === "number" ? listenerId : null,
       addtlConsent: "",
       purpose: purposes,
-      vendor: { consents: {}, legitimateInterests: {} }
+      vendor: { consents: {}, legitimateInterests: {} },
     };
   };
 
@@ -135,13 +166,19 @@ export const installTCFAPI = (opts) => {
     cmpVersion: cmpVersion,
     cmpId: cmpId,
     gvlVersion: vendorList && vendorList.vendorListVersion ? vendorList.vendorListVersion : 0,
-    tcfPolicyVersion: 4
+    tcfPolicyVersion: 4,
   });
 
   const handle = (command, version, callback, parameter) => {
     if (typeof callback !== "function") return;
-    if (command === "ping") { callback(buildPing(), true); return; }
-    if (command === "getTCData") { callback(buildTCData(null), true); return; }
+    if (command === "ping") {
+      callback(buildPing(), true);
+      return;
+    }
+    if (command === "getTCData") {
+      callback(buildTCData(null), true);
+      return;
+    }
     if (command === "addEventListener") {
       const id = nextId++;
       listeners[id] = callback;
@@ -149,8 +186,10 @@ export const installTCFAPI = (opts) => {
       return;
     }
     if (command === "removeEventListener") {
-      if (listeners[parameter]) { delete listeners[parameter]; callback(true, true); }
-      else callback(false, true);
+      if (listeners[parameter]) {
+        delete listeners[parameter];
+        callback(true, true);
+      } else callback(false, true);
       return;
     }
     callback(null, false);
@@ -161,13 +200,18 @@ export const installTCFAPI = (opts) => {
     window.__tcfapi.__blakfy = true;
   }
 
-  if (typeof document !== "undefined" && !document.querySelector('iframe[name="__tcfapiLocator"]')) {
+  if (
+    typeof document !== "undefined" &&
+    !document.querySelector('iframe[name="__tcfapiLocator"]')
+  ) {
     try {
       const iframe = document.createElement("iframe");
       iframe.style.cssText = "display:none;position:absolute;width:0;height:0;border:0";
       iframe.name = "__tcfapiLocator";
       (document.body || document.documentElement).appendChild(iframe);
-    } catch (e) { /* noop */ }
+    } catch (e) {
+      /* noop */
+    }
   }
 
   if (!window.__blakfyTcfMsg) {
@@ -178,10 +222,21 @@ export const installTCFAPI = (opts) => {
       const payload = typeof data === "string" ? safeParse(data) : data;
       if (!payload || !payload.__tcfapiCall) return;
       const call = payload.__tcfapiCall;
-      handle(call.command, call.version, (returnValue, success) => {
-        const msg = { __tcfapiReturn: { returnValue: returnValue, success: success, callId: call.callId } };
-        try { ev.source && ev.source.postMessage(msg, ev.origin || "*"); } catch (e) { /* noop */ }
-      }, call.parameter);
+      handle(
+        call.command,
+        call.version,
+        (returnValue, success) => {
+          const msg = {
+            __tcfapiReturn: { returnValue: returnValue, success: success, callId: call.callId },
+          };
+          try {
+            ev.source && ev.source.postMessage(msg, ev.origin || "*");
+          } catch (e) {
+            /* noop */
+          }
+        },
+        call.parameter
+      );
     });
   }
 
@@ -189,16 +244,32 @@ export const installTCFAPI = (opts) => {
     const ids = Object.keys(listeners);
     for (let i = 0; i < ids.length; i++) {
       const id = ids[i];
-      try { listeners[id](buildTCData(parseInt(id, 10)), true); } catch (e) { /* noop */ }
+      try {
+        listeners[id](buildTCData(parseInt(id, 10)), true);
+      } catch (e) {
+        /* noop */
+      }
     }
   };
 
   if (subscribe) {
-    subscribe("change", () => { eventStatus = "useractioncomplete"; fireAll(); });
-    subscribe("display", (visible) => { displayStatus = visible ? "visible" : "hidden"; fireAll(); });
+    subscribe("change", () => {
+      eventStatus = "useractioncomplete";
+      fireAll();
+    });
+    subscribe("display", (visible) => {
+      displayStatus = visible ? "visible" : "hidden";
+      fireAll();
+    });
   }
 
   return { fireAll: fireAll };
 };
 
-const safeParse = (s) => { try { return JSON.parse(s); } catch (e) { return null; } };
+const safeParse = (s) => {
+  try {
+    return JSON.parse(s);
+  } catch (e) {
+    return null;
+  }
+};

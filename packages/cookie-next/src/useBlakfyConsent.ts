@@ -2,6 +2,7 @@
 // blakfy-cookie/packages/cookie-next/src/useBlakfyConsent.ts — event-based consent state hook (no polling)
 
 import { useCallback, useEffect, useState } from "react";
+
 import type { BlakfyConsentState, ConsentCategory, Jurisdiction } from "./types";
 
 export function useBlakfyConsent() {

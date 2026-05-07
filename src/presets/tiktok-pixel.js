@@ -7,5 +7,5 @@ export default {
   storage: [],
   scriptHosts: ["analytics.tiktok.com"],
   onGrant: (state) => {},
-  onRevoke: (state) => {}
+  onRevoke: (state) => {},
 };

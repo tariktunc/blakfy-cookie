@@ -7,5 +7,5 @@ export default {
   storage: [],
   scriptHosts: ["www.clarity.ms", "c.clarity.ms"],
   onGrant: (state) => {},
-  onRevoke: (state) => {}
+  onRevoke: (state) => {},
 };

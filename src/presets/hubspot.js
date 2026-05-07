@@ -7,5 +7,5 @@ export default {
   storage: [],
   scriptHosts: ["js.hs-scripts.com", "js.hs-analytics.net"],
   onGrant: (state) => {},
-  onRevoke: (state) => {}
+  onRevoke: (state) => {},
 };

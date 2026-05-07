@@ -6,7 +6,8 @@ const BADGE_BRAND = "Blakfy Studio";
 const BADGE_CLASS = "blakfy-badge";
 const PROTECT_STYLE_ID = "blakfy-badge-protect";
 
-const PROTECT_CSS = ".blakfy-badge{display:flex !important;visibility:visible !important;opacity:0.6 !important;pointer-events:auto !important;}.blakfy-badge:hover{opacity:1 !important;}.blakfy-badge[hidden]{display:flex !important;}";
+const PROTECT_CSS =
+  ".blakfy-badge{display:flex !important;visibility:visible !important;opacity:0.6 !important;pointer-events:auto !important;}.blakfy-badge:hover{opacity:1 !important;}.blakfy-badge[hidden]{display:flex !important;}";
 
 const mountedBadges = new Set();
 const slotMap = new WeakMap();
@@ -29,13 +30,14 @@ export const buildBadge = () => {
   strong.textContent = BADGE_BRAND;
   a.appendChild(strong);
 
-  let cssText = "display: flex !important; align-items: center; gap: 4px;"
-    + "position: absolute; bottom: 8px; right: 12px;"
-    + "font-size: 11px; font-family: system-ui, -apple-system, sans-serif;"
-    + "color: inherit; text-decoration: none;"
-    + "opacity: 0.6 !important; transition: opacity 0.2s;"
-    + "pointer-events: auto !important;"
-    + "z-index: 1;";
+  const cssText =
+    "display: flex !important; align-items: center; gap: 4px;" +
+    "position: absolute; bottom: 8px; right: 12px;" +
+    "font-size: 11px; font-family: system-ui, -apple-system, sans-serif;" +
+    "color: inherit; text-decoration: none;" +
+    "opacity: 0.6 !important; transition: opacity 0.2s;" +
+    "pointer-events: auto !important;" +
+    "z-index: 1;";
   a.style.cssText = cssText;
 
   return a;
@@ -203,7 +205,7 @@ export const installAntiTamper = (rootEl) => {
     childList: true,
     attributes: true,
     subtree: true,
-    attributeFilter: ["style", "class", "hidden"]
+    attributeFilter: ["style", "class", "hidden"],
   });
 
   if (document.head) {

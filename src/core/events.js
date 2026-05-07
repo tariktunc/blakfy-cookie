@@ -20,7 +20,11 @@ export const createEmitter = () => {
     const arr = listeners[event];
     if (!arr) return;
     for (let i = 0; i < arr.length; i++) {
-      try { arr[i].apply(null, args); } catch (e) { /* swallow listener errors */ }
+      try {
+        arr[i].apply(null, args);
+      } catch (e) {
+        /* swallow listener errors */
+      }
     }
   };
 

@@ -1,4 +1,5 @@
 import { describe, it, expect, vi, afterEach } from "vitest";
+
 import { mountBadges, installAntiTamper, disposeAntiTamper, buildBadge } from "../src/ui/badge.js";
 
 const makeRoot = () => {

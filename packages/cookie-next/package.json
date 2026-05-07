@@ -18,7 +18,10 @@
     "./package.json": "./package.json"
   },
   "sideEffects": false,
-  "files": ["dist", "README.md"],
+  "files": [
+    "dist",
+    "README.md"
+  ],
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch"
@@ -59,9 +62,15 @@
     "react-dom": ">=18 <20"
   },
   "peerDependenciesMeta": {
-    "next": { "optional": false },
-    "react": { "optional": false },
-    "react-dom": { "optional": false }
+    "next": {
+      "optional": false
+    },
+    "react": {
+      "optional": false
+    },
+    "react-dom": {
+      "optional": false
+    }
   },
   "devDependencies": {
     "tsup": "^8.0.0",

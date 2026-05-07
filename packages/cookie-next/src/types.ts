@@ -27,12 +27,7 @@ export type BlakfyLocale =
 
 export type Jurisdiction = "GDPR" | "CCPA" | "LGPD" | "default";
 
-export type ConsentCategory =
-  | "essential"
-  | "analytics"
-  | "marketing"
-  | "functional"
-  | "recording";
+export type ConsentCategory = "essential" | "analytics" | "marketing" | "functional" | "recording";
 
 export interface BlakfyConsentState {
   id: string;
@@ -99,12 +94,7 @@ declare global {
     uetq?: unknown[];
     ym?: unknown;
     dataLayer?: unknown[];
-    __tcfapi?: (
-      cmd: string,
-      version: number,
-      callback: Function,
-      parameter?: unknown
-    ) => void;
+    __tcfapi?: (cmd: string, version: number, callback: Function, parameter?: unknown) => void;
     __uspapi?: (cmd: string, version: number, callback: Function) => void;
   }
 }

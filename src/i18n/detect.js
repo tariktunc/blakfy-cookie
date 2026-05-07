@@ -1,11 +1,29 @@
 // blakfy-cookie/src/i18n/detect.js — BCP47 locale detection and direction metadata
 
 export const SUPPORTED_LOCALES = [
-  "tr", "en", "ar", "fa", "ur",
-  "fr", "ru", "de", "he", "uk",
-  "es", "it", "pt", "nl", "pl", "sv", "cs",
-  "zh", "zh-TW", "ja", "ko",
-  "id", "hi"
+  "tr",
+  "en",
+  "ar",
+  "fa",
+  "ur",
+  "fr",
+  "ru",
+  "de",
+  "he",
+  "uk",
+  "es",
+  "it",
+  "pt",
+  "nl",
+  "pl",
+  "sv",
+  "cs",
+  "zh",
+  "zh-TW",
+  "ja",
+  "ko",
+  "id",
+  "hi",
 ];
 
 export const RTL_LOCALES = ["ar", "he", "fa", "ur"];
@@ -37,7 +55,9 @@ export const detectLocale = ({ configLocale, supported, defaultLocale }) => {
       const ql = normalizeLocale(qp, list);
       if (ql) return ql;
     }
-  } catch (e) { /* ignore */ }
+  } catch (e) {
+    /* ignore */
+  }
   const htmlLang = document.documentElement.lang;
   if (htmlLang) {
     const hl = normalizeLocale(htmlLang, list);

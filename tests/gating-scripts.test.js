@@ -1,4 +1,5 @@
 import { describe, it, expect } from "vitest";
+
 import { unblockScripts } from "../src/gating/script-unblocker.js";
 
 describe("unblockScripts", () => {
@@ -16,7 +17,9 @@ describe("unblockScripts", () => {
     expect(live).not.toBeNull();
     expect(live.getAttribute("type")).toBeNull();
 
-    const remaining = document.querySelectorAll('script[type="text/plain"][data-blakfy-category="marketing"]:not([data-blakfy-unblocked="true"])');
+    const remaining = document.querySelectorAll(
+      'script[type="text/plain"][data-blakfy-category="marketing"]:not([data-blakfy-unblocked="true"])'
+    );
     expect(remaining.length).toBe(0);
   });
 

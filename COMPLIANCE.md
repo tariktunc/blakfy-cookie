@@ -6,38 +6,40 @@
 
 ## 1. Compliance Matrisi
 
-| Yasa / Standart | Yetki Alanı | Modül | Durum (v2.0.0) |
-|---|---|---|---|
-| **GDPR** | AB | core + ui (eşit prominence butonlar, pre-tick yok) | ✅ |
-| **ePrivacy Directive** | AB | core (consent öncesi cookie konmaz) | ✅ |
-| **KVKK** | Türkiye | core/audit.js (Md.12 kanıt yükümlülüğü) | ✅ |
-| **CCPA / CPRA** | Kaliforniya, ABD | compliance/ccpa.js | ✅ |
-| **LGPD** | Brezilya | i18n/translations/pt.js + jurisdiction | ⚠️ (v2.1) |
-| **Google Consent Mode v2** | Google ekosistemi | compliance/google-cmv2.js | ✅ |
-| **Microsoft UET Consent Mode** | Bing Ads + Clarity | compliance/microsoft-uet.js | ✅ |
-| **Yandex Metrica Consent** | Yandex ekosistemi | compliance/yandex-metrica.js | ✅ |
-| **IAB TCF v2.2** | AB AdTech (AdSense/Ad Manager) | compliance/tcf-v2.js | ✅ kod + ⏳ sertifikasyon |
-| **GPC** (Global Privacy Control) | Tarayıcı standardı, CA yasal | compliance/gpc.js | ✅ |
-| **DNT** (Do Not Track) | Tarayıcı standardı | compliance/dnt.js | ✅ |
+| Yasa / Standart                  | Yetki Alanı                    | Modül                                              | Durum (v2.0.0)            |
+| -------------------------------- | ------------------------------ | -------------------------------------------------- | ------------------------- |
+| **GDPR**                         | AB                             | core + ui (eşit prominence butonlar, pre-tick yok) | ✅                        |
+| **ePrivacy Directive**           | AB                             | core (consent öncesi cookie konmaz)                | ✅                        |
+| **KVKK**                         | Türkiye                        | core/audit.js (Md.12 kanıt yükümlülüğü)            | ✅                        |
+| **CCPA / CPRA**                  | Kaliforniya, ABD               | compliance/ccpa.js                                 | ✅                        |
+| **LGPD**                         | Brezilya                       | i18n/translations/pt.js + jurisdiction             | ⚠️ (v2.1)                 |
+| **Google Consent Mode v2**       | Google ekosistemi              | compliance/google-cmv2.js                          | ✅                        |
+| **Microsoft UET Consent Mode**   | Bing Ads + Clarity             | compliance/microsoft-uet.js                        | ✅                        |
+| **Yandex Metrica Consent**       | Yandex ekosistemi              | compliance/yandex-metrica.js                       | ✅                        |
+| **IAB TCF v2.2**                 | AB AdTech (AdSense/Ad Manager) | compliance/tcf-v2.js                               | ✅ kod + ⏳ sertifikasyon |
+| **GPC** (Global Privacy Control) | Tarayıcı standardı, CA yasal   | compliance/gpc.js                                  | ✅                        |
+| **DNT** (Do Not Track)           | Tarayıcı standardı             | compliance/dnt.js                                  | ✅                        |
 
 ---
 
 ## 2. Google Consent Mode v2
 
 **Sinyal:**
+
 ```js
-gtag('consent', 'update', {
-  ad_storage:              marketing  ? 'granted' : 'denied',
-  ad_user_data:            marketing  ? 'granted' : 'denied',
-  ad_personalization:      marketing  ? 'granted' : 'denied',
-  analytics_storage:       analytics  ? 'granted' : 'denied',
-  functionality_storage:   functional ? 'granted' : 'denied',
-  personalization_storage: functional ? 'granted' : 'denied',
-  security_storage:        'granted'
+gtag("consent", "update", {
+  ad_storage: marketing ? "granted" : "denied",
+  ad_user_data: marketing ? "granted" : "denied",
+  ad_personalization: marketing ? "granted" : "denied",
+  analytics_storage: analytics ? "granted" : "denied",
+  functionality_storage: functional ? "granted" : "denied",
+  personalization_storage: functional ? "granted" : "denied",
+  security_storage: "granted",
 });
 ```
 
 **Bootstrap (cookie-defaults.min.js):**
+
 - Tüm sinyaller default `denied`
 - `wait_for_update: 500` ile GTM/GA4 cevap bekler
 - `gtag` global fonksiyonu yoksa stub kurulur
@@ -47,10 +49,11 @@ gtag('consent', 'update', {
 ## 3. Microsoft UET Consent Mode
 
 **Sinyal:**
+
 ```js
 window.uetq = window.uetq || [];
-window.uetq.push('consent', 'update', {
-  ad_storage: marketing ? 'granted' : 'denied'
+window.uetq.push("consent", "update", {
+  ad_storage: marketing ? "granted" : "denied",
 });
 ```
 
@@ -98,15 +101,17 @@ Yandex'in Google gibi standart bir consent API'si yok. Yaklaşımımız:
 **Kapsam:** Kaliforniya sakinleri için.
 
 **Tetiklenme:** `src/geo/jurisdiction.js` ABD/CA tespit ederse:
+
 - Banner "Reddet" yerine **"Do Not Sell or Share My Personal Information"** olarak değiştirilir.
 - Footer'a kalıcı `<a class="blakfy-ccpa-link">` eklenir (yasal zorunluluk).
 - `Sec-GPC: 1` header otomatik opt-out say.
 - USP string `1YYY` formatında set edilir (versiyon, opt-out, sale, third-party).
 
 **API:**
+
 ```js
-BlakfyCookie.ccpa.optOut()
-BlakfyCookie.ccpa.isOptedOut()
+BlakfyCookie.ccpa.optOut();
+BlakfyCookie.ccpa.isOptedOut();
 ```
 
 ---
@@ -114,6 +119,7 @@ BlakfyCookie.ccpa.isOptedOut()
 ## 7. GPC (Global Privacy Control)
 
 `navigator.globalPrivacyControl === true` ise:
+
 - `marketing` ve `analytics` kategorileri **otomatik denied** (kullanıcı açık onay vermediyse)
 - CCPA jurisdiction'da yasal olarak zorunlu opt-out
 - GDPR jurisdiction'da rehberlik niteliğinde, biz default'ta saygı gösteriyoruz
@@ -125,6 +131,7 @@ Override: `data-blakfy-gpc="ignore"` ile kapatılabilir (önerilmez).
 ## 8. DNT (Do Not Track)
 
 `navigator.doNotTrack === "1"` ise:
+
 - Default'ta **sadece UI'da işaret** (kullanıcı görsün, "GPC veya DNT etkin" yazısı)
 - `data-blakfy-dnt="auto-deny"` ile auto-deny opsiyonel
 
@@ -170,19 +177,20 @@ Her consent değişikliği `data-blakfy-audit-endpoint`'e POST edilir:
 
 ## 11. Kategori → Yasal Temel Eşlemesi
 
-| Kategori | GDPR Yasal Temel | KVKK | CCPA |
-|---|---|---|---|
-| `essential` | Art. 6(1)(b) — sözleşme/zorunluluk | Md.5(2)(c) | exempt |
-| `analytics` | Art. 6(1)(a) — açık rıza | Md.5(1) | optable |
-| `marketing` | Art. 6(1)(a) — açık rıza | Md.5(1) | optable + GPC saygısı |
-| `functional` | Art. 6(1)(a) — açık rıza | Md.5(1) | optable |
-| `recording` (Webvisor) | Art. 6(1)(a) — ek granular onay | Md.5(1) açık rıza | optable |
+| Kategori               | GDPR Yasal Temel                   | KVKK              | CCPA                  |
+| ---------------------- | ---------------------------------- | ----------------- | --------------------- |
+| `essential`            | Art. 6(1)(b) — sözleşme/zorunluluk | Md.5(2)(c)        | exempt                |
+| `analytics`            | Art. 6(1)(a) — açık rıza           | Md.5(1)           | optable               |
+| `marketing`            | Art. 6(1)(a) — açık rıza           | Md.5(1)           | optable + GPC saygısı |
+| `functional`           | Art. 6(1)(a) — açık rıza           | Md.5(1)           | optable               |
+| `recording` (Webvisor) | Art. 6(1)(a) — ek granular onay    | Md.5(1) açık rıza | optable               |
 
 ---
 
 ## 12. Test Kapsamı
 
 `tests/compliance/` altında her modül için ayrı test:
+
 - `google-cmv2.test.js` — gtag stub kurulumu, update sinyalleri
 - `microsoft-uet.test.js` — uetq queue, consent push
 - `yandex-metrica.test.js` — cookie engelleme, Webvisor ayrı kategori

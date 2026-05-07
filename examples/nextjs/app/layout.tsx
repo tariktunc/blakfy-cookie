@@ -8,11 +8,7 @@ export const metadata: Metadata = {
     "Minimal Next.js 15 demo of @blakfy/cookie-next: SSR-safe consent widget with GCM v2, UET, Yandex, TCF v2.2, CCPA.",
 };
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="tr" suppressHydrationWarning>
       <head>

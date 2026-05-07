@@ -1,4 +1,5 @@
 import { describe, it, expect, beforeEach } from "vitest";
+
 import { registerCleanup, runCleanup, clearAllRules } from "../src/gating/cleaner.js";
 
 beforeEach(() => {
@@ -16,7 +17,7 @@ describe("cleaner registerCleanup + runCleanup", () => {
     registerCleanup({
       category: "analytics",
       cookies: ["_ga", /^_ga_/],
-      storage: ["ga-session"]
+      storage: ["ga-session"],
     });
 
     runCleanup("analytics");

@@ -16,6 +16,6 @@ export const pushUET = (state) => {
   const s = state || {};
   window.uetq = window.uetq || [];
   window.uetq.push("consent", "update", {
-    ad_storage: s.marketing ? "granted" : "denied"
+    ad_storage: s.marketing ? "granted" : "denied",
   });
 };

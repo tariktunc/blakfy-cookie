@@ -8,5 +8,5 @@ export default {
   storage: [],
   scriptHosts: ["mc.yandex.ru", "mc.webvisor.com", "mc.yandex.com"],
   onGrant: (state) => {},
-  onRevoke: (state) => {}
+  onRevoke: (state) => {},
 };

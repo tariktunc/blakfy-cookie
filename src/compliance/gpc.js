@@ -2,7 +2,13 @@
 
 export const getGPC = () => {
   if (typeof navigator !== "undefined" && navigator.globalPrivacyControl === true) return true;
-  if (typeof document !== "undefined" && document.documentElement && document.documentElement.dataset && document.documentElement.dataset.gpc === "1") return true;
+  if (
+    typeof document !== "undefined" &&
+    document.documentElement &&
+    document.documentElement.dataset &&
+    document.documentElement.dataset.gpc === "1"
+  )
+    return true;
   return false;
 };
 

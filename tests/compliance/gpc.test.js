@@ -1,4 +1,5 @@
 import { describe, it, expect, vi, afterEach } from "vitest";
+
 import { getGPC, applyGPC } from "../../src/compliance/gpc.js";
 
 const setNavGPC = (val) => {
@@ -6,7 +7,11 @@ const setNavGPC = (val) => {
 };
 
 afterEach(() => {
-  try { delete navigator.globalPrivacyControl; } catch (e) { /* ignore */ }
+  try {
+    delete navigator.globalPrivacyControl;
+  } catch (e) {
+    /* ignore */
+  }
 });
 
 describe("getGPC", () => {
@@ -16,7 +21,11 @@ describe("getGPC", () => {
   });
 
   it("returns false when not set", () => {
-    try { delete navigator.globalPrivacyControl; } catch (e) { /* ignore */ }
+    try {
+      delete navigator.globalPrivacyControl;
+    } catch (e) {
+      /* ignore */
+    }
     expect(getGPC()).toBe(false);
   });
 
@@ -53,7 +62,11 @@ describe("applyGPC", () => {
   });
 
   it("does nothing when GPC signal is not present", () => {
-    try { delete navigator.globalPrivacyControl; } catch (e) { /* ignore */ }
+    try {
+      delete navigator.globalPrivacyControl;
+    } catch (e) {
+      /* ignore */
+    }
     const setPrefs = vi.fn();
     const result = applyGPC({ mode: "respect", currentState: null, setPrefs });
     expect(result.applied).toBe(false);
