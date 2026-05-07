@@ -8,6 +8,37 @@
 
 ---
 
+## Installation
+
+İki yol var. Birini seç.
+
+### A) CDN (önerilen — sıfır konfigürasyon)
+
+| Strateji | URL | Ne zaman kullan |
+|---|---|---|
+| **Pinned** (sabit sürüm) | `cdn.jsdelivr.net/npm/@blakfy/cookie@2.1.1/dist/cookie.min.js` | Production — değişikliklerin gözden geçirilerek kabul edilmesini istersen |
+| **Auto-patch** (semver tag) | `cdn.jsdelivr.net/npm/@blakfy/cookie@2/dist/cookie.min.js` | Otomatik güvenlik/patch güncellemeleri — major (`@3`) gelene kadar takip eder |
+
+unpkg da çalışır: `unpkg.com/@blakfy/cookie@2.1.1/dist/cookie.min.js`.
+
+### B) npm / bundler (Vite, Webpack, Rollup, Astro)
+
+```bash
+npm i @blakfy/cookie              # Vanilla / bundler için widget
+npm i @blakfy/cookie-next         # Next.js / React wrapper (cookie'yi peer olarak çekmez, sadece wrapper)
+```
+
+```js
+// app.js veya main.js
+import "@blakfy/cookie";
+```
+
+Bundler ile gelen versiyonu kontrol etmek için: `import { version } from "@blakfy/cookie"` mevcut değil — runtime'da `window.BlakfyCookie.version`.
+
+> 💡 **Public API:** `window.BlakfyCookie` global'i hem CDN hem npm install yöntemiyle aynı şekilde tanımlanır. Aşağıdaki Quick Start CDN örneğindedir; npm install ediyorsan `<script src=...>` yerine `import "@blakfy/cookie"` kullan, gerisi aynı.
+
+---
+
 ## Quick Start (3 adım)
 
 ### 1. Bootstrap (head içine, ilk script olarak)
@@ -101,6 +132,16 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   );
 }
 ```
+
+**`@blakfy/cookie-next` export'ları:**
+
+| Export | Tip | Açıklama |
+|---|---|---|
+| `BlakfyCookieProvider` | React component | Widget'ı `next/script beforeInteractive` ile yükler. Tüm `data-blakfy-*` attribute'ları prop olarak. |
+| `ConsentModeDefault` | React component | Bootstrap script'i (gtag/uetq/ym defaults `denied`). `<head>` içinde kullan. |
+| `useBlakfyConsent()` | Hook | Mevcut consent state'i döndürür, değişimde re-render. |
+| `useGating(category)` | Hook | Belirtilen kategori onaylı mı (`boolean`). Conditional render için. |
+| `useTcf()` | Hook | TCF v2.2 TC string ve event listener wrapper'ı. |
 
 Tam Next.js örneği: [`examples/nextjs/`](./examples/nextjs/).
 Paket README'si: [`packages/cookie-next/README.md`](./packages/cookie-next/README.md).
@@ -211,7 +252,7 @@ Tüm `<script>` tag'i üzerine konabilen `data-blakfy-*` attribute'ları:
 | `data-blakfy-ccpa` | `auto` | enum | `auto` (jurisdiction tespiti), `true` (her zaman aç), `false` (kapat) |
 | `data-blakfy-gpc` | `respect` | enum | `respect` (tarayıcı GPC'si auto-deny say) \| `ignore` |
 | `data-blakfy-dnt` | `respect` | enum | `respect` (UI'da uyar) \| `auto-deny` (auto-reject) |
-| `data-blakfy-status-url` | jsDelivr `@2/status.json` | URL | Status bar mesajları için kaynak. |
+| `data-blakfy-status-url` | `cdn.jsdelivr.net/npm/@blakfy/cookie@2/status.json` | URL | Status bar mesajları için kaynak. Kendi domain'inde host'lamak için override et. |
 | `data-blakfy-status` | `true` | bool | `false` ise status bar render edilmez. |
 
 **Desteklenen 23 dil:** `tr`, `en`, `ar`, `fa`, `ur`, `fr`, `ru`, `de`, `he`, `uk`, `es`, `it`, `pt`, `nl`, `pl`, `sv`, `cs`, `zh`, `zh-TW`, `ja`, `ko`, `id`, `hi` (RTL: `ar`, `fa`, `ur`, `he`).
@@ -224,7 +265,7 @@ Tüm `<script>` tag'i üzerine konabilen `data-blakfy-*` attribute'ları:
 
 | Metod | Sürüm | İmza | Açıklama |
 |---|---|---|---|
-| `version` | v1 | `string` | Kütüphane sürümü, örn. `"2.1.0"`. |
+| `version` | v1 | `string` | Kütüphane sürümü, örn. `"2.1.1"`. |
 | `open()` | v1 | `() => void` | Tercihler modalını aç. |
 | `acceptAll()` | v1 | `() => void` | Tüm kategorileri kabul et. |
 | `rejectAll()` | v1 | `() => void` | Tüm kategorileri reddet (essential dışında). |
@@ -440,7 +481,16 @@ Webvisor `marketing` değil, **`recording`** kategorisi gerektirir. Modal'da bu 
 
 ## Migration v1 → v2
 
-**Kısa cevap:** Değişiklik gerekmez. v1 kullanıcıları `@1` etiketinde kalır, çalışmaya devam eder. v2'ye opt-in yapmak için **CDN URL'sindeki `@1` → `@2`** ve dosya adı `cookie.js` → `dist/cookie.min.js` güncellemesi yeterli — tüm v1 attribute'ları korunur, kullanıcı consent cookie'si geriye uyumlu okunur.
+**Kısa cevap:** Değişiklik gerekmez. v1 kullanıcıları `@1` etiketinde kalır, çalışmaya devam eder. v2'ye opt-in yapmak için **CDN URL'sini npm registry kaynağına çevir**:
+
+```diff
+- <script src="https://cdn.jsdelivr.net/gh/tariktunc/blakfy-cookie@1/cookie.js"></script>
++ <script src="https://cdn.jsdelivr.net/npm/@blakfy/cookie@2/dist/cookie.min.js"></script>
+```
+
+Tüm v1 attribute'ları korunur, kullanıcı consent cookie'si geriye uyumlu okunur. v2'de yeni eklenen özellikler (3-tab modal, 3 renk teması, 18 preset, TCF v2.2, CCPA, GPC) **opt-in** — varsayılanlar v1 davranışını taklit eder.
+
+Bundler kullanıyorsan: `npm i @blakfy/cookie` ve `import "@blakfy/cookie"`.
 
 Detay: [`MIGRATION.md`](./MIGRATION.md).
 
