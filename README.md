@@ -76,12 +76,13 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
   data-blakfy-presets="ga4,gtm,facebook,clarity"
   data-blakfy-ccpa="auto"
   data-blakfy-tcf="false"
-  data-blakfy-position="bottom-right"
   data-blakfy-theme="auto"
   data-blakfy-accent="#3E5C3A"></script>
+<!-- Konum varsayılanı: alt-orta (bottom-center). İstersen data-blakfy-position="bottom-right" / "top-center" vb. ile değiştir. -->
+
 ```
 
-**Bittiğinde:** Sayfa yüklendiğinde sağ alt köşede consent banner ve "Powered by Blakfy Studio" badge belirir. Kullanıcı bir karar verene kadar GTM/GA4/Facebook Pixel/Clarity tag'leri çalışmaz; karar verildiğinde otomatik aktif olur.
+**Bittiğinde:** Sayfa yüklendiğinde **alt-orta**'da (varsayılan) consent banner ve "Powered by Blakfy Studio" badge belirir. Konumu değiştirmek için `data-blakfy-position` ile `bottom-right`, `bottom-left`, `top-center`, `top-right`, `top-left` seçeneklerinden birini ver. Kullanıcı bir karar verene kadar GTM/GA4/Facebook Pixel/Clarity tag'leri çalışmaz; karar verildiğinde otomatik aktif olur.
 
 ---
 
@@ -121,7 +122,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           presets="ga4,gtm,facebook,clarity"
           ccpa="auto"
           tcf={false}
-          position="bottom-right"
+          // position varsayılanı "bottom-center" — değiştirmek istersen aç:
+          // position="bottom-right"
           theme="auto"
           accent="#3E5C3A"
         >
@@ -243,7 +245,7 @@ Tüm `<script>` tag'i üzerine konabilen `data-blakfy-*` attribute'ları:
 | `data-blakfy-policy-url` | `/cerez-politikasi` | URL | "Çerez Politikası" linki için hedef. |
 | `data-blakfy-version` | `1.0` | string | **Politika versiyonu**. Bunu artırırsan tüm kullanıcılar tekrar onay vermek zorunda (re-consent). |
 | `data-blakfy-audit-endpoint` | `null` | URL | Consent kararı bu endpoint'e POST edilir (KVKK Md.12 / GDPR Art.7(1) kanıt). |
-| `data-blakfy-position` | `bottom-right` | enum | `bottom-right` \| `bottom-left` \| `bottom` \| `top` \| `center` |
+| `data-blakfy-position` | `bottom-center` | enum | `bottom-center` \| `bottom-right` \| `bottom-left` \| `top-center` \| `top-right` \| `top-left` |
 | `data-blakfy-theme` | `auto` | enum | **`light`** (beyaz) \| **`gray`** (açık gri) \| **`dark`** (siyah) \| `auto` (`prefers-color-scheme`) |
 | `data-blakfy-accent` | `#3E5C3A` | hex | Buton ve vurgu rengi. |
 | `data-blakfy-presets` | `null` | virgül listesi | Etkinleştirilecek preset key'leri. Örn: `ga4,gtm,facebook,clarity`. Aşağıda 18 preset listesi. |

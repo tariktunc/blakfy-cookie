@@ -72,7 +72,7 @@ add_action('wp_footer', function () {
     data-blakfy-tcf="false"
     data-blakfy-gpc="respect"
     data-blakfy-dnt="respect"
-    data-blakfy-position="bottom-right"
+    data-blakfy-position="bottom-center"
     data-blakfy-theme="auto"
     data-blakfy-accent="#3E5C3A"></script>
 <?php });
