@@ -47,7 +47,7 @@ export function BlakfyCookieProvider({
     };
   }, [locale]);
 
-  const src = srcOverride || `https://cdn.jsdelivr.net/gh/tariktunc/blakfy-cookie@v${cdnVersion}/dist/cookie.min.js`;
+  const src = srcOverride || `https://cdn.jsdelivr.net/npm/@blakfy/cookie@${cdnVersion}/dist/cookie.min.js`;
 
   const dataAttrs: Record<string, string> = {};
   dataAttrs["data-blakfy-locale"] = locale;

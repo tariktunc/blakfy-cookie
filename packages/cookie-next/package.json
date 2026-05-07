@@ -1,6 +1,6 @@
 {
   "name": "@blakfy/cookie-next",
-  "version": "2.1.0",
+  "version": "2.1.1",
   "description": "Next.js / React wrapper for Blakfy Cookie Consent. SSR-safe, no FOUC.",
   "main": "dist/index.js",
   "module": "dist/index.mjs",

@@ -4,6 +4,19 @@ All notable changes follow [Keep a Changelog](https://keepachangelog.com/) and S
 
 ---
 
+## [2.1.1] — 2026-05-07
+
+### Changed
+- **CDN_BASE** runtime URL'i `cdn.jsdelivr.net/gh/tariktunc/blakfy-cookie@v2` → `cdn.jsdelivr.net/npm/@blakfy/cookie@2` (versiyonlu, immutable, npm registry kaynağı)
+- `cookie-next` `BlakfyCookieProvider`: `cdnVersion` prop'u artık npm CDN URL'i üretir (default `"2"` → `@blakfy/cookie@2`)
+- `package.json` `files` listesine `status.json` eklendi (widget runtime'da fetch eder)
+
+### Notes
+- Bu sadece patch yayınıdır; v2.1.0 ile tüm public API'ler ve davranış aynıdır.
+- `srcOverride` (Next wrapper) ile özel CDN URL'i geçenler etkilenmez.
+
+---
+
 ## [2.1.0] — 2026-04-30
 
 ### Added

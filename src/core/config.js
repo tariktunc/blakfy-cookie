@@ -1,6 +1,6 @@
 // blakfy-cookie/src/core/config.js — script tag attribute reader and v2 defaults
 
-export const CDN_BASE = "https://cdn.jsdelivr.net/gh/tariktunc/blakfy-cookie@v2";
+export const CDN_BASE = "https://cdn.jsdelivr.net/npm/@blakfy/cookie@2";
 
 export const DEFAULTS = {
   locale: "auto",
