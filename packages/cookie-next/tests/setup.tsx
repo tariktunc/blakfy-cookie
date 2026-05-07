@@ -51,13 +51,16 @@ vi.mock("next/script", () => ({
 }));
 
 afterEach(() => {
-  cleanup();
-  // window.BlakfyCookie ve global flag'leri reset
-  delete (window as unknown as Record<string, unknown>).BlakfyCookie;
-  delete (window as unknown as Record<string, unknown>).__blakfyConsentDefaultsLoaded;
-  delete (window as unknown as Record<string, unknown>).__tcfapi;
-  delete (window as unknown as Record<string, unknown>).gtag;
-  delete (window as unknown as Record<string, unknown>).uetq;
-  delete (window as unknown as Record<string, unknown>).ym;
-  delete (window as unknown as Record<string, unknown>).dataLayer;
+  // RTL cleanup ve window state reset SADECE jsdom env'de
+  // (Node env'de SSR testleri için window yok, document yok)
+  if (typeof window !== "undefined") {
+    cleanup();
+    delete (window as unknown as Record<string, unknown>).BlakfyCookie;
+    delete (window as unknown as Record<string, unknown>).__blakfyConsentDefaultsLoaded;
+    delete (window as unknown as Record<string, unknown>).__tcfapi;
+    delete (window as unknown as Record<string, unknown>).gtag;
+    delete (window as unknown as Record<string, unknown>).uetq;
+    delete (window as unknown as Record<string, unknown>).ym;
+    delete (window as unknown as Record<string, unknown>).dataLayer;
+  }
 });
