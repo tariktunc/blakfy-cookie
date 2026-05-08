@@ -51,7 +51,14 @@ export interface BlakfyCookieConfig {
   policyUrl?: string;
   policyVersion?: string;
   auditEndpoint?: string;
-  position?: "bottom-right" | "bottom-left" | "bottom" | "top" | "center";
+  position?:
+    | "bottom-center"
+    | "bottom-right"
+    | "bottom-left"
+    | "top-center"
+    | "top-right"
+    | "top-left"
+    | "center";
   theme?: "light" | "dark" | "auto";
   accent?: string;
   presets?: string;
