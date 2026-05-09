@@ -19,22 +19,43 @@ import {
 import { getScriptEl, readConfig } from "./core/config.js";
 import { readCookie } from "./core/consent-store.js";
 import { createEmitter } from "./core/events.js";
+import { runCleanup, registerCleanup } from "./gating/cleaner.js";
 import { unblockIframes, installPlaceholders } from "./gating/iframe-unblocker.js";
+import { startObserver, scanAll } from "./gating/observer.js";
 import { unblockScripts } from "./gating/script-unblocker.js";
+import { detectJurisdiction } from "./geo/jurisdiction.js";
 import { detectLocale, detectMainLang, RTL_LOCALES } from "./i18n/detect.js";
 import { getTranslation } from "./i18n/index.js";
-import { injectStyles } from "./ui/styles.js";
-import { createBanner } from "./ui/banner.js";
-import { createModal } from "./ui/modal.js";
-import { mountBadges, installAntiTamper } from "./ui/badge.js";
-import { installFocusTrap, removeFocusTrap } from "./ui/focus-trap.js";
-import { fetchStatus, renderStatus } from "./ui/status-bar.js";
-import { startObserver, scanAll } from "./gating/observer.js";
-import { runCleanup, registerCleanup } from "./gating/cleaner.js";
 import { applyPreset } from "./presets/_registry.js";
-import { detectJurisdiction } from "./geo/jurisdiction.js";
+import { mountBadges, installAntiTamper } from "./ui/badge.js";
+import { createBanner } from "./ui/banner.js";
+import { installFocusTrap, removeFocusTrap } from "./ui/focus-trap.js";
+import { createModal } from "./ui/modal.js";
+import { fetchStatus, renderStatus } from "./ui/status-bar.js";
+import { injectStyles } from "./ui/styles.js";
+import {
+  detectSiteTheme,
+  watchSiteTheme,
+  applyThemeToCard,
+  normalizeThemeValue,
+} from "./ui/theme-bridge.js";
 
 const ROOT_OVERLAY_CLASS = "blakfy-overlay";
+
+const VALID_POSITIONS = {
+  "bottom-center": 1,
+  "bottom-right": 1,
+  "bottom-left": 1,
+  "top-center": 1,
+  "top-right": 1,
+  "top-left": 1,
+  center: 1,
+};
+
+const resolvePosition = (raw) => {
+  if (raw && Object.prototype.hasOwnProperty.call(VALID_POSITIONS, raw)) return raw;
+  return "bottom-center";
+};
 
 const bootstrap = async () => {
   if (typeof window === "undefined" || typeof document === "undefined") return;
@@ -50,20 +71,26 @@ const bootstrap = async () => {
   let t = getTranslation(currentLocale);
   let isRTL = RTL_LOCALES.indexOf(currentLocale) > -1;
 
-  // 2b. resolve theme: auto → light/dark via matchMedia; aliases white→light, black→dark
-  const resolveTheme = (raw) => {
-    if (raw === "auto") {
-      try {
-        return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
-      } catch (e) {
-        return "light";
-      }
-    }
-    if (raw === "black") return "dark";
-    if (raw === "white") return "light";
-    return raw || "light";
-  };
-  const theme = resolveTheme(config.theme);
+  // 2b. resolve theme via bridge: explicit (light/dark/gray) bypasses bridge;
+  // "auto" reads host site's class/data-theme contract, watches for changes.
+  const normalized = normalizeThemeValue(config.theme);
+  const isExplicit = normalized === "light" || normalized === "dark" || normalized === "gray";
+  let theme = isExplicit ? normalized : detectSiteTheme();
+  const trackedCards = new Set();
+  let unwatchTheme = null;
+
+  if (!isExplicit) {
+    unwatchTheme = watchSiteTheme((next) => {
+      theme = next;
+      trackedCards.forEach((card) => {
+        if (!card || !document.body.contains(card)) {
+          trackedCards.delete(card);
+          return;
+        }
+        applyThemeToCard(card, next);
+      });
+    });
+  }
 
   // 3. styles
   injectStyles();
@@ -191,7 +218,7 @@ const bootstrap = async () => {
   // Helper: mount banner overlay
   const mountBanner = () => {
     const overlay = document.createElement("div");
-    overlay.className = ROOT_OVERLAY_CLASS + " widget " + (config.position || "bottom-right");
+    overlay.className = ROOT_OVERLAY_CLASS + " widget " + resolvePosition(config.position);
     const card = createBanner({
       t: t,
       isRTL: isRTL,
@@ -211,6 +238,7 @@ const bootstrap = async () => {
     overlay.appendChild(card);
     document.body.appendChild(overlay);
     api.__internal.setUI("banner", overlay);
+    if (!isExplicit) trackedCards.add(card);
     mountBadges(card);
     installAntiTamper(card);
     installFocusTrap(card, {
@@ -247,6 +275,7 @@ const bootstrap = async () => {
     overlay.appendChild(card);
     document.body.appendChild(overlay);
     api.__internal.setUI("modal", overlay);
+    if (!isExplicit) trackedCards.add(card);
     mountBadges(card);
     installAntiTamper(card);
     installFocusTrap(card, { onEscape: () => api.__internal.closeUI() });
@@ -303,6 +332,21 @@ const bootstrap = async () => {
     fetchStatus(config.statusUrl).then((data) => {
       if (data) renderStatus({ data: data, currentLocale: currentLocale, mainLang: mainLang });
     });
+  }
+
+  // 18. cleanup theme bridge on page unload (best-effort; SPAs typically never unload)
+  if (unwatchTheme && typeof window.addEventListener === "function") {
+    window.addEventListener(
+      "pagehide",
+      () => {
+        try {
+          unwatchTheme();
+        } catch (e) {
+          /* ignore */
+        }
+      },
+      { once: true }
+    );
   }
 };
 

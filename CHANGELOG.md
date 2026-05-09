@@ -4,6 +4,41 @@ All notable changes follow [Keep a Changelog](https://keepachangelog.com/) and S
 
 ---
 
+## [2.3.0] — 2026-05-09
+
+### Added
+
+- **Site theme bridge** (`src/ui/theme-bridge.js`) — `theme="auto"` artık host site'ın class/data-theme sözleşmesini okur ve değişiklikleri canlı izler. Site light moddayken widget light, dark moddayken dark. Eskiden sadece OS-level `prefers-color-scheme` okunuyordu — artık çoklu sinyal zinciri:
+  1. `<html class="dark">` veya `<html class="light">` ← WebForge canonical (Tailwind class strategy)
+  2. `<body class>` aynı sinyaller (yedek)
+  3. `<html data-theme>` ← uyumluluk (DaisyUI, shadcn-style)
+  4. `<html data-mode>` ← legacy uyumluluk
+  5. `<body>` arka plan luminance heuristik
+  6. `prefers-color-scheme` ← son çare OS-level
+- **MutationObserver tabanlı tema senkronu** — Site tema toggle'ı çevrilince widget 50ms içinde uyum sağlar (debounce'lu, jank-free).
+- **Theme bridge testleri** (`tests/ui/theme-bridge.test.js`) — 20 test: detect priority chain, watch/dispose, debounce, applyThemeToCard idempotency.
+
+### Changed
+
+- **`@blakfy/cookie-next` `BlakfyCookieProvider`** — Explicit defaults: `position="bottom-center"`, `theme="auto"`. Eskiden default'lar Provider'da yoktu; vanilla `DEFAULTS` yedeğine düşüyordu. Şimdi React component davranışı öngörülebilir.
+- **`config.position` doğrulama** — Geçersiz veya boş `data-blakfy-position` artık `bottom-center`'a düşürülür (eskiden `bottom-right` yedeğine düşüyordu — tutarsızdı).
+- **Explicit `theme="light"` veya `theme="dark"`** — Bridge devre dışı bırakılır, kullanıcı seçimi kilitli kalır (kaçış kapısı).
+
+### Fixed
+
+- **Light tema sitelerde widget'ın dark görünmesi sorunu** — Kullanıcının OS'u dark mode'da olduğunda widget zorla dark renderlanıyor, site içeriğiyle çelişiyordu. Artık site sinyali öncelikli.
+- **`bottom-center` default'unun bazı senaryolarda uygulanmaması** — `DEFAULTS.position` doğru ayarlıydı ama mount fallback `bottom-right`'a düşüyordu. Artık tüm zincir tutarlı.
+
+### Notes
+
+- Public API davranışı değişmedi; mevcut kullanıcılar otomatik geçiş yapar.
+- `theme="auto"` (default) → bridge aktif. `theme="light"` veya `theme="dark"` → bridge pas, manuel kontrol.
+- WebForge sitelerinde `<html class="dark">` / class kaldırma pattern'i tema kontratı olarak resmileştirildi (bkz. `webforge/specs/theme-system.md`).
+- Bundle boyutu: `cookie.min.js` 121.5kb → 124.4kb (+2.9kb theme-bridge).
+- `@2` semver tag jsDelivr CDN otomatik bu sürüme geçer (~5-10 dk cache propagation).
+
+---
+
 ## [2.2.0] — 2026-05-07
 
 ### Added

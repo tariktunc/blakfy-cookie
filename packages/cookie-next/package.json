@@ -1,6 +1,6 @@
 {
   "name": "@blakfy/cookie-next",
-  "version": "2.2.1",
+  "version": "2.3.0",
   "description": "Next.js / React wrapper for Blakfy Cookie Consent. SSR-safe, no FOUC. Supports React 18+19, Next.js 14+15.",
   "type": "module",
   "engines": {

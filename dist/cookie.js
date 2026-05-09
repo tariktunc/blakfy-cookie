@@ -1,5 +1,5 @@
 /*!
- * Blakfy Cookie Widget v2.2.0
+ * Blakfy Cookie Widget v2.3.0
  * https://github.com/tariktunc/blakfy-cookie
  * MIT License | (c) Blakfy Studio
  *
@@ -3803,6 +3803,128 @@
     }).catch(() => null);
   };
 
+  // src/ui/theme-bridge.js
+  var DEBOUNCE_MS = 50;
+  var hasClass = (el2, cls) => {
+    return Boolean(el2 && el2.classList && el2.classList.contains(cls));
+  };
+  var luminanceFromBg = () => {
+    if (!document.body) return null;
+    try {
+      const bg = window.getComputedStyle(document.body).backgroundColor;
+      if (!bg || bg === "transparent" || bg === "rgba(0, 0, 0, 0)") return null;
+      const m = bg.match(/rgba?\(\s*(\d+)[,\s]+(\d+)[,\s]+(\d+)/);
+      if (!m) return null;
+      const r = parseInt(m[1], 10) / 255;
+      const g = parseInt(m[2], 10) / 255;
+      const b = parseInt(m[3], 10) / 255;
+      const lum = 0.2126 * r + 0.7152 * g + 0.0722 * b;
+      return lum < 0.5 ? "dark" : "light";
+    } catch (e) {
+      return null;
+    }
+  };
+  var readDataAttr = (el2, name) => {
+    if (!el2 || !el2.getAttribute) return null;
+    const v = el2.getAttribute(name);
+    if (v === "dark" || v === "light") return v;
+    return null;
+  };
+  var detectSiteTheme = () => {
+    if (typeof document === "undefined") return "light";
+    const html = document.documentElement;
+    const body = document.body;
+    if (hasClass(html, "dark")) return "dark";
+    if (hasClass(html, "light")) return "light";
+    if (hasClass(body, "dark")) return "dark";
+    if (hasClass(body, "light")) return "light";
+    const dt = readDataAttr(html, "data-theme") || readDataAttr(body, "data-theme");
+    if (dt) return dt;
+    const dm = readDataAttr(html, "data-mode") || readDataAttr(body, "data-mode");
+    if (dm) return dm;
+    const lum = luminanceFromBg();
+    if (lum) return lum;
+    try {
+      return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+    } catch (e) {
+      return "light";
+    }
+  };
+  var watchSiteTheme = (callback) => {
+    if (typeof window === "undefined" || typeof MutationObserver === "undefined") {
+      return () => {
+      };
+    }
+    let timer = null;
+    let lastTheme = detectSiteTheme();
+    const debouncedCheck = () => {
+      if (timer) clearTimeout(timer);
+      timer = setTimeout(() => {
+        timer = null;
+        const next = detectSiteTheme();
+        if (next !== lastTheme) {
+          lastTheme = next;
+          try {
+            callback(next);
+          } catch (e) {
+          }
+        }
+      }, DEBOUNCE_MS);
+    };
+    const observer2 = new MutationObserver(debouncedCheck);
+    const observerOpts = {
+      attributes: true,
+      attributeFilter: ["class", "data-theme", "data-mode"]
+    };
+    try {
+      observer2.observe(document.documentElement, observerOpts);
+    } catch (e) {
+    }
+    if (document.body) {
+      try {
+        observer2.observe(document.body, observerOpts);
+      } catch (e) {
+      }
+    }
+    let mql = null;
+    try {
+      mql = window.matchMedia("(prefers-color-scheme: dark)");
+      if (mql && mql.addEventListener) mql.addEventListener("change", debouncedCheck);
+      else if (mql && mql.addListener) mql.addListener(debouncedCheck);
+    } catch (e) {
+      mql = null;
+    }
+    return () => {
+      try {
+        observer2.disconnect();
+      } catch (e) {
+      }
+      if (timer) clearTimeout(timer);
+      try {
+        if (mql) {
+          if (mql.removeEventListener) mql.removeEventListener("change", debouncedCheck);
+          else if (mql.removeListener) mql.removeListener(debouncedCheck);
+        }
+      } catch (e) {
+      }
+    };
+  };
+  var applyThemeToCard = (card, theme) => {
+    if (!card || !card.setAttribute) return;
+    if (theme === "dark") {
+      card.setAttribute("data-blakfy-theme", "dark");
+    } else if (theme === "gray") {
+      card.setAttribute("data-blakfy-theme", "gray");
+    } else {
+      card.removeAttribute("data-blakfy-theme");
+    }
+  };
+  var normalizeThemeValue = (raw) => {
+    if (raw === "black") return "dark";
+    if (raw === "white") return "light";
+    return raw || "auto";
+  };
+
   // src/gating/cleaner.js
   var rules = /* @__PURE__ */ new Map();
   var ensure = (category) => {
@@ -4255,6 +4377,19 @@
 
   // src/index.js
   var ROOT_OVERLAY_CLASS = "blakfy-overlay";
+  var VALID_POSITIONS = {
+    "bottom-center": 1,
+    "bottom-right": 1,
+    "bottom-left": 1,
+    "top-center": 1,
+    "top-right": 1,
+    "top-left": 1,
+    center: 1
+  };
+  var resolvePosition = (raw) => {
+    if (raw && Object.prototype.hasOwnProperty.call(VALID_POSITIONS, raw)) return raw;
+    return "bottom-center";
+  };
   var bootstrap = async () => {
     if (typeof window === "undefined" || typeof document === "undefined") return;
     if (window.BlakfyCookie && window.BlakfyCookie.__bootstrapped) return;
@@ -4264,19 +4399,23 @@
     const mainLang = detectMainLang({ configMainLang: config.mainLang });
     let t = getTranslation(currentLocale);
     let isRTL = RTL_LOCALES.indexOf(currentLocale) > -1;
-    const resolveTheme = (raw) => {
-      if (raw === "auto") {
-        try {
-          return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
-        } catch (e) {
-          return "light";
-        }
-      }
-      if (raw === "black") return "dark";
-      if (raw === "white") return "light";
-      return raw || "light";
-    };
-    const theme = resolveTheme(config.theme);
+    const normalized = normalizeThemeValue(config.theme);
+    const isExplicit = normalized === "light" || normalized === "dark" || normalized === "gray";
+    let theme = isExplicit ? normalized : detectSiteTheme();
+    const trackedCards = /* @__PURE__ */ new Set();
+    let unwatchTheme = null;
+    if (!isExplicit) {
+      unwatchTheme = watchSiteTheme((next) => {
+        theme = next;
+        trackedCards.forEach((card) => {
+          if (!card || !document.body.contains(card)) {
+            trackedCards.delete(card);
+            return;
+          }
+          applyThemeToCard(card, next);
+        });
+      });
+    }
     injectStyles();
     const emitter = createEmitter();
     let jurisdiction = "default";
@@ -4367,7 +4506,7 @@
     }
     const mountBanner = () => {
       const overlay = document.createElement("div");
-      overlay.className = ROOT_OVERLAY_CLASS + " widget " + (config.position || "bottom-right");
+      overlay.className = ROOT_OVERLAY_CLASS + " widget " + resolvePosition(config.position);
       const card = createBanner({
         t,
         isRTL,
@@ -4386,6 +4525,7 @@
       overlay.appendChild(card);
       document.body.appendChild(overlay);
       api.__internal.setUI("banner", overlay);
+      if (!isExplicit) trackedCards.add(card);
       mountBadges(card);
       installAntiTamper(card);
       installFocusTrap(card, {
@@ -4419,6 +4559,7 @@
       overlay.appendChild(card);
       document.body.appendChild(overlay);
       api.__internal.setUI("modal", overlay);
+      if (!isExplicit) trackedCards.add(card);
       mountBadges(card);
       installAntiTamper(card);
       installFocusTrap(card, { onEscape: () => api.__internal.closeUI() });
@@ -4469,6 +4610,18 @@
       fetchStatus(config.statusUrl).then((data) => {
         if (data) renderStatus({ data, currentLocale, mainLang });
       });
+    }
+    if (unwatchTheme && typeof window.addEventListener === "function") {
+      window.addEventListener(
+        "pagehide",
+        () => {
+          try {
+            unwatchTheme();
+          } catch (e) {
+          }
+        },
+        { once: true }
+      );
     }
   };
   if (typeof document !== "undefined") {
