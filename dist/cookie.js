@@ -1,5 +1,5 @@
 /*!
- * Blakfy Cookie Widget v2.3.0
+ * Blakfy Cookie Widget v2.3.1
  * https://github.com/tariktunc/blakfy-cookie
  * MIT License | (c) Blakfy Studio
  *
@@ -2337,6 +2337,7 @@
     policyVersion: "1.0",
     auditEndpoint: null,
     position: "bottom-center",
+    margin: "16",
     theme: "auto",
     accent: "#3E5C3A",
     presets: null,
@@ -2367,6 +2368,7 @@
       policyVersion: attr("data-blakfy-version", DEFAULTS.policyVersion),
       auditEndpoint: attr("data-blakfy-audit-endpoint", DEFAULTS.auditEndpoint),
       position: attr("data-blakfy-position", DEFAULTS.position),
+      margin: attr("data-blakfy-margin", DEFAULTS.margin),
       theme: attr("data-blakfy-theme", DEFAULTS.theme),
       accent: attr("data-blakfy-accent", DEFAULTS.accent),
       presets: attr("data-blakfy-presets", DEFAULTS.presets),
@@ -2405,6 +2407,104 @@
       }
     };
     return { on, off, emit };
+  };
+
+  // src/gating/cleaner.js
+  var rules = /* @__PURE__ */ new Map();
+  var ensure = (category) => {
+    if (!rules.has(category)) rules.set(category, []);
+    return rules.get(category);
+  };
+  var registerCleanup = ({ category, cookies, storage }) => {
+    if (!category) return;
+    const list = ensure(category);
+    list.push({
+      cookies: Array.isArray(cookies) ? cookies.slice() : [],
+      storage: Array.isArray(storage) ? storage.slice() : []
+    });
+  };
+  var getRootDomain = (host) => {
+    if (!host) return "";
+    const parts = host.split(".");
+    if (parts.length <= 2) return host;
+    return parts.slice(-2).join(".");
+  };
+  var expireCookie = (name) => {
+    if (typeof document === "undefined") return;
+    const host = typeof location !== "undefined" && location.hostname || "";
+    const root = getRootDomain(host);
+    const past = "Thu, 01 Jan 1970 00:00:00 GMT";
+    try {
+      document.cookie = name + "=; expires=" + past + "; path=/";
+    } catch (e) {
+    }
+    if (host) {
+      try {
+        document.cookie = name + "=; expires=" + past + "; path=/; domain=" + host;
+      } catch (e) {
+      }
+      try {
+        document.cookie = name + "=; expires=" + past + "; path=/; domain=." + host;
+      } catch (e) {
+      }
+    }
+    if (root && root !== host) {
+      try {
+        document.cookie = name + "=; expires=" + past + "; path=/; domain=" + root;
+      } catch (e) {
+      }
+      try {
+        document.cookie = name + "=; expires=" + past + "; path=/; domain=." + root;
+      } catch (e) {
+      }
+    }
+  };
+  var readCookieNames = () => {
+    if (typeof document === "undefined" || !document.cookie) return [];
+    const out = [];
+    const parts = document.cookie.split(";");
+    for (let i = 0; i < parts.length; i++) {
+      const eq = parts[i].indexOf("=");
+      const name = (eq === -1 ? parts[i] : parts[i].slice(0, eq)).trim();
+      if (name) out.push(name);
+    }
+    return out;
+  };
+  var runCleanup = (category) => {
+    const list = rules.get(category);
+    if (!list || !list.length) return { cookies: 0, storage: 0 };
+    const allNames = readCookieNames();
+    let cookieCount = 0;
+    let storageCount = 0;
+    for (let i = 0; i < list.length; i++) {
+      const rule = list[i];
+      const cookieMatchers = rule.cookies || [];
+      for (let m = 0; m < cookieMatchers.length; m++) {
+        const matcher = cookieMatchers[m];
+        if (matcher instanceof RegExp) {
+          for (let n = 0; n < allNames.length; n++) {
+            if (matcher.test(allNames[n])) {
+              expireCookie(allNames[n]);
+              cookieCount++;
+            }
+          }
+        } else if (typeof matcher === "string") {
+          expireCookie(matcher);
+          cookieCount++;
+        }
+      }
+      const storageKeys = rule.storage || [];
+      for (let k = 0; k < storageKeys.length; k++) {
+        try {
+          if (typeof localStorage !== "undefined") {
+            localStorage.removeItem(storageKeys[k]);
+            storageCount++;
+          }
+        } catch (e) {
+        }
+      }
+    }
+    return { cookies: cookieCount, storage: storageCount };
   };
 
   // src/gating/placeholder.js
@@ -2584,135 +2684,538 @@
     return count;
   };
 
-  // src/ui/styles.js
-  var STYLE_ID = "blakfy-cookie-styles";
-  var RULES = [
-    "/* Layout architecture is locked \u2014 only --blakfy-accent is overridable */",
-    // Modal mode (centered, dimmed backdrop)
-    ".blakfy-overlay.modal{position:fixed !important;inset:0;background:rgba(0,0,0,.4);z-index:2147483646 !important;display:flex !important;align-items:center;justify-content:center;padding:16px}",
-    // Widget mode (transparent, no backdrop)
-    ".blakfy-overlay.widget{position:fixed !important;inset:auto;background:transparent;padding:0;display:block !important;z-index:2147483646 !important;pointer-events:none}",
-    ".blakfy-overlay.widget .blakfy-card{width:min(96vw,1100px);max-width:none;border-radius:8px;position:relative;pointer-events:auto;padding-bottom:40px}",
-    // Widget butonları kart genişliğine eşit dağılımlı
-    ".blakfy-overlay.widget .blakfy-actions{flex-wrap:nowrap}",
-    ".blakfy-overlay.widget .blakfy-actions .blakfy-btn{flex:1;min-width:0;min-height:36px;padding:8px 16px}",
-    // Position modifiers (widget)
-    ".blakfy-overlay.widget.bottom-center{bottom:16px;left:50%;right:auto;top:auto;transform:translateX(-50%)}",
-    ".blakfy-overlay.widget.bottom-right{bottom:16px;right:16px;left:auto;top:auto}",
-    ".blakfy-overlay.widget.bottom-left{bottom:16px;left:16px;right:auto;top:auto}",
-    ".blakfy-overlay.widget.top-center{top:16px;left:50%;right:auto;bottom:auto;transform:translateX(-50%)}",
-    ".blakfy-overlay.widget.top-right{top:16px;right:16px;left:auto;bottom:auto}",
-    ".blakfy-overlay.widget.top-left{top:16px;left:16px;right:auto;bottom:auto}",
-    ".blakfy-overlay.widget.center{top:50%;left:50%;right:auto;bottom:auto;transform:translate(-50%,-50%)}",
-    // Card base (shared by banner + modal)
-    ".blakfy-card{background:#fff;color:#222;border-radius:16px;max-width:560px;width:100%;padding:24px;border:3px solid var(--blakfy-accent,#3E5C3A);font-family:system-ui,-apple-system,sans-serif;line-height:1.5;position:relative}",
-    ".blakfy-card[dir=rtl]{text-align:right}",
-    ".blakfy-card h2{margin:0 0 8px;font-size:18px;font-weight:600}",
-    ".blakfy-card p{margin:0 0 16px;font-size:14px;color:#444}",
-    ".blakfy-card a{color:var(--blakfy-accent,#3E5C3A);text-decoration:underline}",
-    // Actions
-    ".blakfy-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}",
-    // Buttons (3px radius per spec)
-    ".blakfy-btn{flex:1;min-width:120px;min-height:44px;padding:12px 16px;border:1px solid #ddd;border-radius:3px;background:#fff;color:#222;font-size:14px;font-weight:500;cursor:pointer;transition:transform .1s,background .15s}",
-    ".blakfy-btn:hover{transform:translateY(-1px)}",
-    ".blakfy-btn-primary{background:var(--blakfy-accent,#3E5C3A);color:#fff;border-color:transparent}",
-    ".blakfy-cat{padding:12px 0;border-top:1px solid #eee;display:flex;align-items:flex-start;gap:12px}",
-    ".blakfy-cat:first-of-type{border-top:none}",
-    ".blakfy-cat-text{flex:1}",
-    ".blakfy-cat-text strong{display:block;font-size:14px;margin-bottom:2px}",
-    ".blakfy-cat-text span{font-size:13px;color:#666}",
-    // Switches (pill-shaped — UX standard)
-    ".blakfy-switch{flex-shrink:0;width:44px;height:24px;border-radius:999px;background:#ccc;position:relative;cursor:pointer;border:none;padding:0}",
-    ".blakfy-switch[aria-checked=true]{background:var(--blakfy-accent,#3E5C3A)}",
-    ".blakfy-switch::after{content:'';position:absolute;top:2px;left:2px;width:20px;height:20px;border-radius:50%;background:#fff;transition:transform .2s}",
-    ".blakfy-switch[aria-checked=true]::after{transform:translateX(20px)}",
-    ".blakfy-switch:disabled{opacity:.6;cursor:not-allowed}",
-    ".blakfy-close{position:absolute;top:12px;right:12px;background:none;border:none;font-size:20px;cursor:pointer;color:#666;width:32px;height:32px;border-radius:50%}",
-    ".blakfy-close:hover{background:#f3f3f3}",
-    "[dir=rtl] .blakfy-close{right:auto;left:12px}",
-    ".blakfy-badge{position:absolute;bottom:8px;right:12px;font-size:11px;opacity:0.6;transition:opacity 0.2s;display:flex !important;pointer-events:auto !important;align-items:center;gap:4px;color:#666;text-decoration:none}",
-    ".blakfy-badge:hover{opacity:1}",
-    "[dir=rtl] .blakfy-badge{right:auto;left:12px}",
-    ".blakfy-status{position:fixed;bottom:0;left:0;right:0;z-index:2147483645;display:flex;align-items:center;gap:12px;padding:10px 20px;font-family:system-ui,-apple-system,sans-serif;font-size:13px;line-height:1.5}",
-    ".blakfy-status-msg{flex:1}",
-    ".blakfy-status-dismiss{background:none;border:none;color:inherit;cursor:pointer;padding:4px 10px;border-radius:6px;font-size:16px;opacity:.8;line-height:1}",
-    ".blakfy-status-dismiss:hover{opacity:1;background:rgba(255,255,255,.2)}",
-    "@media (prefers-reduced-motion:reduce){.blakfy-btn,.blakfy-switch::after{transition:none}}",
-    // Responsive
-    "@media (max-width:1024px){.blakfy-card{max-width:440px}}",
-    "@media (max-width:768px){.blakfy-card{max-width:calc(100vw - 32px);padding:18px}.blakfy-card h2{font-size:16px}.blakfy-card p{font-size:13px}.blakfy-btn{flex:1 1 100%;min-height:44px;padding:10px 14px;font-size:13px}.blakfy-overlay.widget.bottom-center,.blakfy-overlay.widget.top-center{left:16px;right:16px;transform:none}.blakfy-overlay.widget .blakfy-card{width:100%}.blakfy-overlay.widget .blakfy-actions .blakfy-btn{flex:1 1 100%;min-width:0}}",
-    "@media (max-width:480px){.blakfy-overlay.widget .blakfy-card{width:100%;max-width:calc(100vw - 32px)}}",
-    // Tab bar
-    ".blakfy-tabs{display:flex;border-bottom:2px solid #eee;margin:12px 0 16px;gap:0}",
-    ".blakfy-tab-btn{flex:1;background:none;border:none;border-bottom:2px solid transparent;margin-bottom:-2px;padding:8px 10px;font-size:13px;font-weight:500;color:#666;cursor:pointer;transition:color .15s,border-color .15s;white-space:nowrap;font-family:inherit}",
-    ".blakfy-tab-btn:hover{color:#222}",
-    ".blakfy-tab-btn--active{color:var(--blakfy-accent,#3E5C3A);border-bottom-color:var(--blakfy-accent,#3E5C3A);font-weight:600}",
-    // Tab panels
-    ".blakfy-tab-panel[aria-hidden=true]{display:none}",
-    ".blakfy-tab-panel[aria-hidden=false]{display:block}",
-    // Service list + cards
-    ".blakfy-service-list{display:flex;flex-direction:column;gap:8px;max-height:420px;overflow-y:auto;padding-right:2px}",
-    ".blakfy-service-card{border:1px solid #eee;border-radius:6px;overflow:hidden}",
-    ".blakfy-service-card-header{display:flex;align-items:center;gap:8px;padding:10px 12px;cursor:pointer;background:#fafafa;user-select:none}",
-    ".blakfy-service-card-header:hover{background:#f3f3f3}",
-    ".blakfy-service-name{flex:1;font-size:13px;font-weight:600;color:#222}",
-    ".blakfy-service-cat{font-size:11px;padding:2px 8px;border-radius:999px;background:#eee;color:#555;text-transform:capitalize}",
-    ".blakfy-service-toggle{font-size:11px;color:#aaa;line-height:1}",
-    ".blakfy-service-body[aria-hidden=true]{display:none}",
-    ".blakfy-service-body[aria-hidden=false]{display:block;padding:12px;border-top:1px solid #eee}",
-    ".blakfy-service-dl{margin:0 0 10px;display:grid;grid-template-columns:auto 1fr;gap:4px 12px}",
-    ".blakfy-service-dt{font-size:11px;font-weight:600;color:#888;text-transform:uppercase;letter-spacing:.4px;white-space:nowrap}",
-    ".blakfy-service-dd{margin:0;font-size:12px;color:#444;word-break:break-word}",
-    ".blakfy-service-links{display:flex;gap:12px;margin-top:8px;flex-wrap:wrap}",
-    ".blakfy-service-links a{font-size:12px;color:var(--blakfy-accent,#3E5C3A);text-decoration:underline}",
-    ".blakfy-svc-empty{font-size:13px;color:#888;padding:16px 0}",
-    // About panel
-    ".blakfy-about-panel{padding:4px 0}",
-    ".blakfy-about-brand{display:flex;align-items:center;gap:8px;margin-bottom:14px}",
-    ".blakfy-about-brand strong{font-size:15px;color:#222}",
-    ".blakfy-about-panel p{font-size:13px;color:#555;margin:0 0 10px;line-height:1.6}",
-    ".blakfy-about-panel a{font-size:13px;color:var(--blakfy-accent,#3E5C3A);text-decoration:underline}",
-    ".blakfy-about-meta{font-size:12px;color:#aaa;margin-top:12px}",
-    "@media (max-width:480px){.blakfy-tab-btn{font-size:12px;padding:8px 6px}.blakfy-service-list{max-height:260px}}",
-    // ── Themes: gray ──────────────────────────────────────────────────────────
-    ".blakfy-card[data-blakfy-theme=gray]{background:#f0f0f0}",
-    ".blakfy-card[data-blakfy-theme=gray] .blakfy-btn{background:#e4e4e4;border-color:#ccc}",
-    ".blakfy-card[data-blakfy-theme=gray] .blakfy-service-card-header{background:#e8e8e8}",
-    ".blakfy-card[data-blakfy-theme=gray] .blakfy-service-card-header:hover{background:#ddd}",
-    // ── Themes: dark ──────────────────────────────────────────────────────────
-    ".blakfy-card[data-blakfy-theme=dark]{background:#1a1a1a;color:#f0f0f0;border-color:var(--blakfy-accent,#3E5C3A)}",
-    ".blakfy-card[data-blakfy-theme=dark] p{color:#aaa}",
-    ".blakfy-card[data-blakfy-theme=dark] .blakfy-cat-text span{color:#999}",
-    ".blakfy-card[data-blakfy-theme=dark] .blakfy-cat{border-top-color:#333}",
-    ".blakfy-card[data-blakfy-theme=dark] .blakfy-btn{background:#2a2a2a;color:#f0f0f0;border-color:#444}",
-    ".blakfy-card[data-blakfy-theme=dark] .blakfy-btn:hover{background:#333}",
-    ".blakfy-card[data-blakfy-theme=dark] .blakfy-switch{background:#444}",
-    ".blakfy-card[data-blakfy-theme=dark] .blakfy-close{color:#aaa}",
-    ".blakfy-card[data-blakfy-theme=dark] .blakfy-close:hover{background:#2a2a2a}",
-    ".blakfy-card[data-blakfy-theme=dark] .blakfy-tabs{border-bottom-color:#333}",
-    ".blakfy-card[data-blakfy-theme=dark] .blakfy-tab-btn{color:#888}",
-    ".blakfy-card[data-blakfy-theme=dark] .blakfy-tab-btn:hover{color:#f0f0f0}",
-    ".blakfy-card[data-blakfy-theme=dark] .blakfy-tab-btn--active{color:var(--blakfy-accent,#3E5C3A);border-bottom-color:var(--blakfy-accent,#3E5C3A)}",
-    ".blakfy-card[data-blakfy-theme=dark] .blakfy-service-card{border-color:#333}",
-    ".blakfy-card[data-blakfy-theme=dark] .blakfy-service-card-header{background:#252525}",
-    ".blakfy-card[data-blakfy-theme=dark] .blakfy-service-card-header:hover{background:#2e2e2e}",
-    ".blakfy-card[data-blakfy-theme=dark] .blakfy-service-body[aria-hidden=false]{border-top-color:#333}",
-    ".blakfy-card[data-blakfy-theme=dark] .blakfy-service-dt{color:#777}",
-    ".blakfy-card[data-blakfy-theme=dark] .blakfy-service-dd{color:#ccc}",
-    ".blakfy-card[data-blakfy-theme=dark] .blakfy-service-name{color:#f0f0f0}",
-    ".blakfy-card[data-blakfy-theme=dark] .blakfy-service-cat{background:#333;color:#aaa}",
-    ".blakfy-card[data-blakfy-theme=dark] .blakfy-badge{color:#777}",
-    ".blakfy-card[data-blakfy-theme=dark] .blakfy-about-brand strong{color:#f0f0f0}",
-    ".blakfy-card[data-blakfy-theme=dark] .blakfy-about-panel p{color:#aaa}",
-    ".blakfy-card[data-blakfy-theme=dark] .blakfy-about-meta{color:#666}",
-    ".blakfy-card[data-blakfy-theme=dark] .blakfy-svc-empty{color:#666}"
+  // src/geo/jurisdiction.js
+  var EU_COUNTRIES = [
+    "AT",
+    "BE",
+    "BG",
+    "HR",
+    "CY",
+    "CZ",
+    "DK",
+    "EE",
+    "FI",
+    "FR",
+    "DE",
+    "GR",
+    "HU",
+    "IE",
+    "IT",
+    "LV",
+    "LT",
+    "LU",
+    "MT",
+    "NL",
+    "PL",
+    "PT",
+    "RO",
+    "SK",
+    "SI",
+    "ES",
+    "SE",
+    "NO",
+    "IS",
+    "LI",
+    "GB",
+    "UK",
+    "CH"
   ];
-  var injectStyles = () => {
-    if (document.getElementById(STYLE_ID)) return;
-    const css = document.createElement("style");
-    css.id = STYLE_ID;
-    css.textContent = RULES.join("");
-    document.head.appendChild(css);
+  var mapCountryToJurisdiction = (country, region) => {
+    if (!country) return "default";
+    const c = String(country).toUpperCase();
+    const r = region ? String(region).toUpperCase() : "";
+    if (EU_COUNTRIES.indexOf(c) !== -1) return "GDPR";
+    if (c === "TR") return "GDPR";
+    if (c === "BR") return "LGPD";
+    if (c === "US" && r === "CA") return "CCPA";
+    return "default";
+  };
+  var tzGuess = () => {
+    try {
+      const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || "";
+      if (tz.indexOf("Europe/") === 0) return "GDPR";
+      if (tz === "America/Los_Angeles" || tz === "America/Tijuana") return "CCPA";
+      if (tz === "America/Sao_Paulo") return "LGPD";
+      return "default";
+    } catch (e) {
+      return "default";
+    }
+  };
+  var detectJurisdiction = async (opts) => {
+    const o = opts || {};
+    if (typeof document !== "undefined" && document.documentElement && document.documentElement.dataset && document.documentElement.dataset.jurisdiction) {
+      const v = document.documentElement.dataset.jurisdiction;
+      if (v === "GDPR" || v === "CCPA" || v === "LGPD" || v === "default") return v;
+    }
+    if (o.geoEndpoint && typeof fetch === "function") {
+      try {
+        const res = await fetch(o.geoEndpoint, { credentials: "omit" });
+        if (res && res.ok) {
+          const data = await res.json();
+          return mapCountryToJurisdiction(data && data.country, data && data.region);
+        }
+      } catch (e) {
+      }
+    }
+    return tzGuess();
+  };
+
+  // src/presets/bing-ads-uet.js
+  var bing_ads_uet_default = {
+    name: "Bing Ads UET",
+    category: "marketing",
+    cookies: ["MUID", "_uetsid", "_uetvid"],
+    storage: [],
+    scriptHosts: ["bat.bing.com"],
+    onGrant: (state) => {
+    },
+    onRevoke: (state) => {
+    }
+  };
+
+  // src/presets/facebook-pixel.js
+  var facebook_pixel_default = {
+    name: "Facebook Pixel",
+    category: "marketing",
+    cookies: ["_fbp", "_fbc"],
+    storage: [],
+    scriptHosts: ["connect.facebook.net"],
+    onGrant: (state) => {
+    },
+    onRevoke: (state) => {
+    }
+  };
+
+  // src/presets/google-analytics.js
+  var google_analytics_default = {
+    name: "Google Analytics 4",
+    category: "analytics",
+    cookies: [/^_ga/, "_gid", "_gat", /^_ga_/],
+    storage: [],
+    scriptHosts: ["www.googletagmanager.com", "google-analytics.com"],
+    onGrant: (state) => {
+    },
+    onRevoke: (state) => {
+    }
+  };
+
+  // src/presets/google-maps.js
+  var google_maps_default = {
+    name: "Google Maps",
+    category: "functional",
+    cookies: [],
+    storage: [],
+    scriptHosts: ["maps.googleapis.com", "maps.gstatic.com"],
+    onGrant: (state) => {
+    },
+    onRevoke: (state) => {
+    }
+  };
+
+  // src/presets/google-recaptcha.js
+  var google_recaptcha_default = {
+    name: "Google reCAPTCHA",
+    category: "functional",
+    cookies: ["_GRECAPTCHA"],
+    storage: [],
+    scriptHosts: ["www.google.com/recaptcha", "www.gstatic.com/recaptcha"],
+    onGrant: (state) => {
+    },
+    onRevoke: (state) => {
+    }
+  };
+
+  // src/presets/google-tag-manager.js
+  var google_tag_manager_default = {
+    name: "Google Tag Manager",
+    category: "analytics",
+    cookies: ["_gtm", /^_dc_gtm/],
+    storage: [],
+    scriptHosts: ["www.googletagmanager.com"],
+    onGrant: (state) => {
+    },
+    onRevoke: (state) => {
+    }
+  };
+
+  // src/presets/hotjar.js
+  var hotjar_default = {
+    name: "Hotjar",
+    category: "analytics",
+    cookies: [/^_hj/],
+    storage: [],
+    scriptHosts: ["static.hotjar.com", "script.hotjar.com"],
+    onGrant: (state) => {
+    },
+    onRevoke: (state) => {
+    }
+  };
+
+  // src/presets/intercom.js
+  var intercom_default = {
+    name: "Intercom",
+    category: "functional",
+    cookies: [/^intercom-/],
+    storage: [],
+    scriptHosts: ["widget.intercom.io", "js.intercomcdn.com"],
+    onGrant: (state) => {
+    },
+    onRevoke: (state) => {
+    }
+  };
+
+  // src/presets/hubspot.js
+  var hubspot_default = {
+    name: "HubSpot",
+    category: "marketing",
+    cookies: ["__hstc", "__hssc", "__hssrc", "hubspotutk", "messagesUtk"],
+    storage: [],
+    scriptHosts: ["js.hs-scripts.com", "js.hs-analytics.net"],
+    onGrant: (state) => {
+    },
+    onRevoke: (state) => {
+    }
+  };
+
+  // src/presets/linkedin-insight.js
+  var linkedin_insight_default = {
+    name: "LinkedIn Insight Tag",
+    category: "marketing",
+    cookies: ["li_sugr", "bcookie", "lidc", "UserMatchHistory", "AnalyticsSyncHistory"],
+    storage: [],
+    scriptHosts: ["snap.licdn.com", "px.ads.linkedin.com"],
+    onGrant: (state) => {
+    },
+    onRevoke: (state) => {
+    }
+  };
+
+  // src/presets/mailchimp.js
+  var mailchimp_default = {
+    name: "Mailchimp",
+    category: "marketing",
+    cookies: [/^_mcid/, "ak_bmsc", "_mcvisit"],
+    storage: [],
+    scriptHosts: ["chimpstatic.com"],
+    onGrant: (state) => {
+    },
+    onRevoke: (state) => {
+    }
+  };
+
+  // src/presets/microsoft-clarity.js
+  var microsoft_clarity_default = {
+    name: "Microsoft Clarity",
+    category: "analytics",
+    cookies: ["_clck", "_clsk", "CLID", "MR", "MUID", "SM"],
+    storage: [],
+    scriptHosts: ["www.clarity.ms", "c.clarity.ms"],
+    onGrant: (state) => {
+    },
+    onRevoke: (state) => {
+    }
+  };
+
+  // src/presets/pinterest-tag.js
+  var pinterest_tag_default = {
+    name: "Pinterest Tag",
+    category: "marketing",
+    cookies: ["_pinterest_ct", "_pinterest_sess"],
+    storage: [],
+    scriptHosts: ["s.pinimg.com", "ct.pinterest.com"],
+    onGrant: (state) => {
+    },
+    onRevoke: (state) => {
+    }
+  };
+
+  // src/presets/tawk-to.js
+  var tawk_to_default = {
+    name: "Tawk.to",
+    category: "functional",
+    cookies: ["TawkConnectionTime", /^__tawkuuid/, /^Tawk_/],
+    storage: [],
+    scriptHosts: ["embed.tawk.to"],
+    onGrant: (state) => {
+    },
+    onRevoke: (state) => {
+    }
+  };
+
+  // src/presets/tiktok-pixel.js
+  var tiktok_pixel_default = {
+    name: "TikTok Pixel",
+    category: "marketing",
+    cookies: ["_ttp"],
+    storage: [],
+    scriptHosts: ["analytics.tiktok.com"],
+    onGrant: (state) => {
+    },
+    onRevoke: (state) => {
+    }
+  };
+
+  // src/presets/vimeo.js
+  var vimeo_default = {
+    name: "Vimeo",
+    category: "marketing",
+    cookies: [],
+    storage: [],
+    scriptHosts: ["player.vimeo.com", "vimeo.com"],
+    onGrant: (state) => {
+    },
+    onRevoke: (state) => {
+    }
+  };
+
+  // src/presets/yandex-metrica.js
+  var yandex_metrica_default = {
+    name: "Yandex Metrica",
+    category: "analytics",
+    subCategory: "recording",
+    cookies: [/^_ym/, "yandexuid", "yabs-frequency"],
+    storage: [],
+    scriptHosts: ["mc.yandex.ru", "mc.webvisor.com", "mc.yandex.com"],
+    onGrant: (state) => {
+    },
+    onRevoke: (state) => {
+    }
+  };
+
+  // src/presets/youtube.js
+  var youtube_default = {
+    name: "YouTube",
+    category: "marketing",
+    cookies: [],
+    storage: [],
+    scriptHosts: ["www.youtube.com", "youtube-nocookie.com"],
+    onGrant: (state) => {
+    },
+    onRevoke: (state) => {
+    }
+  };
+
+  // src/presets/_registry.js
+  var PRESETS = {
+    ga4: google_analytics_default,
+    gtm: google_tag_manager_default,
+    maps: google_maps_default,
+    recaptcha: google_recaptcha_default,
+    facebook: facebook_pixel_default,
+    youtube: youtube_default,
+    vimeo: vimeo_default,
+    hotjar: hotjar_default,
+    clarity: microsoft_clarity_default,
+    linkedin: linkedin_insight_default,
+    yandex: yandex_metrica_default,
+    bing: bing_ads_uet_default,
+    tiktok: tiktok_pixel_default,
+    pinterest: pinterest_tag_default,
+    tawkto: tawk_to_default,
+    intercom: intercom_default,
+    hubspot: hubspot_default,
+    mailchimp: mailchimp_default
+  };
+  var applyPreset = (name, { registerCleanup: registerCleanup2 }) => {
+    const preset = PRESETS[name];
+    if (!preset) return null;
+    if (typeof registerCleanup2 === "function") {
+      registerCleanup2({
+        category: preset.category,
+        cookies: preset.cookies || [],
+        storage: preset.storage || []
+      });
+      if (preset.subCategory) {
+        registerCleanup2({
+          category: preset.subCategory,
+          cookies: preset.cookies || [],
+          storage: preset.storage || []
+        });
+      }
+    }
+    return preset;
+  };
+
+  // src/ui/badge.js
+  var BADGE_HREF = "https://blakfy.com";
+  var BADGE_TEXT_PREFIX = "Powered by ";
+  var BADGE_BRAND = "Blakfy Studio";
+  var BADGE_CLASS = "blakfy-badge";
+  var PROTECT_STYLE_ID = "blakfy-badge-protect";
+  var PROTECT_CSS = ".blakfy-badge{display:flex !important;visibility:visible !important;opacity:0.6 !important;pointer-events:auto !important;}.blakfy-badge:hover{opacity:1 !important;}.blakfy-badge[hidden]{display:flex !important;}";
+  var mountedBadges = /* @__PURE__ */ new Set();
+  var slotMap = /* @__PURE__ */ new WeakMap();
+  var observer = null;
+  var intervalId = null;
+  var rootRef = null;
+  var buildBadge = () => {
+    const a = document.createElement("a");
+    a.href = BADGE_HREF;
+    a.target = "_blank";
+    a.rel = "noopener noreferrer";
+    a.className = BADGE_CLASS;
+    a.setAttribute("aria-label", "Powered by Blakfy Studio \u2014 opens in new tab");
+    const prefix = document.createTextNode(BADGE_TEXT_PREFIX);
+    a.appendChild(prefix);
+    const strong = document.createElement("strong");
+    strong.textContent = BADGE_BRAND;
+    a.appendChild(strong);
+    const cssText = "display: flex !important; align-items: center; gap: 4px;position: absolute; bottom: 8px; right: 12px;font-size: 11px; font-family: system-ui, -apple-system, sans-serif;color: inherit; text-decoration: none;opacity: 0.6 !important; transition: opacity 0.2s;pointer-events: auto !important;z-index: 1;";
+    a.style.cssText = cssText;
+    return a;
+  };
+  var applyRTL = (badge) => {
+    const rtlAncestor = badge.closest && badge.closest("[dir=rtl]");
+    if (rtlAncestor) {
+      badge.style.right = "auto";
+      badge.style.left = "12px";
+    }
+  };
+  var injectProtectStyle = () => {
+    if (typeof document === "undefined") return;
+    if (document.getElementById(PROTECT_STYLE_ID)) return;
+    const style = document.createElement("style");
+    style.id = PROTECT_STYLE_ID;
+    style.textContent = PROTECT_CSS;
+    (document.head || document.documentElement).appendChild(style);
+  };
+  var replaceBadge = (oldBadge) => {
+    const slot = slotMap.get(oldBadge);
+    const fresh = buildBadge();
+    if (oldBadge.parentNode) {
+      oldBadge.parentNode.replaceChild(fresh, oldBadge);
+    } else if (slot && slot.isConnected) {
+      slot.appendChild(fresh);
+    } else if (rootRef) {
+      rootRef.appendChild(fresh);
+    }
+    mountedBadges.delete(oldBadge);
+    mountedBadges.add(fresh);
+    if (slot) slotMap.set(fresh, slot);
+    applyRTL(fresh);
+    return fresh;
+  };
+  var reAttachBadge = (badge) => {
+    const slot = slotMap.get(badge);
+    if (badge.isConnected) return badge;
+    const fresh = buildBadge();
+    if (slot && slot.isConnected) {
+      slot.appendChild(fresh);
+    } else if (rootRef) {
+      rootRef.appendChild(fresh);
+    } else {
+      return badge;
+    }
+    mountedBadges.delete(badge);
+    mountedBadges.add(fresh);
+    if (slot) slotMap.set(fresh, slot);
+    applyRTL(fresh);
+    return fresh;
+  };
+  var mountBadges = (rootEl) => {
+    if (!rootEl) return [];
+    rootRef = rootEl;
+    const slots = rootEl.querySelectorAll(".blakfy-badge-slot");
+    const result = [];
+    for (let i = 0; i < slots.length; i++) {
+      const slot = slots[i];
+      const existing = slot.querySelector("." + BADGE_CLASS);
+      if (existing) {
+        mountedBadges.add(existing);
+        slotMap.set(existing, slot);
+        applyRTL(existing);
+        result.push(existing);
+        continue;
+      }
+      const badge = buildBadge();
+      while (slot.firstChild) slot.removeChild(slot.firstChild);
+      slot.appendChild(badge);
+      mountedBadges.add(badge);
+      slotMap.set(badge, slot);
+      applyRTL(badge);
+      result.push(badge);
+    }
+    return result;
+  };
+  var verifyBadges = () => {
+    if (typeof window === "undefined" || !window.getComputedStyle) return;
+    const snapshot = Array.from(mountedBadges);
+    for (let i = 0; i < snapshot.length; i++) {
+      const badge = snapshot[i];
+      if (!badge.isConnected) {
+        reAttachBadge(badge);
+        continue;
+      }
+      const cs = window.getComputedStyle(badge);
+      const opacity = parseFloat(cs.opacity);
+      if (isFinite(opacity) && opacity < 0.5 || cs.display === "none" || cs.visibility === "hidden") {
+        replaceBadge(badge);
+      }
+    }
+    if (!document.getElementById(PROTECT_STYLE_ID)) {
+      injectProtectStyle();
+    }
+  };
+  var handleMutations = (records) => {
+    let needsStyleReinject = false;
+    const removedBadges = [];
+    const mutatedBadges = [];
+    for (let i = 0; i < records.length; i++) {
+      const rec = records[i];
+      if (rec.type === "childList") {
+        for (let j = 0; j < rec.removedNodes.length; j++) {
+          const node = rec.removedNodes[j];
+          if (!node || node.nodeType !== 1) continue;
+          if (node.id === PROTECT_STYLE_ID) {
+            needsStyleReinject = true;
+          }
+          if (mountedBadges.has(node)) {
+            removedBadges.push(node);
+          } else if (node.querySelector) {
+            const inner = node.querySelector("." + BADGE_CLASS);
+            if (inner && mountedBadges.has(inner)) {
+              removedBadges.push(inner);
+            }
+          }
+        }
+      } else if (rec.type === "attributes") {
+        const target = rec.target;
+        if (target && mountedBadges.has(target)) {
+          mutatedBadges.push(target);
+        }
+      }
+    }
+    if (needsStyleReinject) {
+      setTimeout(injectProtectStyle, 0);
+    }
+    if (removedBadges.length) {
+      setTimeout(() => {
+        for (let i = 0; i < removedBadges.length; i++) {
+          reAttachBadge(removedBadges[i]);
+        }
+      }, 50);
+    }
+    for (let i = 0; i < mutatedBadges.length; i++) {
+      replaceBadge(mutatedBadges[i]);
+    }
+  };
+  var installAntiTamper = (rootEl) => {
+    if (!rootEl || typeof MutationObserver === "undefined") return;
+    rootRef = rootEl;
+    injectProtectStyle();
+    if (observer) observer.disconnect();
+    observer = new MutationObserver(handleMutations);
+    observer.observe(rootEl, {
+      childList: true,
+      attributes: true,
+      subtree: true,
+      attributeFilter: ["style", "class", "hidden"]
+    });
+    if (document.head) {
+      observer.observe(document.head, { childList: true, subtree: false });
+    }
+    if (intervalId) clearInterval(intervalId);
+    intervalId = setInterval(verifyBadges, 2e3);
   };
 
   // src/ui/banner.js
@@ -2777,6 +3280,51 @@
     badgeSlot.className = "blakfy-badge-slot";
     card.appendChild(badgeSlot);
     return card;
+  };
+
+  // src/ui/focus-trap.js
+  var FOCUSABLE = 'button:not([disabled]),a[href],input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])';
+  var activeRoot = null;
+  var activeHandler = null;
+  var activeEscape = null;
+  var installFocusTrap = (rootEl, options) => {
+    removeFocusTrap();
+    if (!rootEl) return;
+    activeRoot = rootEl;
+    activeEscape = options && options.onEscape;
+    activeHandler = (e) => {
+      if (!activeRoot) return;
+      if (e.key === "Escape") {
+        if (typeof activeEscape === "function") {
+          e.preventDefault();
+          activeEscape();
+        }
+        return;
+      }
+      if (e.key !== "Tab") return;
+      const nodes = activeRoot.querySelectorAll(FOCUSABLE);
+      if (!nodes.length) return;
+      const first = nodes[0];
+      const last = nodes[nodes.length - 1];
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    };
+    document.addEventListener("keydown", activeHandler);
+    const firstFocusable = rootEl.querySelector(FOCUSABLE);
+    if (firstFocusable) firstFocusable.focus();
+  };
+  var removeFocusTrap = () => {
+    if (activeHandler) {
+      document.removeEventListener("keydown", activeHandler);
+    }
+    activeRoot = null;
+    activeHandler = null;
+    activeEscape = null;
   };
 
   // src/data/service-metadata.js
@@ -3509,233 +4057,6 @@
     return card;
   };
 
-  // src/ui/badge.js
-  var BADGE_HREF = "https://blakfy.com";
-  var BADGE_TEXT_PREFIX = "Powered by ";
-  var BADGE_BRAND = "Blakfy Studio";
-  var BADGE_CLASS = "blakfy-badge";
-  var PROTECT_STYLE_ID = "blakfy-badge-protect";
-  var PROTECT_CSS = ".blakfy-badge{display:flex !important;visibility:visible !important;opacity:0.6 !important;pointer-events:auto !important;}.blakfy-badge:hover{opacity:1 !important;}.blakfy-badge[hidden]{display:flex !important;}";
-  var mountedBadges = /* @__PURE__ */ new Set();
-  var slotMap = /* @__PURE__ */ new WeakMap();
-  var observer = null;
-  var intervalId = null;
-  var rootRef = null;
-  var buildBadge = () => {
-    const a = document.createElement("a");
-    a.href = BADGE_HREF;
-    a.target = "_blank";
-    a.rel = "noopener noreferrer";
-    a.className = BADGE_CLASS;
-    a.setAttribute("aria-label", "Powered by Blakfy Studio \u2014 opens in new tab");
-    const prefix = document.createTextNode(BADGE_TEXT_PREFIX);
-    a.appendChild(prefix);
-    const strong = document.createElement("strong");
-    strong.textContent = BADGE_BRAND;
-    a.appendChild(strong);
-    const cssText = "display: flex !important; align-items: center; gap: 4px;position: absolute; bottom: 8px; right: 12px;font-size: 11px; font-family: system-ui, -apple-system, sans-serif;color: inherit; text-decoration: none;opacity: 0.6 !important; transition: opacity 0.2s;pointer-events: auto !important;z-index: 1;";
-    a.style.cssText = cssText;
-    return a;
-  };
-  var applyRTL = (badge) => {
-    const rtlAncestor = badge.closest && badge.closest("[dir=rtl]");
-    if (rtlAncestor) {
-      badge.style.right = "auto";
-      badge.style.left = "12px";
-    }
-  };
-  var injectProtectStyle = () => {
-    if (typeof document === "undefined") return;
-    if (document.getElementById(PROTECT_STYLE_ID)) return;
-    const style = document.createElement("style");
-    style.id = PROTECT_STYLE_ID;
-    style.textContent = PROTECT_CSS;
-    (document.head || document.documentElement).appendChild(style);
-  };
-  var replaceBadge = (oldBadge) => {
-    const slot = slotMap.get(oldBadge);
-    const fresh = buildBadge();
-    if (oldBadge.parentNode) {
-      oldBadge.parentNode.replaceChild(fresh, oldBadge);
-    } else if (slot && slot.isConnected) {
-      slot.appendChild(fresh);
-    } else if (rootRef) {
-      rootRef.appendChild(fresh);
-    }
-    mountedBadges.delete(oldBadge);
-    mountedBadges.add(fresh);
-    if (slot) slotMap.set(fresh, slot);
-    applyRTL(fresh);
-    return fresh;
-  };
-  var reAttachBadge = (badge) => {
-    const slot = slotMap.get(badge);
-    if (badge.isConnected) return badge;
-    const fresh = buildBadge();
-    if (slot && slot.isConnected) {
-      slot.appendChild(fresh);
-    } else if (rootRef) {
-      rootRef.appendChild(fresh);
-    } else {
-      return badge;
-    }
-    mountedBadges.delete(badge);
-    mountedBadges.add(fresh);
-    if (slot) slotMap.set(fresh, slot);
-    applyRTL(fresh);
-    return fresh;
-  };
-  var mountBadges = (rootEl) => {
-    if (!rootEl) return [];
-    rootRef = rootEl;
-    const slots = rootEl.querySelectorAll(".blakfy-badge-slot");
-    const result = [];
-    for (let i = 0; i < slots.length; i++) {
-      const slot = slots[i];
-      const existing = slot.querySelector("." + BADGE_CLASS);
-      if (existing) {
-        mountedBadges.add(existing);
-        slotMap.set(existing, slot);
-        applyRTL(existing);
-        result.push(existing);
-        continue;
-      }
-      const badge = buildBadge();
-      while (slot.firstChild) slot.removeChild(slot.firstChild);
-      slot.appendChild(badge);
-      mountedBadges.add(badge);
-      slotMap.set(badge, slot);
-      applyRTL(badge);
-      result.push(badge);
-    }
-    return result;
-  };
-  var verifyBadges = () => {
-    if (typeof window === "undefined" || !window.getComputedStyle) return;
-    const snapshot = Array.from(mountedBadges);
-    for (let i = 0; i < snapshot.length; i++) {
-      const badge = snapshot[i];
-      if (!badge.isConnected) {
-        reAttachBadge(badge);
-        continue;
-      }
-      const cs = window.getComputedStyle(badge);
-      const opacity = parseFloat(cs.opacity);
-      if (isFinite(opacity) && opacity < 0.5 || cs.display === "none" || cs.visibility === "hidden") {
-        replaceBadge(badge);
-      }
-    }
-    if (!document.getElementById(PROTECT_STYLE_ID)) {
-      injectProtectStyle();
-    }
-  };
-  var handleMutations = (records) => {
-    let needsStyleReinject = false;
-    const removedBadges = [];
-    const mutatedBadges = [];
-    for (let i = 0; i < records.length; i++) {
-      const rec = records[i];
-      if (rec.type === "childList") {
-        for (let j = 0; j < rec.removedNodes.length; j++) {
-          const node = rec.removedNodes[j];
-          if (!node || node.nodeType !== 1) continue;
-          if (node.id === PROTECT_STYLE_ID) {
-            needsStyleReinject = true;
-          }
-          if (mountedBadges.has(node)) {
-            removedBadges.push(node);
-          } else if (node.querySelector) {
-            const inner = node.querySelector("." + BADGE_CLASS);
-            if (inner && mountedBadges.has(inner)) {
-              removedBadges.push(inner);
-            }
-          }
-        }
-      } else if (rec.type === "attributes") {
-        const target = rec.target;
-        if (target && mountedBadges.has(target)) {
-          mutatedBadges.push(target);
-        }
-      }
-    }
-    if (needsStyleReinject) {
-      setTimeout(injectProtectStyle, 0);
-    }
-    if (removedBadges.length) {
-      setTimeout(() => {
-        for (let i = 0; i < removedBadges.length; i++) {
-          reAttachBadge(removedBadges[i]);
-        }
-      }, 50);
-    }
-    for (let i = 0; i < mutatedBadges.length; i++) {
-      replaceBadge(mutatedBadges[i]);
-    }
-  };
-  var installAntiTamper = (rootEl) => {
-    if (!rootEl || typeof MutationObserver === "undefined") return;
-    rootRef = rootEl;
-    injectProtectStyle();
-    if (observer) observer.disconnect();
-    observer = new MutationObserver(handleMutations);
-    observer.observe(rootEl, {
-      childList: true,
-      attributes: true,
-      subtree: true,
-      attributeFilter: ["style", "class", "hidden"]
-    });
-    if (document.head) {
-      observer.observe(document.head, { childList: true, subtree: false });
-    }
-    if (intervalId) clearInterval(intervalId);
-    intervalId = setInterval(verifyBadges, 2e3);
-  };
-
-  // src/ui/focus-trap.js
-  var FOCUSABLE = 'button:not([disabled]),a[href],input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])';
-  var activeRoot = null;
-  var activeHandler = null;
-  var activeEscape = null;
-  var installFocusTrap = (rootEl, options) => {
-    removeFocusTrap();
-    if (!rootEl) return;
-    activeRoot = rootEl;
-    activeEscape = options && options.onEscape;
-    activeHandler = (e) => {
-      if (!activeRoot) return;
-      if (e.key === "Escape") {
-        if (typeof activeEscape === "function") {
-          e.preventDefault();
-          activeEscape();
-        }
-        return;
-      }
-      if (e.key !== "Tab") return;
-      const nodes = activeRoot.querySelectorAll(FOCUSABLE);
-      if (!nodes.length) return;
-      const first = nodes[0];
-      const last = nodes[nodes.length - 1];
-      if (e.shiftKey && document.activeElement === first) {
-        e.preventDefault();
-        last.focus();
-      } else if (!e.shiftKey && document.activeElement === last) {
-        e.preventDefault();
-        first.focus();
-      }
-    };
-    document.addEventListener("keydown", activeHandler);
-    const firstFocusable = rootEl.querySelector(FOCUSABLE);
-    if (firstFocusable) firstFocusable.focus();
-  };
-  var removeFocusTrap = () => {
-    if (activeHandler) {
-      document.removeEventListener("keydown", activeHandler);
-    }
-    activeRoot = null;
-    activeHandler = null;
-    activeEscape = null;
-  };
-
   // src/ui/status-bar.js
   var STATUS_COLORS = {
     info: "#1a56db",
@@ -3801,6 +4122,137 @@
       data._id = (data.expires || "") + (data.type || "");
       return data;
     }).catch(() => null);
+  };
+
+  // src/ui/styles.js
+  var STYLE_ID = "blakfy-cookie-styles";
+  var RULES = [
+    "/* Layout architecture is locked \u2014 only --blakfy-accent is overridable */",
+    // Modal mode (centered, dimmed backdrop)
+    ".blakfy-overlay.modal{position:fixed !important;inset:0;background:rgba(0,0,0,.4);z-index:2147483646 !important;display:flex !important;align-items:center;justify-content:center;padding:16px}",
+    // Widget mode (transparent, no backdrop)
+    ".blakfy-overlay.widget{position:fixed !important;inset:auto;background:transparent;padding:0;display:block !important;z-index:2147483646 !important;pointer-events:none}",
+    ".blakfy-overlay.widget .blakfy-card{width:min(96vw,1100px);max-width:none;border-radius:8px;position:relative;pointer-events:auto;padding-bottom:40px;box-sizing:border-box}",
+    // Widget butonları kart genişliğine eşit dağılımlı
+    ".blakfy-overlay.widget .blakfy-actions{flex-wrap:nowrap}",
+    ".blakfy-overlay.widget .blakfy-actions .blakfy-btn{flex:1;min-width:0;min-height:36px;padding:8px 16px}",
+    // Position modifiers (widget) — offset uses --blakfy-margin (default 16px, min 5px enforced in JS)
+    ".blakfy-overlay.widget.bottom-center{bottom:var(--blakfy-margin,16px);left:50%;right:auto;top:auto;transform:translateX(-50%)}",
+    ".blakfy-overlay.widget.bottom-right{bottom:var(--blakfy-margin,16px);right:var(--blakfy-margin,16px);left:auto;top:auto}",
+    ".blakfy-overlay.widget.bottom-left{bottom:var(--blakfy-margin,16px);left:var(--blakfy-margin,16px);right:auto;top:auto}",
+    ".blakfy-overlay.widget.top-center{top:var(--blakfy-margin,16px);left:50%;right:auto;bottom:auto;transform:translateX(-50%)}",
+    ".blakfy-overlay.widget.top-right{top:var(--blakfy-margin,16px);right:var(--blakfy-margin,16px);left:auto;bottom:auto}",
+    ".blakfy-overlay.widget.top-left{top:var(--blakfy-margin,16px);left:var(--blakfy-margin,16px);right:auto;bottom:auto}",
+    ".blakfy-overlay.widget.center{top:50%;left:50%;right:auto;bottom:auto;transform:translate(-50%,-50%)}",
+    // Card base (shared by banner + modal)
+    ".blakfy-card{box-sizing:border-box;background:#fff;color:#222;border-radius:16px;max-width:560px;width:100%;padding:24px;border:3px solid var(--blakfy-accent,#3E5C3A);font-family:system-ui,-apple-system,sans-serif;line-height:1.5;position:relative}",
+    ".blakfy-card[dir=rtl]{text-align:right}",
+    ".blakfy-card h2{margin:0 0 8px;font-size:18px;font-weight:600}",
+    ".blakfy-card p{margin:0 0 16px;font-size:14px;color:#444}",
+    ".blakfy-card a{color:var(--blakfy-accent,#3E5C3A);text-decoration:underline}",
+    // Actions
+    ".blakfy-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}",
+    // Buttons (3px radius per spec)
+    ".blakfy-btn{flex:1;min-width:120px;min-height:44px;padding:12px 16px;border:1px solid #ddd;border-radius:3px;background:#fff;color:#222;font-size:14px;font-weight:500;cursor:pointer;transition:transform .1s,background .15s}",
+    ".blakfy-btn:hover{transform:translateY(-1px)}",
+    ".blakfy-btn-primary{background:var(--blakfy-accent,#3E5C3A);color:#fff;border-color:transparent}",
+    ".blakfy-cat{padding:12px 0;border-top:1px solid #eee;display:flex;align-items:flex-start;gap:12px}",
+    ".blakfy-cat:first-of-type{border-top:none}",
+    ".blakfy-cat-text{flex:1}",
+    ".blakfy-cat-text strong{display:block;font-size:14px;margin-bottom:2px}",
+    ".blakfy-cat-text span{font-size:13px;color:#666}",
+    // Switches (pill-shaped — UX standard)
+    ".blakfy-switch{flex-shrink:0;width:44px;height:24px;border-radius:999px;background:#ccc;position:relative;cursor:pointer;border:none;padding:0}",
+    ".blakfy-switch[aria-checked=true]{background:var(--blakfy-accent,#3E5C3A)}",
+    ".blakfy-switch::after{content:'';position:absolute;top:2px;left:2px;width:20px;height:20px;border-radius:50%;background:#fff;transition:transform .2s}",
+    ".blakfy-switch[aria-checked=true]::after{transform:translateX(20px)}",
+    ".blakfy-switch:disabled{opacity:.6;cursor:not-allowed}",
+    ".blakfy-close{position:absolute;top:12px;right:12px;background:none;border:none;font-size:20px;cursor:pointer;color:#666;width:32px;height:32px;border-radius:50%}",
+    ".blakfy-close:hover{background:#f3f3f3}",
+    "[dir=rtl] .blakfy-close{right:auto;left:12px}",
+    ".blakfy-badge{position:absolute;bottom:8px;right:12px;font-size:11px;opacity:0.6;transition:opacity 0.2s;display:flex !important;pointer-events:auto !important;align-items:center;gap:4px;color:#666;text-decoration:none}",
+    ".blakfy-badge:hover{opacity:1}",
+    "[dir=rtl] .blakfy-badge{right:auto;left:12px}",
+    ".blakfy-status{position:fixed;bottom:0;left:0;right:0;z-index:2147483645;display:flex;align-items:center;gap:12px;padding:10px 20px;font-family:system-ui,-apple-system,sans-serif;font-size:13px;line-height:1.5}",
+    ".blakfy-status-msg{flex:1}",
+    ".blakfy-status-dismiss{background:none;border:none;color:inherit;cursor:pointer;padding:4px 10px;border-radius:6px;font-size:16px;opacity:.8;line-height:1}",
+    ".blakfy-status-dismiss:hover{opacity:1;background:rgba(255,255,255,.2)}",
+    "@media (prefers-reduced-motion:reduce){.blakfy-btn,.blakfy-switch::after{transition:none}}",
+    // Responsive
+    "@media (max-width:1024px){.blakfy-card{max-width:440px}}",
+    "@media (max-width:768px){.blakfy-card{max-width:calc(100vw - 2 * var(--blakfy-margin,16px));padding:18px}.blakfy-card h2{font-size:16px}.blakfy-card p{font-size:13px}.blakfy-btn{flex:1 1 100%;min-height:44px;padding:10px 14px;font-size:13px}.blakfy-overlay.widget.bottom-center,.blakfy-overlay.widget.top-center{left:var(--blakfy-margin,16px);right:var(--blakfy-margin,16px);transform:none}.blakfy-overlay.widget .blakfy-card{width:100%}.blakfy-overlay.widget .blakfy-actions .blakfy-btn{flex:1 1 100%;min-width:0}}",
+    "@media (max-width:480px){.blakfy-overlay.widget .blakfy-card{width:100%;max-width:calc(100vw - 2 * var(--blakfy-margin,16px))}}",
+    // Tab bar
+    ".blakfy-tabs{display:flex;border-bottom:2px solid #eee;margin:12px 0 16px;gap:0}",
+    ".blakfy-tab-btn{flex:1;background:none;border:none;border-bottom:2px solid transparent;margin-bottom:-2px;padding:8px 10px;font-size:13px;font-weight:500;color:#666;cursor:pointer;transition:color .15s,border-color .15s;white-space:nowrap;font-family:inherit}",
+    ".blakfy-tab-btn:hover{color:#222}",
+    ".blakfy-tab-btn--active{color:var(--blakfy-accent,#3E5C3A);border-bottom-color:var(--blakfy-accent,#3E5C3A);font-weight:600}",
+    // Tab panels
+    ".blakfy-tab-panel[aria-hidden=true]{display:none}",
+    ".blakfy-tab-panel[aria-hidden=false]{display:block}",
+    // Service list + cards
+    ".blakfy-service-list{display:flex;flex-direction:column;gap:8px;max-height:420px;overflow-y:auto;padding-right:2px}",
+    ".blakfy-service-card{border:1px solid #eee;border-radius:6px;overflow:hidden}",
+    ".blakfy-service-card-header{display:flex;align-items:center;gap:8px;padding:10px 12px;cursor:pointer;background:#fafafa;user-select:none}",
+    ".blakfy-service-card-header:hover{background:#f3f3f3}",
+    ".blakfy-service-name{flex:1;font-size:13px;font-weight:600;color:#222}",
+    ".blakfy-service-cat{font-size:11px;padding:2px 8px;border-radius:999px;background:#eee;color:#555;text-transform:capitalize}",
+    ".blakfy-service-toggle{font-size:11px;color:#aaa;line-height:1}",
+    ".blakfy-service-body[aria-hidden=true]{display:none}",
+    ".blakfy-service-body[aria-hidden=false]{display:block;padding:12px;border-top:1px solid #eee}",
+    ".blakfy-service-dl{margin:0 0 10px;display:grid;grid-template-columns:auto 1fr;gap:4px 12px}",
+    ".blakfy-service-dt{font-size:11px;font-weight:600;color:#888;text-transform:uppercase;letter-spacing:.4px;white-space:nowrap}",
+    ".blakfy-service-dd{margin:0;font-size:12px;color:#444;word-break:break-word}",
+    ".blakfy-service-links{display:flex;gap:12px;margin-top:8px;flex-wrap:wrap}",
+    ".blakfy-service-links a{font-size:12px;color:var(--blakfy-accent,#3E5C3A);text-decoration:underline}",
+    ".blakfy-svc-empty{font-size:13px;color:#888;padding:16px 0}",
+    // About panel
+    ".blakfy-about-panel{padding:4px 0}",
+    ".blakfy-about-brand{display:flex;align-items:center;gap:8px;margin-bottom:14px}",
+    ".blakfy-about-brand strong{font-size:15px;color:#222}",
+    ".blakfy-about-panel p{font-size:13px;color:#555;margin:0 0 10px;line-height:1.6}",
+    ".blakfy-about-panel a{font-size:13px;color:var(--blakfy-accent,#3E5C3A);text-decoration:underline}",
+    ".blakfy-about-meta{font-size:12px;color:#aaa;margin-top:12px}",
+    "@media (max-width:480px){.blakfy-tab-btn{font-size:12px;padding:8px 6px}.blakfy-service-list{max-height:260px}}",
+    // ── Themes: gray ──────────────────────────────────────────────────────────
+    ".blakfy-card[data-blakfy-theme=gray]{background:#f0f0f0}",
+    ".blakfy-card[data-blakfy-theme=gray] .blakfy-btn{background:#e4e4e4;border-color:#ccc}",
+    ".blakfy-card[data-blakfy-theme=gray] .blakfy-service-card-header{background:#e8e8e8}",
+    ".blakfy-card[data-blakfy-theme=gray] .blakfy-service-card-header:hover{background:#ddd}",
+    // ── Themes: dark ──────────────────────────────────────────────────────────
+    ".blakfy-card[data-blakfy-theme=dark]{background:#1a1a1a;color:#f0f0f0;border-color:var(--blakfy-accent,#3E5C3A)}",
+    ".blakfy-card[data-blakfy-theme=dark] p{color:#aaa}",
+    ".blakfy-card[data-blakfy-theme=dark] .blakfy-cat-text span{color:#999}",
+    ".blakfy-card[data-blakfy-theme=dark] .blakfy-cat{border-top-color:#333}",
+    ".blakfy-card[data-blakfy-theme=dark] .blakfy-btn{background:#2a2a2a;color:#f0f0f0;border-color:#444}",
+    ".blakfy-card[data-blakfy-theme=dark] .blakfy-btn:hover{background:#333}",
+    ".blakfy-card[data-blakfy-theme=dark] .blakfy-switch{background:#444}",
+    ".blakfy-card[data-blakfy-theme=dark] .blakfy-close{color:#aaa}",
+    ".blakfy-card[data-blakfy-theme=dark] .blakfy-close:hover{background:#2a2a2a}",
+    ".blakfy-card[data-blakfy-theme=dark] .blakfy-tabs{border-bottom-color:#333}",
+    ".blakfy-card[data-blakfy-theme=dark] .blakfy-tab-btn{color:#888}",
+    ".blakfy-card[data-blakfy-theme=dark] .blakfy-tab-btn:hover{color:#f0f0f0}",
+    ".blakfy-card[data-blakfy-theme=dark] .blakfy-tab-btn--active{color:var(--blakfy-accent,#3E5C3A);border-bottom-color:var(--blakfy-accent,#3E5C3A)}",
+    ".blakfy-card[data-blakfy-theme=dark] .blakfy-service-card{border-color:#333}",
+    ".blakfy-card[data-blakfy-theme=dark] .blakfy-service-card-header{background:#252525}",
+    ".blakfy-card[data-blakfy-theme=dark] .blakfy-service-card-header:hover{background:#2e2e2e}",
+    ".blakfy-card[data-blakfy-theme=dark] .blakfy-service-body[aria-hidden=false]{border-top-color:#333}",
+    ".blakfy-card[data-blakfy-theme=dark] .blakfy-service-dt{color:#777}",
+    ".blakfy-card[data-blakfy-theme=dark] .blakfy-service-dd{color:#ccc}",
+    ".blakfy-card[data-blakfy-theme=dark] .blakfy-service-name{color:#f0f0f0}",
+    ".blakfy-card[data-blakfy-theme=dark] .blakfy-service-cat{background:#333;color:#aaa}",
+    ".blakfy-card[data-blakfy-theme=dark] .blakfy-badge{color:#777}",
+    ".blakfy-card[data-blakfy-theme=dark] .blakfy-about-brand strong{color:#f0f0f0}",
+    ".blakfy-card[data-blakfy-theme=dark] .blakfy-about-panel p{color:#aaa}",
+    ".blakfy-card[data-blakfy-theme=dark] .blakfy-about-meta{color:#666}",
+    ".blakfy-card[data-blakfy-theme=dark] .blakfy-svc-empty{color:#666}"
+  ];
+  var injectStyles = () => {
+    if (document.getElementById(STYLE_ID)) return;
+    const css = document.createElement("style");
+    css.id = STYLE_ID;
+    css.textContent = RULES.join("");
+    document.head.appendChild(css);
   };
 
   // src/ui/theme-bridge.js
@@ -3925,456 +4377,6 @@
     return raw || "auto";
   };
 
-  // src/gating/cleaner.js
-  var rules = /* @__PURE__ */ new Map();
-  var ensure = (category) => {
-    if (!rules.has(category)) rules.set(category, []);
-    return rules.get(category);
-  };
-  var registerCleanup = ({ category, cookies, storage }) => {
-    if (!category) return;
-    const list = ensure(category);
-    list.push({
-      cookies: Array.isArray(cookies) ? cookies.slice() : [],
-      storage: Array.isArray(storage) ? storage.slice() : []
-    });
-  };
-  var getRootDomain = (host) => {
-    if (!host) return "";
-    const parts = host.split(".");
-    if (parts.length <= 2) return host;
-    return parts.slice(-2).join(".");
-  };
-  var expireCookie = (name) => {
-    if (typeof document === "undefined") return;
-    const host = typeof location !== "undefined" && location.hostname || "";
-    const root = getRootDomain(host);
-    const past = "Thu, 01 Jan 1970 00:00:00 GMT";
-    try {
-      document.cookie = name + "=; expires=" + past + "; path=/";
-    } catch (e) {
-    }
-    if (host) {
-      try {
-        document.cookie = name + "=; expires=" + past + "; path=/; domain=" + host;
-      } catch (e) {
-      }
-      try {
-        document.cookie = name + "=; expires=" + past + "; path=/; domain=." + host;
-      } catch (e) {
-      }
-    }
-    if (root && root !== host) {
-      try {
-        document.cookie = name + "=; expires=" + past + "; path=/; domain=" + root;
-      } catch (e) {
-      }
-      try {
-        document.cookie = name + "=; expires=" + past + "; path=/; domain=." + root;
-      } catch (e) {
-      }
-    }
-  };
-  var readCookieNames = () => {
-    if (typeof document === "undefined" || !document.cookie) return [];
-    const out = [];
-    const parts = document.cookie.split(";");
-    for (let i = 0; i < parts.length; i++) {
-      const eq = parts[i].indexOf("=");
-      const name = (eq === -1 ? parts[i] : parts[i].slice(0, eq)).trim();
-      if (name) out.push(name);
-    }
-    return out;
-  };
-  var runCleanup = (category) => {
-    const list = rules.get(category);
-    if (!list || !list.length) return { cookies: 0, storage: 0 };
-    const allNames = readCookieNames();
-    let cookieCount = 0;
-    let storageCount = 0;
-    for (let i = 0; i < list.length; i++) {
-      const rule = list[i];
-      const cookieMatchers = rule.cookies || [];
-      for (let m = 0; m < cookieMatchers.length; m++) {
-        const matcher = cookieMatchers[m];
-        if (matcher instanceof RegExp) {
-          for (let n = 0; n < allNames.length; n++) {
-            if (matcher.test(allNames[n])) {
-              expireCookie(allNames[n]);
-              cookieCount++;
-            }
-          }
-        } else if (typeof matcher === "string") {
-          expireCookie(matcher);
-          cookieCount++;
-        }
-      }
-      const storageKeys = rule.storage || [];
-      for (let k = 0; k < storageKeys.length; k++) {
-        try {
-          if (typeof localStorage !== "undefined") {
-            localStorage.removeItem(storageKeys[k]);
-            storageCount++;
-          }
-        } catch (e) {
-        }
-      }
-    }
-    return { cookies: cookieCount, storage: storageCount };
-  };
-
-  // src/presets/bing-ads-uet.js
-  var bing_ads_uet_default = {
-    name: "Bing Ads UET",
-    category: "marketing",
-    cookies: ["MUID", "_uetsid", "_uetvid"],
-    storage: [],
-    scriptHosts: ["bat.bing.com"],
-    onGrant: (state) => {
-    },
-    onRevoke: (state) => {
-    }
-  };
-
-  // src/presets/facebook-pixel.js
-  var facebook_pixel_default = {
-    name: "Facebook Pixel",
-    category: "marketing",
-    cookies: ["_fbp", "_fbc"],
-    storage: [],
-    scriptHosts: ["connect.facebook.net"],
-    onGrant: (state) => {
-    },
-    onRevoke: (state) => {
-    }
-  };
-
-  // src/presets/google-analytics.js
-  var google_analytics_default = {
-    name: "Google Analytics 4",
-    category: "analytics",
-    cookies: [/^_ga/, "_gid", "_gat", /^_ga_/],
-    storage: [],
-    scriptHosts: ["www.googletagmanager.com", "google-analytics.com"],
-    onGrant: (state) => {
-    },
-    onRevoke: (state) => {
-    }
-  };
-
-  // src/presets/google-maps.js
-  var google_maps_default = {
-    name: "Google Maps",
-    category: "functional",
-    cookies: [],
-    storage: [],
-    scriptHosts: ["maps.googleapis.com", "maps.gstatic.com"],
-    onGrant: (state) => {
-    },
-    onRevoke: (state) => {
-    }
-  };
-
-  // src/presets/google-recaptcha.js
-  var google_recaptcha_default = {
-    name: "Google reCAPTCHA",
-    category: "functional",
-    cookies: ["_GRECAPTCHA"],
-    storage: [],
-    scriptHosts: ["www.google.com/recaptcha", "www.gstatic.com/recaptcha"],
-    onGrant: (state) => {
-    },
-    onRevoke: (state) => {
-    }
-  };
-
-  // src/presets/google-tag-manager.js
-  var google_tag_manager_default = {
-    name: "Google Tag Manager",
-    category: "analytics",
-    cookies: ["_gtm", /^_dc_gtm/],
-    storage: [],
-    scriptHosts: ["www.googletagmanager.com"],
-    onGrant: (state) => {
-    },
-    onRevoke: (state) => {
-    }
-  };
-
-  // src/presets/hotjar.js
-  var hotjar_default = {
-    name: "Hotjar",
-    category: "analytics",
-    cookies: [/^_hj/],
-    storage: [],
-    scriptHosts: ["static.hotjar.com", "script.hotjar.com"],
-    onGrant: (state) => {
-    },
-    onRevoke: (state) => {
-    }
-  };
-
-  // src/presets/intercom.js
-  var intercom_default = {
-    name: "Intercom",
-    category: "functional",
-    cookies: [/^intercom-/],
-    storage: [],
-    scriptHosts: ["widget.intercom.io", "js.intercomcdn.com"],
-    onGrant: (state) => {
-    },
-    onRevoke: (state) => {
-    }
-  };
-
-  // src/presets/hubspot.js
-  var hubspot_default = {
-    name: "HubSpot",
-    category: "marketing",
-    cookies: ["__hstc", "__hssc", "__hssrc", "hubspotutk", "messagesUtk"],
-    storage: [],
-    scriptHosts: ["js.hs-scripts.com", "js.hs-analytics.net"],
-    onGrant: (state) => {
-    },
-    onRevoke: (state) => {
-    }
-  };
-
-  // src/presets/linkedin-insight.js
-  var linkedin_insight_default = {
-    name: "LinkedIn Insight Tag",
-    category: "marketing",
-    cookies: ["li_sugr", "bcookie", "lidc", "UserMatchHistory", "AnalyticsSyncHistory"],
-    storage: [],
-    scriptHosts: ["snap.licdn.com", "px.ads.linkedin.com"],
-    onGrant: (state) => {
-    },
-    onRevoke: (state) => {
-    }
-  };
-
-  // src/presets/mailchimp.js
-  var mailchimp_default = {
-    name: "Mailchimp",
-    category: "marketing",
-    cookies: [/^_mcid/, "ak_bmsc", "_mcvisit"],
-    storage: [],
-    scriptHosts: ["chimpstatic.com"],
-    onGrant: (state) => {
-    },
-    onRevoke: (state) => {
-    }
-  };
-
-  // src/presets/microsoft-clarity.js
-  var microsoft_clarity_default = {
-    name: "Microsoft Clarity",
-    category: "analytics",
-    cookies: ["_clck", "_clsk", "CLID", "MR", "MUID", "SM"],
-    storage: [],
-    scriptHosts: ["www.clarity.ms", "c.clarity.ms"],
-    onGrant: (state) => {
-    },
-    onRevoke: (state) => {
-    }
-  };
-
-  // src/presets/pinterest-tag.js
-  var pinterest_tag_default = {
-    name: "Pinterest Tag",
-    category: "marketing",
-    cookies: ["_pinterest_ct", "_pinterest_sess"],
-    storage: [],
-    scriptHosts: ["s.pinimg.com", "ct.pinterest.com"],
-    onGrant: (state) => {
-    },
-    onRevoke: (state) => {
-    }
-  };
-
-  // src/presets/tawk-to.js
-  var tawk_to_default = {
-    name: "Tawk.to",
-    category: "functional",
-    cookies: ["TawkConnectionTime", /^__tawkuuid/, /^Tawk_/],
-    storage: [],
-    scriptHosts: ["embed.tawk.to"],
-    onGrant: (state) => {
-    },
-    onRevoke: (state) => {
-    }
-  };
-
-  // src/presets/tiktok-pixel.js
-  var tiktok_pixel_default = {
-    name: "TikTok Pixel",
-    category: "marketing",
-    cookies: ["_ttp"],
-    storage: [],
-    scriptHosts: ["analytics.tiktok.com"],
-    onGrant: (state) => {
-    },
-    onRevoke: (state) => {
-    }
-  };
-
-  // src/presets/vimeo.js
-  var vimeo_default = {
-    name: "Vimeo",
-    category: "marketing",
-    cookies: [],
-    storage: [],
-    scriptHosts: ["player.vimeo.com", "vimeo.com"],
-    onGrant: (state) => {
-    },
-    onRevoke: (state) => {
-    }
-  };
-
-  // src/presets/yandex-metrica.js
-  var yandex_metrica_default = {
-    name: "Yandex Metrica",
-    category: "analytics",
-    subCategory: "recording",
-    cookies: [/^_ym/, "yandexuid", "yabs-frequency"],
-    storage: [],
-    scriptHosts: ["mc.yandex.ru", "mc.webvisor.com", "mc.yandex.com"],
-    onGrant: (state) => {
-    },
-    onRevoke: (state) => {
-    }
-  };
-
-  // src/presets/youtube.js
-  var youtube_default = {
-    name: "YouTube",
-    category: "marketing",
-    cookies: [],
-    storage: [],
-    scriptHosts: ["www.youtube.com", "youtube-nocookie.com"],
-    onGrant: (state) => {
-    },
-    onRevoke: (state) => {
-    }
-  };
-
-  // src/presets/_registry.js
-  var PRESETS = {
-    ga4: google_analytics_default,
-    gtm: google_tag_manager_default,
-    maps: google_maps_default,
-    recaptcha: google_recaptcha_default,
-    facebook: facebook_pixel_default,
-    youtube: youtube_default,
-    vimeo: vimeo_default,
-    hotjar: hotjar_default,
-    clarity: microsoft_clarity_default,
-    linkedin: linkedin_insight_default,
-    yandex: yandex_metrica_default,
-    bing: bing_ads_uet_default,
-    tiktok: tiktok_pixel_default,
-    pinterest: pinterest_tag_default,
-    tawkto: tawk_to_default,
-    intercom: intercom_default,
-    hubspot: hubspot_default,
-    mailchimp: mailchimp_default
-  };
-  var applyPreset = (name, { registerCleanup: registerCleanup2 }) => {
-    const preset = PRESETS[name];
-    if (!preset) return null;
-    if (typeof registerCleanup2 === "function") {
-      registerCleanup2({
-        category: preset.category,
-        cookies: preset.cookies || [],
-        storage: preset.storage || []
-      });
-      if (preset.subCategory) {
-        registerCleanup2({
-          category: preset.subCategory,
-          cookies: preset.cookies || [],
-          storage: preset.storage || []
-        });
-      }
-    }
-    return preset;
-  };
-
-  // src/geo/jurisdiction.js
-  var EU_COUNTRIES = [
-    "AT",
-    "BE",
-    "BG",
-    "HR",
-    "CY",
-    "CZ",
-    "DK",
-    "EE",
-    "FI",
-    "FR",
-    "DE",
-    "GR",
-    "HU",
-    "IE",
-    "IT",
-    "LV",
-    "LT",
-    "LU",
-    "MT",
-    "NL",
-    "PL",
-    "PT",
-    "RO",
-    "SK",
-    "SI",
-    "ES",
-    "SE",
-    "NO",
-    "IS",
-    "LI",
-    "GB",
-    "UK",
-    "CH"
-  ];
-  var mapCountryToJurisdiction = (country, region) => {
-    if (!country) return "default";
-    const c = String(country).toUpperCase();
-    const r = region ? String(region).toUpperCase() : "";
-    if (EU_COUNTRIES.indexOf(c) !== -1) return "GDPR";
-    if (c === "TR") return "GDPR";
-    if (c === "BR") return "LGPD";
-    if (c === "US" && r === "CA") return "CCPA";
-    return "default";
-  };
-  var tzGuess = () => {
-    try {
-      const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || "";
-      if (tz.indexOf("Europe/") === 0) return "GDPR";
-      if (tz === "America/Los_Angeles" || tz === "America/Tijuana") return "CCPA";
-      if (tz === "America/Sao_Paulo") return "LGPD";
-      return "default";
-    } catch (e) {
-      return "default";
-    }
-  };
-  var detectJurisdiction = async (opts) => {
-    const o = opts || {};
-    if (typeof document !== "undefined" && document.documentElement && document.documentElement.dataset && document.documentElement.dataset.jurisdiction) {
-      const v = document.documentElement.dataset.jurisdiction;
-      if (v === "GDPR" || v === "CCPA" || v === "LGPD" || v === "default") return v;
-    }
-    if (o.geoEndpoint && typeof fetch === "function") {
-      try {
-        const res = await fetch(o.geoEndpoint, { credentials: "omit" });
-        if (res && res.ok) {
-          const data = await res.json();
-          return mapCountryToJurisdiction(data && data.country, data && data.region);
-        }
-      } catch (e) {
-      }
-    }
-    return tzGuess();
-  };
-
   // src/index.js
   var ROOT_OVERLAY_CLASS = "blakfy-overlay";
   var VALID_POSITIONS = {
@@ -4389,6 +4391,12 @@
   var resolvePosition = (raw) => {
     if (raw && Object.prototype.hasOwnProperty.call(VALID_POSITIONS, raw)) return raw;
     return "bottom-center";
+  };
+  var MIN_MARGIN_PX = 5;
+  var resolveMargin = (raw) => {
+    const n = parseInt(raw, 10);
+    if (isNaN(n)) return 16;
+    return Math.max(MIN_MARGIN_PX, n);
   };
   var bootstrap = async () => {
     if (typeof window === "undefined" || typeof document === "undefined") return;
@@ -4507,6 +4515,7 @@
     const mountBanner = () => {
       const overlay = document.createElement("div");
       overlay.className = ROOT_OVERLAY_CLASS + " widget " + resolvePosition(config.position);
+      overlay.style.setProperty("--blakfy-margin", resolveMargin(config.margin) + "px");
       const card = createBanner({
         t,
         isRTL,

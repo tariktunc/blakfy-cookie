@@ -57,6 +57,14 @@ const resolvePosition = (raw) => {
   return "bottom-center";
 };
 
+const MIN_MARGIN_PX = 5;
+
+const resolveMargin = (raw) => {
+  const n = parseInt(raw, 10);
+  if (isNaN(n)) return 16;
+  return Math.max(MIN_MARGIN_PX, n);
+};
+
 const bootstrap = async () => {
   if (typeof window === "undefined" || typeof document === "undefined") return;
   if (window.BlakfyCookie && window.BlakfyCookie.__bootstrapped) return;
@@ -219,6 +227,7 @@ const bootstrap = async () => {
   const mountBanner = () => {
     const overlay = document.createElement("div");
     overlay.className = ROOT_OVERLAY_CLASS + " widget " + resolvePosition(config.position);
+    overlay.style.setProperty("--blakfy-margin", resolveMargin(config.margin) + "px");
     const card = createBanner({
       t: t,
       isRTL: isRTL,

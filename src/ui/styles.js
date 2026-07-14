@@ -9,20 +9,20 @@ const RULES = [
   ".blakfy-overlay.modal{position:fixed !important;inset:0;background:rgba(0,0,0,.4);z-index:2147483646 !important;display:flex !important;align-items:center;justify-content:center;padding:16px}",
   // Widget mode (transparent, no backdrop)
   ".blakfy-overlay.widget{position:fixed !important;inset:auto;background:transparent;padding:0;display:block !important;z-index:2147483646 !important;pointer-events:none}",
-  ".blakfy-overlay.widget .blakfy-card{width:min(96vw,1100px);max-width:none;border-radius:8px;position:relative;pointer-events:auto;padding-bottom:40px}",
+  ".blakfy-overlay.widget .blakfy-card{width:min(96vw,1100px);max-width:none;border-radius:8px;position:relative;pointer-events:auto;padding-bottom:40px;box-sizing:border-box}",
   // Widget butonları kart genişliğine eşit dağılımlı
   ".blakfy-overlay.widget .blakfy-actions{flex-wrap:nowrap}",
   ".blakfy-overlay.widget .blakfy-actions .blakfy-btn{flex:1;min-width:0;min-height:36px;padding:8px 16px}",
-  // Position modifiers (widget)
-  ".blakfy-overlay.widget.bottom-center{bottom:16px;left:50%;right:auto;top:auto;transform:translateX(-50%)}",
-  ".blakfy-overlay.widget.bottom-right{bottom:16px;right:16px;left:auto;top:auto}",
-  ".blakfy-overlay.widget.bottom-left{bottom:16px;left:16px;right:auto;top:auto}",
-  ".blakfy-overlay.widget.top-center{top:16px;left:50%;right:auto;bottom:auto;transform:translateX(-50%)}",
-  ".blakfy-overlay.widget.top-right{top:16px;right:16px;left:auto;bottom:auto}",
-  ".blakfy-overlay.widget.top-left{top:16px;left:16px;right:auto;bottom:auto}",
+  // Position modifiers (widget) — offset uses --blakfy-margin (default 16px, min 5px enforced in JS)
+  ".blakfy-overlay.widget.bottom-center{bottom:var(--blakfy-margin,16px);left:50%;right:auto;top:auto;transform:translateX(-50%)}",
+  ".blakfy-overlay.widget.bottom-right{bottom:var(--blakfy-margin,16px);right:var(--blakfy-margin,16px);left:auto;top:auto}",
+  ".blakfy-overlay.widget.bottom-left{bottom:var(--blakfy-margin,16px);left:var(--blakfy-margin,16px);right:auto;top:auto}",
+  ".blakfy-overlay.widget.top-center{top:var(--blakfy-margin,16px);left:50%;right:auto;bottom:auto;transform:translateX(-50%)}",
+  ".blakfy-overlay.widget.top-right{top:var(--blakfy-margin,16px);right:var(--blakfy-margin,16px);left:auto;bottom:auto}",
+  ".blakfy-overlay.widget.top-left{top:var(--blakfy-margin,16px);left:var(--blakfy-margin,16px);right:auto;bottom:auto}",
   ".blakfy-overlay.widget.center{top:50%;left:50%;right:auto;bottom:auto;transform:translate(-50%,-50%)}",
   // Card base (shared by banner + modal)
-  ".blakfy-card{background:#fff;color:#222;border-radius:16px;max-width:560px;width:100%;padding:24px;border:3px solid var(--blakfy-accent,#3E5C3A);font-family:system-ui,-apple-system,sans-serif;line-height:1.5;position:relative}",
+  ".blakfy-card{box-sizing:border-box;background:#fff;color:#222;border-radius:16px;max-width:560px;width:100%;padding:24px;border:3px solid var(--blakfy-accent,#3E5C3A);font-family:system-ui,-apple-system,sans-serif;line-height:1.5;position:relative}",
   ".blakfy-card[dir=rtl]{text-align:right}",
   ".blakfy-card h2{margin:0 0 8px;font-size:18px;font-weight:600}",
   ".blakfy-card p{margin:0 0 16px;font-size:14px;color:#444}",
@@ -57,8 +57,8 @@ const RULES = [
   "@media (prefers-reduced-motion:reduce){.blakfy-btn,.blakfy-switch::after{transition:none}}",
   // Responsive
   "@media (max-width:1024px){.blakfy-card{max-width:440px}}",
-  "@media (max-width:768px){.blakfy-card{max-width:calc(100vw - 32px);padding:18px}.blakfy-card h2{font-size:16px}.blakfy-card p{font-size:13px}.blakfy-btn{flex:1 1 100%;min-height:44px;padding:10px 14px;font-size:13px}.blakfy-overlay.widget.bottom-center,.blakfy-overlay.widget.top-center{left:16px;right:16px;transform:none}.blakfy-overlay.widget .blakfy-card{width:100%}.blakfy-overlay.widget .blakfy-actions .blakfy-btn{flex:1 1 100%;min-width:0}}",
-  "@media (max-width:480px){.blakfy-overlay.widget .blakfy-card{width:100%;max-width:calc(100vw - 32px)}}",
+  "@media (max-width:768px){.blakfy-card{max-width:calc(100vw - 2 * var(--blakfy-margin,16px));padding:18px}.blakfy-card h2{font-size:16px}.blakfy-card p{font-size:13px}.blakfy-btn{flex:1 1 100%;min-height:44px;padding:10px 14px;font-size:13px}.blakfy-overlay.widget.bottom-center,.blakfy-overlay.widget.top-center{left:var(--blakfy-margin,16px);right:var(--blakfy-margin,16px);transform:none}.blakfy-overlay.widget .blakfy-card{width:100%}.blakfy-overlay.widget .blakfy-actions .blakfy-btn{flex:1 1 100%;min-width:0}}",
+  "@media (max-width:480px){.blakfy-overlay.widget .blakfy-card{width:100%;max-width:calc(100vw - 2 * var(--blakfy-margin,16px))}}",
   // Tab bar
   ".blakfy-tabs{display:flex;border-bottom:2px solid #eee;margin:12px 0 16px;gap:0}",
   ".blakfy-tab-btn{flex:1;background:none;border:none;border-bottom:2px solid transparent;margin-bottom:-2px;padding:8px 10px;font-size:13px;font-weight:500;color:#666;cursor:pointer;transition:color .15s,border-color .15s;white-space:nowrap;font-family:inherit}",
