@@ -4,6 +4,12 @@ All notable changes follow [Keep a Changelog](https://keepachangelog.com/) and S
 
 ---
 
+## [cookie-next 2.3.1] — 2026-08-25
+
+### Changed
+
+- **`@blakfy/cookie-next` peer range widened to `next >=14 <17`** — Next.js 16 is now an accepted peer. Verified against Next 16.3.2 + React 19.2.8 in a scratch App Router build: install without `--legacy-peer-deps`, `next build` clean, Consent Mode v2 default script and the CDN loader present in the SSR output. No runtime change; the package still only uses `next/script`.
+
 ## [2.3.0] — 2026-05-09
 
 ### Added
