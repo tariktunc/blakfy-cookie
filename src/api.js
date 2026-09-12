@@ -106,6 +106,7 @@ export const createAPI = (ctx) => {
         timestamp: state.timestamp,
         version: state.version,
         jurisdiction: state.jurisdiction,
+        locale: state.locale,
         consent: {
           analytics: state.analytics,
           marketing: state.marketing,

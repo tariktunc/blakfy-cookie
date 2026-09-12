@@ -10,14 +10,30 @@
   // src/core/audit.js
   var postAudit = (endpoint, payload) => {
     if (!endpoint) return;
+    let body;
     try {
-      fetch(endpoint, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-        keepalive: true
-      }).catch(() => {
-      });
+      body = JSON.stringify(payload);
+    } catch (e) {
+      return;
+    }
+    try {
+      if (typeof navigator !== "undefined" && typeof navigator.sendBeacon === "function" && typeof Blob !== "undefined") {
+        const blob = new Blob([body], { type: "application/json" });
+        const sent = navigator.sendBeacon(endpoint, blob);
+        if (sent) return;
+      }
+    } catch (e) {
+    }
+    try {
+      if (typeof fetch === "function") {
+        fetch(endpoint, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body,
+          keepalive: true
+        }).catch(() => {
+        });
+      }
     } catch (e) {
     }
   };
@@ -512,6 +528,7 @@
           timestamp: state.timestamp,
           version: state.version,
           jurisdiction: state.jurisdiction,
+          locale: state.locale,
           consent: {
             analytics: state.analytics,
             marketing: state.marketing,

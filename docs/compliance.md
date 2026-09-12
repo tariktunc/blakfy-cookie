@@ -181,25 +181,47 @@ Sonuç: `"GDPR"` | `"CCPA"` | `"LGPD"` | `"default"`
 
 ## 10. Audit Log (KVKK Md.12 + GDPR Art.7(1))
 
-Her consent değişikliği `data-blakfy-audit-endpoint`'e POST edilir:
+Her consent değişikliği `data-blakfy-audit-endpoint`'e POST edilir. **Minimal payload şekli**
+(`src/core/audit.js` `BlakfyAuditPayload` JSDoc'unda tip olarak da tanımlıdır):
 
 ```json
 {
   "id": "uuid-v4-anonim-id",
   "timestamp": "2026-04-30T12:00:00Z",
-  "action": "accept_all" | "reject_all" | "save_preferences",
-  "state": { ... },
+  "action": "accept_all" | "reject_all" | "save",
+  "version": "1.0",
   "jurisdiction": "GDPR",
-  "userAgent": "...",
-  "url": "...",
-  "policyVersion": "1.0",
-  "blakfy": "2.0.0",
-  "tcString": "...",
-  "uspString": "..."
+  "locale": "tr",
+  "consent": { "analytics": true, "marketing": false, "functional": true, "recording": false }
 }
 ```
 
 **Anonim ID:** `crypto.randomUUID()` — fingerprint **değil** (v1'deki `makeHash()` kaldırıldı).
+
+**Transport (#28):** `navigator.sendBeacon()` denenir önce — sayfa kapanırken/yönlendirme
+sırasında verilen bir karar kaybolmasın diye (`fetch(keepalive)` bu garantiyi vermez).
+`sendBeacon` yoksa (eski tarayıcı) veya reddederse (`false` dönerse), `fetch(..., {keepalive:true})`
+fallback olarak devreye girer. Her iki yol da fail-open'dır: gönderim başarısız olursa consent
+akışı hiçbir şekilde etkilenmez, sadece sunucu tarafı kayıt eksik kalır (bkz. `data-blakfy-audit-endpoint`
+tanımlı değilse konsola tek seferlik uyarı — `src/api.js`).
+
+**Endpoint uygulaması operatörün sorumluluğundadır** — bu paket sadece client-side POST'u yapar;
+sunucu tarafı referans implementasyon bu repo kapsamı dışındadır (bkz. issue #28 "Full
+server-side reference implementation is OUT of scope").
+
+**Saklama süresi ve DSAR etkisi:** Bu audit kaydı, kendisi de kişisel veri sayılabilecek bir
+anonim-ID + zaman damgası + rıza durumu içerir. Operatör:
+
+- Saklama süresini KENDİ veri saklama politikasına göre belirler ve endpoint'inde uygular
+  (öneri: rıza kanıtı yükümlülüğü [KVKK Md.12 / GDPR Art.7(1)] süresince, en az sözleşme/loglama
+  asgari süresi kadar — bu paket bir varsayılan saklama süresi DAYATMAZ).
+- Bir DSAR (veri sahibi başvurusu) geldiğinde, bu anonim `id`'yi `blakfy_consent` çerezinden
+  (tarayıcıda saklanan aynı `id`) eşleştirerek kayıtları bulabilecek bir arama yolu sağlamalıdır —
+  bu paket `id`'yi üretir ve çerezde taşır, ama endpoint tarafındaki arama/silme mekanizması
+  operatörün kurması gereken bir parçadır.
+- `id` bir fingerprint değildir (`crypto.randomUUID()`), yani tek başına kişiyi tanımlamaz;
+  buna rağmen IP/User-Agent gibi başka bir alanla endpoint'te eşleştirilirse kişisel veri
+  rejimine girer — endpoint'i buna göre tasarlayın.
 
 ---
 
