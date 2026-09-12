@@ -22,8 +22,17 @@ export const DEFAULTS = {
   statusEnabled: true,
 };
 
+// document.currentScript is only reliable DURING the synchronous execution of this
+// classic script — it is null again by the time bootstrap() runs (after a
+// DOMContentLoaded listener fires asynchronously, or after any await). Capture it
+// once, at module-evaluation time, so later calls don't fall back to "last <script>
+// on the page", which silently picks up an unrelated script if anything else was
+// injected after this one loaded (fixes #22).
+const CAPTURED_SCRIPT_EL = typeof document !== "undefined" ? document.currentScript : null;
+
 export const getScriptEl = () => {
-  if (document.currentScript) return document.currentScript;
+  if (CAPTURED_SCRIPT_EL) return CAPTURED_SCRIPT_EL;
+  if (typeof document === "undefined") return null;
   const all = document.getElementsByTagName("script");
   return all[all.length - 1] || null;
 };

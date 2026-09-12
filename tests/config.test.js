@@ -1,6 +1,6 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi, afterEach } from "vitest";
 
-import { readConfig, DEFAULTS, CDN_BASE } from "../src/core/config.js";
+import { readConfig, DEFAULTS, CDN_BASE, getScriptEl } from "../src/core/config.js";
 
 const makeScript = (attrs) => {
   const el = document.createElement("script");
@@ -67,5 +67,44 @@ describe("config readConfig", () => {
     expect(CDN_BASE).not.toContain("/gh/");
     expect(DEFAULTS.statusUrl).toContain("@blakfy/cookie@2");
     expect(DEFAULTS.statusUrl).toMatch(/\/status\.json$/);
+  });
+});
+
+describe("getScriptEl (#22 regression)", () => {
+  afterEach(() => {
+    document.body.innerHTML = "";
+  });
+
+  it("captures the owning script tag even after currentScript goes null (async caller)", async () => {
+    // Simulate: our loader script is the one executing (currentScript set) while
+    // the module is first evaluated — the real-world case for a classic <script> tag.
+    const own = document.createElement("script");
+    own.setAttribute("data-blakfy-locale", "tr");
+    document.body.appendChild(own);
+    Object.defineProperty(document, "currentScript", { value: own, configurable: true });
+
+    vi.resetModules();
+    const fresh = await import("../src/core/config.js?case=own-current");
+
+    // Now simulate the real bug trigger: by the time bootstrap() runs (e.g. from a
+    // DOMContentLoaded callback), currentScript is null again AND another, unrelated
+    // script has since been appended to the page.
+    Object.defineProperty(document, "currentScript", { value: null, configurable: true });
+    const unrelated = document.createElement("script");
+    document.body.appendChild(unrelated);
+
+    expect(fresh.getScriptEl()).toBe(own);
+    expect(fresh.getScriptEl()).not.toBe(unrelated);
+  });
+
+  it("falls back to the last <script> on the page when nothing was ever captured", () => {
+    document.body.innerHTML = "";
+    const s1 = document.createElement("script");
+    const s2 = document.createElement("script");
+    document.body.appendChild(s1);
+    document.body.appendChild(s2);
+    // no currentScript ever set in this environment for this call path
+    Object.defineProperty(document, "currentScript", { value: null, configurable: true });
+    expect(getScriptEl()).toBe(s2);
   });
 });
