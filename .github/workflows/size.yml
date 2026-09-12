@@ -29,10 +29,14 @@ jobs:
       - name: Build all bundles
         run: npm run build:all
 
+      - name: Check size limits on push
+        if: github.event_name == 'push'
+        run: npm run size:report
+
       - name: Size Limit (with PR comment)
+        if: github.event_name == 'pull_request'
         uses: andresz1/size-limit-action@v1
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           skip_step: install
           build_script: build:all
-          script: size:report
