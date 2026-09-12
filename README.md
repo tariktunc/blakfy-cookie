@@ -105,6 +105,24 @@ Bunlar olduğu gibi kalır. Bootstrap zaten consent default'larını `denied` ol
 
 **Bittiğinde:** Sayfa yüklendiğinde **alt-orta**'da (varsayılan) consent banner ve "Powered by Blakfy Studio" badge belirir. Konumu değiştirmek için `data-blakfy-position` ile `bottom-right`, `bottom-left`, `top-center`, `top-right`, `top-left` seçeneklerinden birini ver. Kullanıcı bir karar verene kadar GTM/GA4/Facebook Pixel/Clarity tag'leri çalışmaz; karar verildiğinde otomatik aktif olur.
 
+### 4. Footer'a geri çağırma linki + audit endpoint (ikisi de zorunlu, opsiyonel değil)
+
+Yukarıdaki 3 adım widget'ı ayağa kaldırır ama **iki compliance-kritik parça** eklenmeden kurulum eksik sayılır — ikisi de sona bırakılabilecek "nice to have" değildir:
+
+**a) Geri çekme (withdrawal) linki** — GDPR/KVKK onayı istediği kadar kolay geri alınabilir olmalı der. `data-blakfy-*` script'i tek başına bunu vermez; footer'a (veya gizlilik sayfasına) ekle:
+
+```html
+<a href="#" onclick="event.preventDefault(); window.BlakfyCookie.open();"> Çerez Tercihleri </a>
+```
+
+**b) Audit endpoint** — `data-blakfy-audit-endpoint="/api/consent-log"` verilmezse KVKK Md.12 / GDPR Art. 7(1) gerektirdiği onay kaydı hiç tutulmaz. Widget bunu tespit eder ve ilk consent değişiminde konsola **bir kez** uyarı basar (`console.warn`) — ama bu sadece geliştirici konsolunu görenlere ulaşır, canlı sitede kimse fark etmez; bu yüzden kurulumda elle eklenmesi gerekir. Sunucu tarafı için detay: [`docs/compliance.md` §10](./docs/compliance.md#10-audit-log-kvkk-md12--gdpr-art71).
+
+```html
+<script src="..." data-blakfy-audit-endpoint="/api/consent-log" ...></script>
+```
+
+Sadece yerel demo/prototip için (canlı yayın değil) ikisini de atlayabilirsin — ama canlıya alırken ikisi de olmalı.
+
 ---
 
 ## Senaryolar
