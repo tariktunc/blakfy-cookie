@@ -1,4 +1,4 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, beforeEach, vi } from "vitest";
 
 // Re-import per-test to reset module-level `defaultsInstalled` flag.
 const importFresh = async () => {
@@ -57,5 +57,59 @@ describe("google-cmv2 pushGCM", () => {
     const { pushGCM } = await importFresh();
     delete window.gtag;
     expect(() => pushGCM({ analytics: true })).not.toThrow();
+  });
+});
+
+// #24 (remaining scope): warn when a host platform pushed its own granted
+// consent default into dataLayer before this widget's denied-by-default signal.
+describe("google-cmv2 foreign granted default detection", () => {
+  beforeEach(() => {
+    delete window.dataLayer;
+    delete window.gtag;
+  });
+
+  it("warns when dataLayer already has a foreign granted default (e.g. Wix)", async () => {
+    window.dataLayer = [
+      ["consent", "default", { analytics_storage: "granted", ad_storage: "granted" }],
+    ];
+    const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+    const { installDefaults } = await importFresh();
+    installDefaults();
+    expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining("analytics_storage"));
+    expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining("#24"));
+    warnSpy.mockRestore();
+  });
+
+  it("does not warn when no prior dataLayer entries exist", async () => {
+    const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+    const { installDefaults } = await importFresh();
+    installDefaults();
+    expect(warnSpy).not.toHaveBeenCalled();
+    warnSpy.mockRestore();
+  });
+
+  it("does not warn when the prior default is fully denied", async () => {
+    window.dataLayer = [
+      [
+        "consent",
+        "default",
+        { analytics_storage: "denied", ad_storage: "denied", security_storage: "granted" },
+      ],
+    ];
+    const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+    const { installDefaults } = await importFresh();
+    installDefaults();
+    expect(warnSpy).not.toHaveBeenCalled();
+    warnSpy.mockRestore();
+  });
+
+  it("warns only once per module instance even if called again", async () => {
+    window.dataLayer = [["consent", "default", { ad_storage: "granted" }]];
+    const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+    const { installDefaults } = await importFresh();
+    installDefaults();
+    installDefaults();
+    expect(warnSpy).toHaveBeenCalledTimes(1);
+    warnSpy.mockRestore();
   });
 });
