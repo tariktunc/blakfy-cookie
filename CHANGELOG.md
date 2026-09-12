@@ -4,6 +4,12 @@ All notable changes follow [Keep a Changelog](https://keepachangelog.com/) and S
 
 ---
 
+## [Unreleased]
+
+### Fixed
+
+- Preserve the vanilla loader script when initialization waits for DOMContentLoaded, so later scripts do not replace its data-blakfy configuration.
+
 ## [cookie-next 2.3.1] — 2026-08-25
 
 ### Changed

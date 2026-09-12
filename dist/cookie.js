@@ -4378,6 +4378,7 @@
   };
 
   // src/index.js
+  var loaderScript = typeof document !== "undefined" ? document.currentScript : null;
   var ROOT_OVERLAY_CLASS = "blakfy-overlay";
   var VALID_POSITIONS = {
     "bottom-center": 1,
@@ -4401,7 +4402,7 @@
   var bootstrap = async () => {
     if (typeof window === "undefined" || typeof document === "undefined") return;
     if (window.BlakfyCookie && window.BlakfyCookie.__bootstrapped) return;
-    const scriptEl = getScriptEl();
+    const scriptEl = loaderScript || getScriptEl();
     const config = readConfig(scriptEl);
     const currentLocale = detectLocale({ configLocale: config.locale });
     const mainLang = detectMainLang({ configMainLang: config.mainLang });

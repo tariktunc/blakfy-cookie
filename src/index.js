@@ -40,6 +40,9 @@ import {
   normalizeThemeValue,
 } from "./ui/theme-bridge.js";
 
+// Capture the loader while it is executing; currentScript is null after DOMContentLoaded.
+const loaderScript = typeof document !== "undefined" ? document.currentScript : null;
+
 const ROOT_OVERLAY_CLASS = "blakfy-overlay";
 
 const VALID_POSITIONS = {
@@ -70,7 +73,7 @@ const bootstrap = async () => {
   if (window.BlakfyCookie && window.BlakfyCookie.__bootstrapped) return;
 
   // 1. config
-  const scriptEl = getScriptEl();
+  const scriptEl = loaderScript || getScriptEl();
   const config = readConfig(scriptEl);
 
   // 2. locale + translations
