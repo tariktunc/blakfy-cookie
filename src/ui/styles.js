@@ -123,6 +123,19 @@ const RULES = [
   ".blakfy-card[data-blakfy-theme=dark] .blakfy-about-panel p{color:#aaa}",
   ".blakfy-card[data-blakfy-theme=dark] .blakfy-about-meta{color:#666}",
   ".blakfy-card[data-blakfy-theme=dark] .blakfy-svc-empty{color:#666}",
+  // ── Reopen FAB (#34) — token API, see docs in src/ui/fab.js ────────────────
+  ":root{--blakfy-fab-side:left;--blakfy-fab-offset-x:20px;--blakfy-fab-offset-y:20px;--blakfy-fab-z:2147483640;--blakfy-fab-size:40px;--blakfy-fab-target:44px;--blakfy-fab-icon-size:20px;--blakfy-fab-bg:var(--blakfy-accent,#3E5C3A);--blakfy-fab-color:#fff;--blakfy-fab-radius:50%;--blakfy-fab-shadow:0 2px 8px rgb(0 0 0 / 0.18);--blakfy-fab-opacity:0.55;--blakfy-fab-opacity-hover:1}",
+  ".blakfy-fab{position:fixed;z-index:var(--blakfy-fab-z);width:var(--blakfy-fab-target);height:var(--blakfy-fab-target);display:flex;align-items:center;justify-content:center;padding:0;border:none;cursor:pointer;background:transparent;bottom:calc(var(--blakfy-fab-offset-y) + env(safe-area-inset-bottom,0px))}",
+  ".blakfy-fab::before{content:'';position:absolute;width:var(--blakfy-fab-size);height:var(--blakfy-fab-size);border-radius:var(--blakfy-fab-radius);background:var(--blakfy-fab-bg);box-shadow:var(--blakfy-fab-shadow);opacity:var(--blakfy-fab-opacity);transition:opacity .15s}",
+  ".blakfy-fab:hover::before,.blakfy-fab:focus-visible::before{opacity:var(--blakfy-fab-opacity-hover)}",
+  ".blakfy-fab svg{position:relative;color:var(--blakfy-fab-color);pointer-events:none}",
+  ".blakfy-fab:focus-visible{outline:2px solid var(--blakfy-fab-bg);outline-offset:2px}",
+  ".blakfy-fab--left{left:calc(var(--blakfy-fab-offset-x) + env(safe-area-inset-left,0px))}",
+  ".blakfy-fab--right{right:calc(var(--blakfy-fab-offset-x) + env(safe-area-inset-right,0px))}",
+  "[dir=rtl] .blakfy-fab--left{left:auto;right:calc(var(--blakfy-fab-offset-x) + env(safe-area-inset-right,0px))}",
+  "[dir=rtl] .blakfy-fab--right{right:auto;left:calc(var(--blakfy-fab-offset-x) + env(safe-area-inset-left,0px))}",
+  "@media (prefers-reduced-motion:reduce){.blakfy-fab::before{transition:none}}",
+  "@media (max-width:640px){:root{--blakfy-fab-offset-x:12px;--blakfy-fab-offset-y:12px;--blakfy-fab-size:36px}}",
 ];
 
 export const injectStyles = () => {

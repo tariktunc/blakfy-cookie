@@ -1265,7 +1265,14 @@
     // running a shop on a subdomain. Document the apex/www implication for anyone not
     // redirecting to a canonical host: an unset value means example.com and
     // www.example.com are treated as two different sites for consent purposes.
-    cookieDomain: null
+    cookieDomain: null,
+    // #34: reopen FAB — "off" disables it (a site wiring its own footer link
+    // instead). Wix installs commonly already occupy the right corner with
+    // chat/map buttons, so "left" is the stock default everywhere.
+    fabSide: "left",
+    fabOffset: null,
+    fabSize: null,
+    fabColor: null
   };
   var CAPTURED_SCRIPT_EL = typeof document !== "undefined" ? document.currentScript : null;
   var getScriptEl = () => {
@@ -1314,7 +1321,11 @@
       dnt: attr("data-blakfy-dnt", DEFAULTS.dnt),
       statusUrl: attr("data-blakfy-status-url", DEFAULTS.statusUrl),
       statusEnabled: attr("data-blakfy-status", "true") !== "false",
-      cookieDomain: attr("data-blakfy-cookie-domain", DEFAULTS.cookieDomain)
+      cookieDomain: attr("data-blakfy-cookie-domain", DEFAULTS.cookieDomain),
+      fabSide: attr("data-blakfy-fab", DEFAULTS.fabSide),
+      fabOffset: attr("data-blakfy-fab-offset", DEFAULTS.fabOffset),
+      fabSize: attr("data-blakfy-fab-size", DEFAULTS.fabSize),
+      fabColor: attr("data-blakfy-fab-color", DEFAULTS.fabColor)
     };
   };
 
@@ -2580,6 +2591,51 @@
     activeEscape = null;
   };
 
+  // src/ui/fab.js
+  var FAB_CLASS = "blakfy-fab";
+  var FINGERPRINT_SVG = '<svg viewBox="0 0 24 24" width="var(--blakfy-fab-icon-size,20px)" height="var(--blakfy-fab-icon-size,20px)" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 3a6 6 0 0 0-6 6v2c0 3.5-1 6-2 7.5"/><path d="M12 3a6 6 0 0 1 6 6v2c0 1.2.15 2.6.5 4"/><path d="M8 21c1-1.5 2-4 2-8v-1a2 2 0 1 1 4 0v3"/><path d="M4 15.5c.7-1.2 1-3 1-4.5V9a7 7 0 0 1 3.5-6.06"/><path d="M16 5.5A7 7 0 0 1 19 11v1.5c0 2.5.3 4.5 1 6"/><path d="M12 8a3 3 0 0 1 3 3v1c0 3 .5 5 1.5 7"/></svg>';
+  var createFab = (opts) => {
+    const o = opts || {};
+    if (typeof document === "undefined") return null;
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = FAB_CLASS;
+    btn.setAttribute("aria-label", o.ariaLabel || "Privacy settings");
+    btn.setAttribute("aria-haspopup", "dialog");
+    btn.setAttribute("data-blakfy-open", "");
+    btn.innerHTML = FINGERPRINT_SVG;
+    if (o.isRTL) btn.dir = "rtl";
+    btn.addEventListener("click", () => {
+      if (typeof o.onOpen === "function") o.onOpen();
+    });
+    return btn;
+  };
+  var resolveFabConfig = (config) => {
+    const side = config && config.fabSide ? String(config.fabSide) : "left";
+    if (side === "off") return null;
+    return {
+      side: side === "right" ? "right" : "left",
+      offset: config && config.fabOffset != null ? config.fabOffset : null,
+      size: config && config.fabSize != null ? config.fabSize : null,
+      color: config && config.fabColor != null ? config.fabColor : null
+    };
+  };
+  var applyFabTokens = (btn, resolved) => {
+    if (!btn || !resolved) return;
+    btn.classList.toggle("blakfy-fab--right", resolved.side === "right");
+    btn.classList.toggle("blakfy-fab--left", resolved.side !== "right");
+    if (resolved.offset != null) {
+      btn.style.setProperty("--blakfy-fab-offset-x", resolved.offset + "px");
+      btn.style.setProperty("--blakfy-fab-offset-y", resolved.offset + "px");
+    }
+    if (resolved.size != null) {
+      btn.style.setProperty("--blakfy-fab-size", resolved.size + "px");
+    }
+    if (resolved.color != null) {
+      btn.style.setProperty("--blakfy-fab-bg", resolved.color);
+    }
+  };
+
   // src/data/service-metadata.js
   var SERVICE_METADATA = {
     ga4: {
@@ -3616,7 +3672,20 @@
     ".blakfy-card[data-blakfy-theme=dark] .blakfy-about-brand strong{color:#f0f0f0}",
     ".blakfy-card[data-blakfy-theme=dark] .blakfy-about-panel p{color:#aaa}",
     ".blakfy-card[data-blakfy-theme=dark] .blakfy-about-meta{color:#666}",
-    ".blakfy-card[data-blakfy-theme=dark] .blakfy-svc-empty{color:#666}"
+    ".blakfy-card[data-blakfy-theme=dark] .blakfy-svc-empty{color:#666}",
+    // ── Reopen FAB (#34) — token API, see docs in src/ui/fab.js ────────────────
+    ":root{--blakfy-fab-side:left;--blakfy-fab-offset-x:20px;--blakfy-fab-offset-y:20px;--blakfy-fab-z:2147483640;--blakfy-fab-size:40px;--blakfy-fab-target:44px;--blakfy-fab-icon-size:20px;--blakfy-fab-bg:var(--blakfy-accent,#3E5C3A);--blakfy-fab-color:#fff;--blakfy-fab-radius:50%;--blakfy-fab-shadow:0 2px 8px rgb(0 0 0 / 0.18);--blakfy-fab-opacity:0.55;--blakfy-fab-opacity-hover:1}",
+    ".blakfy-fab{position:fixed;z-index:var(--blakfy-fab-z);width:var(--blakfy-fab-target);height:var(--blakfy-fab-target);display:flex;align-items:center;justify-content:center;padding:0;border:none;cursor:pointer;background:transparent;bottom:calc(var(--blakfy-fab-offset-y) + env(safe-area-inset-bottom,0px))}",
+    ".blakfy-fab::before{content:'';position:absolute;width:var(--blakfy-fab-size);height:var(--blakfy-fab-size);border-radius:var(--blakfy-fab-radius);background:var(--blakfy-fab-bg);box-shadow:var(--blakfy-fab-shadow);opacity:var(--blakfy-fab-opacity);transition:opacity .15s}",
+    ".blakfy-fab:hover::before,.blakfy-fab:focus-visible::before{opacity:var(--blakfy-fab-opacity-hover)}",
+    ".blakfy-fab svg{position:relative;color:var(--blakfy-fab-color);pointer-events:none}",
+    ".blakfy-fab:focus-visible{outline:2px solid var(--blakfy-fab-bg);outline-offset:2px}",
+    ".blakfy-fab--left{left:calc(var(--blakfy-fab-offset-x) + env(safe-area-inset-left,0px))}",
+    ".blakfy-fab--right{right:calc(var(--blakfy-fab-offset-x) + env(safe-area-inset-right,0px))}",
+    "[dir=rtl] .blakfy-fab--left{left:auto;right:calc(var(--blakfy-fab-offset-x) + env(safe-area-inset-right,0px))}",
+    "[dir=rtl] .blakfy-fab--right{right:auto;left:calc(var(--blakfy-fab-offset-x) + env(safe-area-inset-left,0px))}",
+    "@media (prefers-reduced-motion:reduce){.blakfy-fab::before{transition:none}}",
+    "@media (max-width:640px){:root{--blakfy-fab-offset-x:12px;--blakfy-fab-offset-y:12px;--blakfy-fab-size:36px}}"
   ];
   var injectStyles = () => {
     if (document.getElementById(STYLE_ID)) return;
@@ -3915,6 +3984,7 @@
     api.__bootstrapped = true;
     emitter.on("change", (s) => {
       state = s;
+      mountFab();
     });
     emitter.on("locale", (info) => {
       t = info.t;
@@ -4030,6 +4100,29 @@
       });
       return overlay;
     }
+    let fabMounted = false;
+    const mountFab = () => {
+      if (fabMounted || typeof document === "undefined") return;
+      const resolved = resolveFabConfig(config);
+      if (!resolved) return;
+      const fab = createFab({
+        // No dedicated i18n key added (would require touching all 23 locale
+        // files for one string) — reuses the existing "preferences" string,
+        // which already reads correctly as a reopen-the-consent-choices label.
+        ariaLabel: t.preferences,
+        isRTL,
+        onOpen: () => mountModal({
+          commit: api.__internal.commit,
+          t,
+          currentLocale,
+          state
+        })
+      });
+      if (!fab) return;
+      applyFabTokens(fab, resolved);
+      document.body.appendChild(fab);
+      fabMounted = true;
+    };
     if (state) {
       pushGCM(state);
       pushUET(state);
@@ -4053,6 +4146,7 @@
           state
         });
       });
+      mountFab();
     } else {
       mountBanner();
       installPlaceholders(t, () => {

@@ -40,6 +40,7 @@ import { getTranslation, loadTranslation } from "./i18n/index.js";
 import { applyPreset, PRESETS } from "./presets/_registry.js";
 import { mountBadges, installAntiTamper } from "./ui/badge.js";
 import { createBanner } from "./ui/banner.js";
+import { createFab, resolveFabConfig, applyFabTokens } from "./ui/fab.js";
 import { installFocusTrap, removeFocusTrap } from "./ui/focus-trap.js";
 import { createModal } from "./ui/modal.js";
 import { fetchStatus, renderStatus } from "./ui/status-bar.js";
@@ -289,6 +290,9 @@ const bootstrap = async () => {
   // Keep API state in sync after each commit
   emitter.on("change", (s) => {
     state = s;
+    // #34: first-ever decision (accept/reject/save) — the banner just closed
+    // and never returns on its own, so this is the only remaining way back in.
+    mountFab();
   });
 
   // Locale switching: re-render visible UI
@@ -442,6 +446,34 @@ const bootstrap = async () => {
     return overlay;
   }
 
+  // #34: reopen control — rendered only once a consent decision exists (while
+  // the banner is up, a second entry point to the same choice is redundant).
+  // Mounted once; survives closeUI() because it is not a .blakfy-overlay.
+  let fabMounted = false;
+  const mountFab = () => {
+    if (fabMounted || typeof document === "undefined") return;
+    const resolved = resolveFabConfig(config);
+    if (!resolved) return; // data-blakfy-fab="off"
+    const fab = createFab({
+      // No dedicated i18n key added (would require touching all 23 locale
+      // files for one string) — reuses the existing "preferences" string,
+      // which already reads correctly as a reopen-the-consent-choices label.
+      ariaLabel: t.preferences,
+      isRTL: isRTL,
+      onOpen: () =>
+        mountModal({
+          commit: api.__internal.commit,
+          t: t,
+          currentLocale: currentLocale,
+          state: state,
+        }),
+    });
+    if (!fab) return;
+    applyFabTokens(fab, resolved);
+    document.body.appendChild(fab);
+    fabMounted = true;
+  };
+
   // 14./15. Branch on existing state
   if (state) {
     pushGCM(state);
@@ -466,6 +498,7 @@ const bootstrap = async () => {
         state: state,
       });
     });
+    mountFab();
   } else {
     mountBanner();
     installPlaceholders(t, () => {

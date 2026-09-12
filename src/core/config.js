@@ -55,6 +55,13 @@ export const DEFAULTS = {
   // redirecting to a canonical host: an unset value means example.com and
   // www.example.com are treated as two different sites for consent purposes.
   cookieDomain: null,
+  // #34: reopen FAB — "off" disables it (a site wiring its own footer link
+  // instead). Wix installs commonly already occupy the right corner with
+  // chat/map buttons, so "left" is the stock default everywhere.
+  fabSide: "left",
+  fabOffset: null,
+  fabSize: null,
+  fabColor: null,
 };
 
 // document.currentScript is only reliable DURING the synchronous execution of this
@@ -139,5 +146,9 @@ export const readConfig = (scriptEl) => {
     statusUrl: attr("data-blakfy-status-url", DEFAULTS.statusUrl),
     statusEnabled: attr("data-blakfy-status", "true") !== "false",
     cookieDomain: attr("data-blakfy-cookie-domain", DEFAULTS.cookieDomain),
+    fabSide: attr("data-blakfy-fab", DEFAULTS.fabSide),
+    fabOffset: attr("data-blakfy-fab-offset", DEFAULTS.fabOffset),
+    fabSize: attr("data-blakfy-fab-size", DEFAULTS.fabSize),
+    fabColor: attr("data-blakfy-fab-color", DEFAULTS.fabColor),
   };
 };
