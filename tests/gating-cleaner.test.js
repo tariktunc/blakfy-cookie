@@ -1,9 +1,18 @@
-import { describe, it, expect, beforeEach } from "vitest";
+import { describe, it, expect, beforeEach, vi } from "vitest";
 
-import { registerCleanup, runCleanup, clearAllRules } from "../src/gating/cleaner.js";
+import {
+  registerCleanup,
+  runCleanup,
+  clearAllRules,
+  warnUnregisteredCookies,
+} from "../src/gating/cleaner.js";
 
 beforeEach(() => {
   clearAllRules();
+  document.cookie.split(";").forEach((c) => {
+    const name = c.split("=")[0].trim();
+    if (name) document.cookie = name + "=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/";
+  });
 });
 
 describe("cleaner registerCleanup + runCleanup", () => {
@@ -51,5 +60,71 @@ describe("cleaner registerCleanup + runCleanup", () => {
     runCleanup("analytics");
     expect(document.cookie).not.toContain("_ga_AAA");
     expect(document.cookie).not.toContain("_ga_BBB");
+  });
+});
+
+const FAKE_PRESETS = {
+  ga4: { name: "Google Analytics 4", category: "analytics", cookies: [/^_ga/] },
+  facebook: { name: "Facebook Pixel", category: "marketing", cookies: [/^_fbp$/] },
+};
+
+describe("getRootDomain public-suffix handling (#25)", () => {
+  it("expires cookies on the correct root for a .com.tr host, not just 'com.tr'", () => {
+    const original = Object.getOwnPropertyDescriptor(window, "location");
+    Object.defineProperty(window, "location", {
+      value: { hostname: "shop.example.com.tr" },
+      configurable: true,
+    });
+
+    document.cookie = "trackme=1; path=/";
+    registerCleanup({ category: "analytics", cookies: ["trackme"], storage: [] });
+
+    // Spy on document.cookie assignments to confirm a domain=.example.com.tr
+    // deletion attempt is made (not the wrong domain=.com.tr).
+    const setter = vi.spyOn(document, "cookie", "set");
+    runCleanup("analytics");
+
+    const attempts = setter.mock.calls.map((c) => c[0]);
+    expect(attempts.some((a) => a.indexOf("domain=.example.com.tr") > -1)).toBe(true);
+    expect(
+      attempts.some((a) => a.indexOf("domain=.com.tr;") > -1 || a.endsWith("domain=.com.tr"))
+    ).toBe(false);
+
+    setter.mockRestore();
+    if (original) Object.defineProperty(window, "location", original);
+  });
+});
+
+describe("warnUnregisteredCookies (#25)", () => {
+  it("warns when a known tracker cookie exists but its category has no registered rule", () => {
+    document.cookie = "_ga=GA1.2.123; path=/";
+    const spy = vi.spyOn(console, "warn").mockImplementation(() => {});
+
+    const found = warnUnregisteredCookies(FAKE_PRESETS);
+
+    expect(found.length).toBe(1);
+    expect(found[0].preset).toBe("ga4");
+    expect(spy).toHaveBeenCalledTimes(1);
+    expect(spy.mock.calls[0][0]).toContain("ga4");
+    spy.mockRestore();
+  });
+
+  it("does not warn once a rule for that category IS registered", () => {
+    document.cookie = "_ga=GA1.2.123; path=/";
+    registerCleanup({ category: "analytics", cookies: [/^_ga/], storage: [] });
+    const spy = vi.spyOn(console, "warn").mockImplementation(() => {});
+
+    const found = warnUnregisteredCookies(FAKE_PRESETS);
+
+    expect(found.length).toBe(0);
+    expect(spy).not.toHaveBeenCalled();
+    spy.mockRestore();
+  });
+
+  it("returns [] when there are no cookies at all", () => {
+    const spy = vi.spyOn(console, "warn").mockImplementation(() => {});
+    expect(warnUnregisteredCookies(FAKE_PRESETS)).toEqual([]);
+    expect(spy).not.toHaveBeenCalled();
+    spy.mockRestore();
   });
 });

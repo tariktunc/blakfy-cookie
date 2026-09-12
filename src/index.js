@@ -19,7 +19,7 @@ import {
 import { getScriptEl, readConfig } from "./core/config.js";
 import { readCookie } from "./core/consent-store.js";
 import { createEmitter } from "./core/events.js";
-import { runCleanup, registerCleanup } from "./gating/cleaner.js";
+import { runCleanup, registerCleanup, warnUnregisteredCookies } from "./gating/cleaner.js";
 import { unblockIframes, installPlaceholders } from "./gating/iframe-unblocker.js";
 import { scanForLeaks, warnLeaks } from "./gating/leak-detector.js";
 import { startObserver, scanAll } from "./gating/observer.js";
@@ -241,6 +241,19 @@ const bootstrap = async () => {
     window.setTimeout(() => {
       try {
         warnLeaks(api.getLeaks());
+      } catch (e) {
+        /* ignore */
+      }
+    }, 3000);
+  }
+
+  // #25: warn about known-tracker cookies with no registered cleanup rule (e.g. no
+  // data-blakfy-presets at all, or an incomplete list) — same delayed timing as the
+  // leak scan, for the same reason (host-injected cookies may arrive late).
+  if (typeof window.setTimeout === "function") {
+    window.setTimeout(() => {
+      try {
+        warnUnregisteredCookies(PRESETS);
       } catch (e) {
         /* ignore */
       }
