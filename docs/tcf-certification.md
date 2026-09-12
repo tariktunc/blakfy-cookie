@@ -14,6 +14,14 @@ Eğer site sahibi:
 
 kullanıyorsa, **Mart 2024'ten beri** TCF v2.2 sertifikalı bir CMP zorunlu. Sertifikasız widget "non-compliant" sayılır ve Google reklam servisi durdurabilir.
 
+> **#30 (madde 1) — code-split yükleme:** TCF v2.2 varsayılan olarak kapalıdır
+> (`data-blakfy-tcf` default `"false"`). RTB/programatik reklam kullanmayan sitelerin ana
+> pakete ~2.4KB gzip ödememesi için TCF kodu `dist/tcf-v2.min.js` adında ayrı bir chunk olarak
+> derlenir ve sadece `data-blakfy-tcf="true"` olan sitelerde, ana script'in yanına
+> `<script src>` ile aynı klasörden çekilir (bkz. `src/compliance/tcf-loader.js`). Yükleme
+> başarısız olursa (`onerror`) sessizce `null` döner, bootstrap durmaz — sadece `getTCString()`
+> boş kalır ve `window.__tcfapi` kurulmaz.
+
 ---
 
 ## Süreç (5 Adım)

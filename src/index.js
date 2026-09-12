@@ -17,7 +17,11 @@ import {
 import { getGPC, applyGPC } from "./compliance/gpc.js";
 import { installGPPAPI } from "./compliance/gpp.js";
 import { installDefaults as installUETDefaults, pushUET } from "./compliance/microsoft-uet.js";
-import { installTCFAPI, getTCString } from "./compliance/tcf-v2.js";
+// #30 (item 1): TCF v2.2 is opt-in only (config.tcf defaults to "false" — see core/config.js)
+// and is a rarely-needed, RTB-specific surface. It ships as a separate dist/tcf-v2.min.js
+// chunk (same code-split pattern as the remote i18n locales, #38) and is only fetched when
+// a site turns it on — see compliance/tcf-loader.js.
+import { loadTCF } from "./compliance/tcf-loader.js";
 import {
   installDefaults as installYandexDefaults,
   applyYandex,
@@ -171,14 +175,21 @@ const bootstrap = async () => {
   // 9. read cookie BEFORE TCF setup so getConsent reads accurate state
   let state = readCookie(config.policyVersion);
 
-  // 7. TCF
+  // 7. TCF — code-split chunk (see the import-site comment above); not fetched at all unless
+  // the site opts in via data-blakfy-tcf="true". loadTCF() never rejects (network/parse
+  // failure resolves to null), so a broken CDN never blocks the rest of bootstrap.
+  let getTCString = null;
   if (config.tcf === "true") {
-    installTCFAPI({
-      cmpId: parseInt(config.cmpId, 10) || 0,
-      cmpVersion: 1,
-      getConsent: () => state || {},
-      on: emitter.on,
-    });
+    const tcfApi = await loadTCF(scriptEl && scriptEl.src);
+    if (tcfApi) {
+      getTCString = tcfApi.getTCString;
+      tcfApi.installTCFAPI({
+        cmpId: parseInt(config.cmpId, 10) || 0,
+        cmpVersion: 1,
+        getConsent: () => state || {},
+        on: emitter.on,
+      });
+    }
   }
 
   // 8. CCPA (+ GPP, #32 — kept alongside __uspapi for backwards compatibility during the

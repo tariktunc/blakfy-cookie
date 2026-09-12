@@ -1105,219 +1105,32 @@
     });
   };
 
-  // src/compliance/tcf-v2.js
-  var B64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_";
-  var lastTCString = "";
-  var vendorList = null;
-  var bitsToB64 = (bits) => {
-    const pad = (6 - bits.length % 6) % 6;
-    const padded = bits + "0".repeat(pad);
-    let out = "";
-    for (let i = 0; i < padded.length; i += 6) {
-      out += B64.charAt(parseInt(padded.substr(i, 6), 2));
-    }
-    return out;
-  };
-  var intToBits = (n, width) => {
-    let s = (n >>> 0).toString(2);
-    if (s.length > width) s = s.slice(-width);
-    return s.padStart(width, "0");
-  };
-  var bigIntToBits = (n, width) => {
-    const v = BigInt(Math.max(0, Math.floor(Number(n) / 100)));
-    let s = v.toString(2);
-    if (s.length > width) s = s.slice(-width);
-    return s.padStart(width, "0");
-  };
-  var charToBits = (c) => intToBits(c.toUpperCase().charCodeAt(0) - 65, 6);
-  var langToBits = (lang) => charToBits((lang || "EN").charAt(0)) + charToBits((lang || "EN").charAt(1));
-  var buildPurposes = (state) => {
-    const out = new Array(24).fill(0);
-    out[0] = 1;
-    if (state && state.analytics) {
-      out[1] = 1;
-      out[2] = 1;
-      out[3] = 1;
-    }
-    if (state && state.marketing) {
-      out[4] = 1;
-      out[5] = 1;
-      out[6] = 1;
-      out[7] = 1;
-      out[8] = 1;
-    }
-    if (state && state.functional) {
-      out[9] = 1;
-    }
-    return out.join("");
-  };
-  var buildTCString = (opts) => {
-    const o = opts || {};
-    const cmpId = o.cmpId | 0;
-    const cmpVersion2 = o.cmpVersion | 0;
-    const now = Date.now();
-    const created = bigIntToBits(now, 36);
-    const lastUpdated = bigIntToBits(now, 36);
-    const purposesConsent = o.purposeConsents || buildPurposes(o.state);
-    const purposesLI = "0".repeat(24);
-    const core = intToBits(2, 6) + created + lastUpdated + intToBits(cmpId, 12) + intToBits(cmpVersion2, 12) + intToBits(1, 6) + langToBits(o.consentLanguage || "EN") + intToBits(o.vendorListVersion || 300, 12) + intToBits(4, 6) + "10" + "0".repeat(12) + purposesConsent + purposesLI + "0" + charToBits("A") + charToBits("A") + intToBits(0, 16) + intToBits(0, 16) + "1" + intToBits(0, 12) + intToBits(0, 16) + intToBits(0, 16) + "1" + intToBits(0, 12);
-    return bitsToB64(core);
-  };
-  var getTCString = () => lastTCString;
-  var buildPurposeMap = (state) => {
-    const consents = {};
-    const li = {};
-    const s = state || {};
-    for (let i = 1; i <= 11; i++) {
-      consents[i] = false;
-      li[i] = false;
-    }
-    consents[1] = true;
-    if (s.analytics) {
-      consents[2] = true;
-      consents[3] = true;
-      consents[4] = true;
-    }
-    if (s.marketing) {
-      consents[5] = true;
-      consents[6] = true;
-      consents[7] = true;
-      consents[8] = true;
-      consents[9] = true;
-    }
-    if (s.functional) {
-      consents[10] = true;
-    }
-    return { consents, legitimateInterests: li };
-  };
-  var installTCFAPI = (opts) => {
-    if (typeof window === "undefined") return;
-    const o = opts || {};
-    const cmpId = o.cmpId | 0;
-    const cmpVersion2 = o.cmpVersion | 0;
-    const getConsent = typeof o.getConsent === "function" ? o.getConsent : () => ({});
-    const subscribe = typeof o.on === "function" ? o.on : null;
-    const listeners2 = /* @__PURE__ */ Object.create(null);
-    let nextId = 1;
-    let displayStatus = "hidden";
-    let eventStatus = "tcloaded";
-    const buildTCData = (listenerId) => {
-      const state = getConsent() || {};
-      const purposes = buildPurposeMap(state);
-      lastTCString = buildTCString({ cmpId, cmpVersion: cmpVersion2, state });
-      return {
-        tcString: lastTCString,
-        eventStatus,
-        cmpId,
-        cmpVersion: cmpVersion2,
-        gdprApplies: true,
-        listenerId: typeof listenerId === "number" ? listenerId : null,
-        addtlConsent: "",
-        purpose: purposes,
-        vendor: { consents: {}, legitimateInterests: {} }
-      };
-    };
-    const buildPing = () => ({
-      gdprApplies: true,
-      cmpLoaded: true,
-      cmpStatus: "loaded",
-      displayStatus,
-      apiVersion: "2.2",
-      cmpVersion: cmpVersion2,
-      cmpId,
-      gvlVersion: vendorList && vendorList.vendorListVersion ? vendorList.vendorListVersion : 0,
-      tcfPolicyVersion: 4
-    });
-    const handle = (command, version, callback, parameter) => {
-      if (typeof callback !== "function") return;
-      if (command === "ping") {
-        callback(buildPing(), true);
-        return;
-      }
-      if (command === "getTCData") {
-        callback(buildTCData(null), true);
-        return;
-      }
-      if (command === "addEventListener") {
-        const id = nextId++;
-        listeners2[id] = callback;
-        callback(buildTCData(id), true);
-        return;
-      }
-      if (command === "removeEventListener") {
-        if (listeners2[parameter]) {
-          delete listeners2[parameter];
-          callback(true, true);
-        } else callback(false, true);
-        return;
-      }
-      callback(null, false);
-    };
-    if (!window.__tcfapi || !window.__tcfapi.__blakfy) {
-      window.__tcfapi = (cmd, ver, cb, param) => handle(cmd, ver, cb, param);
-      window.__tcfapi.__blakfy = true;
-    }
-    if (typeof document !== "undefined" && !document.querySelector('iframe[name="__tcfapiLocator"]')) {
-      try {
-        const iframe = document.createElement("iframe");
-        iframe.style.cssText = "display:none;position:absolute;width:0;height:0;border:0";
-        iframe.name = "__tcfapiLocator";
-        (document.body || document.documentElement).appendChild(iframe);
-      } catch (e) {
-      }
-    }
-    if (!window.__blakfyTcfMsg) {
-      window.__blakfyTcfMsg = true;
-      window.addEventListener("message", (ev) => {
-        const data = ev && ev.data;
-        if (!data) return;
-        const payload = typeof data === "string" ? safeParse(data) : data;
-        if (!payload || !payload.__tcfapiCall) return;
-        const call = payload.__tcfapiCall;
-        handle(
-          call.command,
-          call.version,
-          (returnValue, success) => {
-            const msg = {
-              __tcfapiReturn: { returnValue, success, callId: call.callId }
-            };
-            try {
-              ev.source && ev.source.postMessage(msg, ev.origin || "*");
-            } catch (e) {
-            }
-          },
-          call.parameter
-        );
-      });
-    }
-    const fireAll = () => {
-      const ids = Object.keys(listeners2);
-      for (let i = 0; i < ids.length; i++) {
-        const id = ids[i];
-        try {
-          listeners2[id](buildTCData(parseInt(id, 10)), true);
-        } catch (e) {
+  // src/compliance/tcf-loader.js
+  var inflight2 = null;
+  var cached = () => typeof window !== "undefined" ? window.__blakfyTCF || null : null;
+  var loadTCF = (baseHref) => {
+    const existing = cached();
+    if (existing) return Promise.resolve(existing);
+    if (!baseHref || typeof document === "undefined") return Promise.resolve(null);
+    if (inflight2) return inflight2;
+    inflight2 = new Promise((resolvePromise) => {
+      const base = baseHref.replace(/\/[^/]*$/, "/");
+      const script = document.createElement("script");
+      script.src = base + "tcf-v2.min.js";
+      script.async = true;
+      const finish = () => resolvePromise(cached());
+      script.onload = finish;
+      script.onerror = () => {
+        if (typeof console !== "undefined" && console.warn) {
+          console.warn("[blakfy-cookie] TCF v2.2 chunk failed to load from " + script.src);
         }
-      }
-    };
-    if (subscribe) {
-      subscribe("change", () => {
-        eventStatus = "useractioncomplete";
-        fireAll();
-      });
-      subscribe("display", (visible) => {
-        displayStatus = visible ? "visible" : "hidden";
-        fireAll();
-      });
-    }
-    return { fireAll };
-  };
-  var safeParse = (s) => {
-    try {
-      return JSON.parse(s);
-    } catch (e) {
-      return null;
-    }
+        resolvePromise(null);
+      };
+      document.head.appendChild(script);
+    }).finally(() => {
+      inflight2 = null;
+    });
+    return inflight2;
   };
 
   // src/compliance/yandex-metrica.js
@@ -3869,8 +3682,8 @@
   };
   var fetchStatus = (url) => {
     if (!url) return Promise.resolve(null);
-    const cached = readStatusCache(url);
-    if (cached !== void 0) return Promise.resolve(cached);
+    const cached2 = readStatusCache(url);
+    if (cached2 !== void 0) return Promise.resolve(cached2);
     return fetch(url).then((r) => r.json()).then((data) => {
       const result = normalizeStatus(data);
       writeStatusCache(url, result);
@@ -4238,13 +4051,18 @@
     installDefaults2();
     installDefaults3();
     let state = readCookie(config.policyVersion);
+    let getTCString = null;
     if (config.tcf === "true") {
-      installTCFAPI({
-        cmpId: parseInt(config.cmpId, 10) || 0,
-        cmpVersion: 1,
-        getConsent: () => state || {},
-        on: emitter.on
-      });
+      const tcfApi = await loadTCF(scriptEl && scriptEl.src);
+      if (tcfApi) {
+        getTCString = tcfApi.getTCString;
+        tcfApi.installTCFAPI({
+          cmpId: parseInt(config.cmpId, 10) || 0,
+          cmpVersion: 1,
+          getConsent: () => state || {},
+          on: emitter.on
+        });
+      }
     }
     const ccpaOn = config.ccpa === "true" || config.ccpa === "auto" && jurisdiction === "CCPA";
     if (ccpaOn) {

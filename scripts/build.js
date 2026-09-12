@@ -4,7 +4,7 @@ import { existsSync } from "node:fs";
 import { readFile, mkdir, copyFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import { gzipSync } from "node:zlib";
+import { gzipSync, brotliCompressSync, constants as zlibConstants } from "node:zlib";
 
 import { build, context } from "esbuild";
 
@@ -80,6 +80,10 @@ const BUDGETS = {
 // these are fetched at most once per (site, locale) and never touch tr/en visitors at all.
 const I18N_CHUNK_BUDGET = 3 * 1024;
 
+// #30 (item 1): budget for the code-split dist/tcf-v2.min.js chunk. Only fetched by sites
+// that turn on data-blakfy-tcf="true" — never touches the default visitor.
+const TCF_CHUNK_BUDGET = 3 * 1024;
+
 const ensureDist = async () => {
   if (!existsSync(DIST)) await mkdir(DIST, { recursive: true });
   if (!existsSync(I18N_DIST)) await mkdir(I18N_DIST, { recursive: true });
@@ -123,6 +127,35 @@ const buildI18nChunks = async () => {
   );
 };
 
+// #30 (item 1): build the code-split dist/tcf-v2.min.js chunk. Registers its exports on
+// window.__blakfyTCF — src/compliance/tcf-loader.js injects a <script src> pointing at this
+// file as a sibling of the main bundle's own <script src>, only when a site opts in.
+const buildTCFChunk = async () => {
+  const tcfPath = resolve(SRC, "compliance/tcf-v2.js").replace(/\\/g, "/");
+  const stdinContents =
+    'import { installTCFAPI, getTCString } from "' +
+    tcfPath +
+    '";\n' +
+    "window.__blakfyTCF = { installTCFAPI: installTCFAPI, getTCString: getTCString };\n";
+  await build({
+    stdin: {
+      contents: stdinContents,
+      resolveDir: SRC,
+      sourcefile: "tcf-v2-entry.js",
+      loader: "js",
+    },
+    bundle: true,
+    platform: "browser",
+    target: ["es2018"],
+    format: "iife",
+    minify: true,
+    sourcemap: false,
+    logLevel: "silent",
+    outfile: resolve(DIST, "tcf-v2.min.js"),
+  });
+  process.stdout.write("[tcf]      1 code-split chunk -> dist/tcf-v2.min.js\n");
+};
+
 const copyTypes = async () => {
   const src = resolve(SRC, "types.d.ts");
   const dst = resolve(DIST, "cookie.d.ts");
@@ -145,6 +178,7 @@ const buildAll = async () => {
     });
   }
   await buildI18nChunks();
+  await buildTCFChunk();
   await copyTypes();
 };
 
@@ -164,10 +198,18 @@ const watchAll = async () => {
     ctxs.push(c);
   }
   await buildI18nChunks(); // #38: remote locale chunks aren't watched, just built once up front
+  await buildTCFChunk(); // #30: same — not watched, built once up front
   process.stdout.write("[blakfy] watching " + TARGETS.length + " targets...\n");
 };
 
 const fmtKB = (bytes) => (bytes / 1024).toFixed(2) + " KB";
+
+// #30 (item 1): quality 11 matches what a CDN/host precompresses at build/publish time
+// (Vercel, Cloudflare, most static hosts) — not a runtime cost paid per-request.
+const brotli = (buf) =>
+  brotliCompressSync(buf, {
+    params: { [zlibConstants.BROTLI_PARAM_QUALITY]: 11 },
+  });
 
 const sizeCheck = async () => {
   const rows = [];
@@ -179,21 +221,30 @@ const sizeCheck = async () => {
     if (!existsSync(p)) continue;
     const buf = await readFile(p);
     const gz = gzipSync(buf);
+    const br = brotli(buf);
     const budget = BUDGETS[name] || null;
+    // Budget is enforced against gzip only (matches the README's "~30KB gz" claim and the
+    // existing CI gate) — brotli is reported for visibility, not gated, since not every host
+    // serves brotli.
     const pass = budget ? gz.length <= budget : true;
     if (!pass) failed = true;
     rows.push({
       file: name,
       raw: fmtKB(buf.length),
       gzip: fmtKB(gz.length),
+      brotli: fmtKB(br.length),
       budget: budget ? fmtKB(budget) : "-",
       status: budget ? (pass ? "PASS" : "FAIL") : "-",
     });
   }
 
   process.stdout.write("\n[size-check]\n");
-  process.stdout.write("file                       raw         gzip        budget      status\n");
-  process.stdout.write("-------------------------- ----------- ----------- ----------- ------\n");
+  process.stdout.write(
+    "file                       raw         gzip        brotli      budget      status\n"
+  );
+  process.stdout.write(
+    "-------------------------- ----------- ----------- ----------- ----------- ------\n"
+  );
   for (let i = 0; i < rows.length; i++) {
     const r = rows[i];
     process.stdout.write(
@@ -202,6 +253,8 @@ const sizeCheck = async () => {
         r.raw.padEnd(11) +
         " " +
         r.gzip.padEnd(11) +
+        " " +
+        r.brotli.padEnd(11) +
         " " +
         r.budget.padEnd(11) +
         " " +
@@ -228,12 +281,37 @@ const sizeCheck = async () => {
           " " +
           fmtKB(gz.length).padEnd(11) +
           " " +
+          fmtKB(brotli(buf).length).padEnd(11) +
+          " " +
           fmtKB(I18N_CHUNK_BUDGET).padEnd(11) +
           " " +
           (pass ? "PASS" : "FAIL") +
           "\n"
       );
     }
+  }
+
+  // #30 (item 1): the code-split TCF chunk — fetched only by sites with data-blakfy-tcf="true".
+  const tcfPath = resolve(DIST, "tcf-v2.min.js");
+  if (existsSync(tcfPath)) {
+    const buf = await readFile(tcfPath);
+    const gz = gzipSync(buf);
+    const pass = gz.length <= TCF_CHUNK_BUDGET;
+    if (!pass) failed = true;
+    process.stdout.write(
+      "tcf-v2.min.js".padEnd(26) +
+        " " +
+        fmtKB(buf.length).padEnd(11) +
+        " " +
+        fmtKB(gz.length).padEnd(11) +
+        " " +
+        fmtKB(brotli(buf).length).padEnd(11) +
+        " " +
+        fmtKB(TCF_CHUNK_BUDGET).padEnd(11) +
+        " " +
+        (pass ? "PASS" : "FAIL") +
+        "\n"
+    );
   }
 
   if (failed) {
