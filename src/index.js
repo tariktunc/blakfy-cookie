@@ -135,7 +135,10 @@ const bootstrap = async () => {
     unwatchTheme = watchSiteTheme((next) => {
       theme = next;
       trackedCards.forEach((card) => {
-        if (!card || !document.body.contains(card)) {
+        // #35: card lives inside the widget's shadow root — document.body.contains()
+        // does not pierce shadow boundaries, so isConnected is the correct liveness
+        // check regardless of which tree the node is attached in.
+        if (!card || !card.isConnected) {
           trackedCards.delete(card);
           return;
         }
@@ -144,8 +147,10 @@ const bootstrap = async () => {
     });
   }
 
-  // 3. styles
-  injectStyles();
+  // 3. styles — #35: mount root is a shadow root (single host `#blakfy-cookie-root`);
+  // banner/modal/FAB and their stylesheet all live inside it, isolated from host CSS.
+  const shadowRoot = getShadowRoot();
+  injectStyles(shadowRoot);
 
   // 4. emitter
   const emitter = createEmitter();
@@ -259,6 +264,9 @@ const bootstrap = async () => {
     baseHref: scriptEl && scriptEl.src,
     mainLang: mainLang,
     jurisdiction: jurisdiction,
+    // #35: closeUI() needs to query overlays inside the shadow root, not document —
+    // document.querySelectorAll cannot see across the shadow boundary.
+    shadowRoot: shadowRoot,
     deps: {
       unblockScripts: unblockScripts,
       unblockIframes: unblockIframes,
@@ -384,11 +392,11 @@ const bootstrap = async () => {
       onOpenPolicy: () => mountModal({ t: t, tab: "policy" }),
     });
     overlay.appendChild(card);
-    document.body.appendChild(overlay);
+    shadowRoot.appendChild(overlay);
     api.__internal.setUI("banner", overlay);
     if (!isExplicit) trackedCards.add(card);
     mountBadges(card);
-    installAntiTamper(card);
+    installAntiTamper(card, shadowRoot);
     // #27: no separate aria-live announcement region — the banner is a non-modal
     // dialog (role="dialog", no aria-modal, background stays reachable) and
     // installFocusTrap() moves focus onto it the moment it renders, which already
@@ -404,7 +412,7 @@ const bootstrap = async () => {
 
   // Helper: mount modal overlay
   function mountModal(opts) {
-    const existing = document.querySelectorAll("." + ROOT_OVERLAY_CLASS + ".modal");
+    const existing = shadowRoot.querySelectorAll("." + ROOT_OVERLAY_CLASS + ".modal");
     for (let i = 0; i < existing.length; i++) {
       if (existing[i].parentNode) existing[i].parentNode.removeChild(existing[i]);
     }
@@ -443,11 +451,11 @@ const bootstrap = async () => {
       onDeleteCookie: (name) => deleteObservedCookie(name),
     });
     overlay.appendChild(card);
-    document.body.appendChild(overlay);
+    shadowRoot.appendChild(overlay);
     api.__internal.setUI("modal", overlay);
     if (!isExplicit) trackedCards.add(card);
     mountBadges(card);
-    installAntiTamper(card);
+    installAntiTamper(card, shadowRoot);
     // #27: this IS the true modal dialog — trap background content with `inert`
     // (tabindex/aria-hidden fallback for older browsers), lock body scroll while
     // open, and return focus to whatever opened it (e.g. the banner's "Preferences"
@@ -456,6 +464,10 @@ const bootstrap = async () => {
       onEscape: () => api.__internal.closeUI(),
       trapBackground: true,
       lockScroll: true,
+      // #35: the light-DOM body child to leave interactive while the modal traps
+      // focus is the shadow host itself — everything the widget renders (banner,
+      // modal, FAB) lives inside it, in the same shadow root.
+      inertSkipEl: getShadowHost(),
     });
     return overlay;
   }
@@ -484,7 +496,7 @@ const bootstrap = async () => {
     });
     if (!fab) return;
     applyFabTokens(fab, resolved);
-    document.body.appendChild(fab);
+    shadowRoot.appendChild(fab);
     fabMounted = true;
   };
 

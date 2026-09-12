@@ -10,6 +10,19 @@ All notable changes follow [Keep a Changelog](https://keepachangelog.com/) and S
 
 - **`@blakfy/cookie-next` peer range widened to `next >=14 <17`** — Next.js 16 is now an accepted peer. Verified against Next 16.3.2 + React 19.2.8 in a scratch App Router build: install without `--legacy-peer-deps`, `next build` clean, Consent Mode v2 default script and the CDN loader present in the SSR output. No runtime change; the package still only uses `next/script`.
 
+## [2.4.0] — 2026-09-13
+
+### Changed
+
+- **Shadow DOM izolasyonu (#35)** — Banner, modal ve reopen FAB (#34) artık tek bir shadow root içinde render ediliyor (`#blakfy-cookie-root`, `src/ui/shadow-root.js`). Enjekte edilen 3 `<style>` etiketi de aynı sınırın içine taşındı — host site CSS'i artık widget'ı bozamaz (`button{...!important}` gibi tema kuralları), ve widget'ın kendi stilleri host sayfaya sızmıyor. Bu ayrıca #29'daki CSP `style-src 'unsafe-inline'` gereksinimini kaldırıyor: enjekte edilen 3 stil artık document.head'de değil, shadow root'ta.
+  - `--blakfy-accent` ve `--blakfy-fab-*` custom property API'si aynen çalışmaya devam ediyor — custom property'ler shadow sınırını miras yoluyla geçer, sitenin kendi `:root` override'ı önceliğini korur.
+  - `aria-labelledby`/`aria-describedby` referansları aynı shadow ağacı içinde kalacak şekilde korundu (ID referansları shadow sınırını geçmez).
+  - Focus trap (#27), odak shadow sınırını geçtiğinde `document.activeElement`'in artık shadow HOST'u döndürmesine karşı düzeltildi (`getDeepActiveElement()`, `src/ui/focus-trap.js`) — Tab döngüsü, Escape ve odak-geri-dönüşü aynen çalışıyor.
+  - Badge anti-tamper MutationObserver'ı artık `document.head` yerine shadow root'u izliyor (`installAntiTamper(rootEl, styleRoot)`).
+  - Theme bridge (`theme="auto"`) kasıtlı olarak DEĞİŞMEDİ — host sayfanın `<html class="dark">` sinyalini light DOM'dan okumaya devam ediyor; sonuç shadow içindeki karta uygulanıyor.
+  - Shadow DOM desteklemeyen (fiilen artık yok denecek kadar az) tarayıcılarda host elemanının kendisine düz mount olarak geri düşüyor — izolasyon yok ama yapısal olarak çalışmaya devam ediyor.
+  - **Risk notu:** widget sınıflarını kendi site CSS'inden override eden bir entegratör artık çalışmayacak. #22 zaten attribute/token API'sinin bugüne kadar çalışmadığını gösterdiği için kimsenin buna güvenmesi olası değil, ama minor sürüm artışıyla işaretlendi.
+
 ## [2.3.0] — 2026-05-09
 
 ### Added

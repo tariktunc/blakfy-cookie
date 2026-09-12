@@ -14,6 +14,14 @@ const slotMap = new WeakMap();
 let observer = null;
 let intervalId = null;
 let rootRef = null;
+// #35: where the anti-tamper protection <style> and the "did someone remove our
+// style tag" watch live. Defaults to document.head for callers outside the
+// shadow-DOM mount (kept for standalone/test usage); index.js passes the
+// widget's shadow root so nothing crosses the isolation boundary.
+let styleRootRef = null;
+
+const resolveStyleRoot = () =>
+  styleRootRef || (typeof document !== "undefined" ? document.head : null);
 
 // buildBadgeHref — resolve #40: attribute the "Powered by" click to its originating site.
 // location.hostname ONLY, stripped of "www." — never path/query, which can carry
@@ -86,11 +94,12 @@ const applyRTL = (badge) => {
 
 const injectProtectStyle = () => {
   if (typeof document === "undefined") return;
-  if (document.getElementById(PROTECT_STYLE_ID)) return;
+  const target = resolveStyleRoot() || document.head || document.documentElement;
+  if (!target || target.querySelector("#" + PROTECT_STYLE_ID)) return;
   const style = document.createElement("style");
   style.id = PROTECT_STYLE_ID;
   style.textContent = PROTECT_CSS;
-  (document.head || document.documentElement).appendChild(style);
+  target.appendChild(style);
 };
 
 const replaceBadge = (oldBadge) => {
@@ -173,7 +182,8 @@ const verifyBadges = () => {
       replaceBadge(badge);
     }
   }
-  if (!document.getElementById(PROTECT_STYLE_ID)) {
+  const styleRoot = resolveStyleRoot();
+  if (!styleRoot || !styleRoot.querySelector("#" + PROTECT_STYLE_ID)) {
     injectProtectStyle();
   }
 };
@@ -226,9 +236,14 @@ const handleMutations = (records) => {
   }
 };
 
-export const installAntiTamper = (rootEl) => {
+// #35: styleRoot is where the anti-tamper <style> lives — the widget's shadow root
+// when mounted there, so the "was our protection style removed" watch stays inside
+// the same isolation boundary as the badge DOM itself instead of watching light-DOM
+// document.head, which would no longer see anything relevant.
+export const installAntiTamper = (rootEl, styleRoot) => {
   if (!rootEl || typeof MutationObserver === "undefined") return;
   rootRef = rootEl;
+  styleRootRef = styleRoot || resolveStyleRoot();
 
   injectProtectStyle();
 
@@ -241,8 +256,8 @@ export const installAntiTamper = (rootEl) => {
     attributeFilter: ["style", "class", "hidden"],
   });
 
-  if (document.head) {
-    observer.observe(document.head, { childList: true, subtree: false });
+  if (styleRootRef && typeof styleRootRef.querySelector === "function") {
+    observer.observe(styleRootRef, { childList: true, subtree: false });
   }
 
   if (intervalId) clearInterval(intervalId);
@@ -260,4 +275,5 @@ export const disposeAntiTamper = () => {
   }
   mountedBadges.clear();
   rootRef = null;
+  styleRootRef = null;
 };

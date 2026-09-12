@@ -46,9 +46,22 @@ const boot = async (attrs) => {
   await FLUSH();
 };
 
-const card = () => document.querySelector(".blakfy-card");
+// #35: banner/modal/FAB render inside a shadow root (`#blakfy-cookie-root`), isolated
+// from host-page CSS — document.querySelector no longer sees into it, so every lookup
+// below goes through the shadow root instead (falls back to the host element itself
+// on the (untested-here) no-Shadow-DOM path, which uses it as a plain mount point).
+const widgetRoot = () => {
+  const host = document.getElementById("blakfy-cookie-root");
+  if (!host) return null;
+  return host.shadowRoot || host;
+};
+const qs = (sel) => {
+  const root = widgetRoot();
+  return root ? root.querySelector(sel) : null;
+};
+const card = () => qs(".blakfy-card");
 const clickAct = (act) => {
-  const btn = document.querySelector('[data-act="' + act + '"]');
+  const btn = qs('[data-act="' + act + '"]');
   expect(btn, "button [data-act=" + act + "] should exist").toBeTruthy();
   btn.click();
 };
@@ -78,7 +91,7 @@ describe("full DOM lifecycle (#31)", () => {
     expect(state).toBeTruthy();
     expect(state.analytics).toBe(true);
     expect(state.marketing).toBe(true);
-    expect(document.querySelector(".blakfy-card")).toBeNull();
+    expect(qs(".blakfy-card")).toBeNull();
   });
 
   it("withdrawing a granted analytics category cleans up its registered cookies (#25)", async () => {
@@ -107,7 +120,7 @@ describe("full DOM lifecycle (#31)", () => {
     clickAct("prefs");
     await FLUSH();
 
-    const modalCard = document.querySelector(".blakfy-card[aria-modal='true']");
+    const modalCard = qs(".blakfy-card[aria-modal='true']");
     expect(modalCard, "opening Preferences should mount the modal").toBeTruthy();
 
     const analyticsToggle = modalCard.querySelector('[data-cat="analytics"]');
@@ -128,12 +141,12 @@ describe("full DOM lifecycle (#31)", () => {
     await boot();
     clickAct("accept");
     await FLUSH();
-    expect(document.querySelector(".blakfy-card")).toBeNull();
+    expect(qs(".blakfy-card")).toBeNull();
 
     window.BlakfyCookie.open();
     await FLUSH();
 
-    const modalCard = document.querySelector(".blakfy-card[aria-modal='true']");
+    const modalCard = qs(".blakfy-card[aria-modal='true']");
     expect(modalCard).toBeTruthy();
   });
 
@@ -166,12 +179,12 @@ describe("full DOM lifecycle (#31)", () => {
     window.BlakfyCookie.onConsent("analytics", analyticsSpy);
     analyticsSpy.mockClear(); // onConsent fires immediately with the current (true) state
 
-    const fab = document.querySelector(".blakfy-fab");
+    const fab = qs(".blakfy-fab");
     expect(fab, "reopen FAB should be mounted once a decision exists (#34)").toBeTruthy();
     fab.click();
     await FLUSH();
 
-    const modalCard = document.querySelector(".blakfy-card[aria-modal='true']");
+    const modalCard = qs(".blakfy-card[aria-modal='true']");
     expect(modalCard, "FAB click should reopen the preferences modal").toBeTruthy();
 
     const analyticsToggle = modalCard.querySelector('[data-cat="analytics"]');
@@ -197,7 +210,7 @@ describe("full DOM lifecycle (#31)", () => {
     clickAct("prefs");
     await FLUSH();
 
-    const modalCard = document.querySelector(".blakfy-card[aria-modal='true']");
+    const modalCard = qs(".blakfy-card[aria-modal='true']");
     const recordingToggle = modalCard.querySelector('[data-cat="recording"]');
     expect(
       recordingToggle,
@@ -226,6 +239,6 @@ describe("full DOM lifecycle (#31)", () => {
     await mod2.default();
     await FLUSH();
 
-    expect(document.querySelector(".blakfy-card")).toBeNull();
+    expect(qs(".blakfy-card")).toBeNull();
   });
 });

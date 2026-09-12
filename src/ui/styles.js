@@ -139,7 +139,12 @@ const RULES = [
   ".blakfy-card[data-blakfy-theme=dark] .blakfy-cookie-meta{color:#999}",
   ".blakfy-card[data-blakfy-theme=dark] .blakfy-cookie-essential{color:#999}",
   // ── Reopen FAB (#34) — token API, see docs in src/ui/fab.js ────────────────
-  ":root{--blakfy-fab-side:left;--blakfy-fab-offset-x:20px;--blakfy-fab-offset-y:20px;--blakfy-fab-z:2147483640;--blakfy-fab-size:40px;--blakfy-fab-target:44px;--blakfy-fab-icon-size:20px;--blakfy-fab-bg:var(--blakfy-accent,#3E5C3A);--blakfy-fab-color:#fff;--blakfy-fab-radius:50%;--blakfy-fab-shadow:0 2px 8px rgb(0 0 0 / 0.18);--blakfy-fab-opacity:0.55;--blakfy-fab-opacity-hover:1}",
+  // #35: declared on :host (the shadow root's own element), not :root — a shadow-scoped
+  // stylesheet's :root never matches the document, only the shadow tree. --blakfy-accent
+  // and any --blakfy-fab-* override a site sets on ITS OWN :root still inherit in across
+  // the shadow boundary (custom properties are inheritable), so a site override always
+  // wins; these are only the widget's own defaults.
+  ":host,:root{--blakfy-fab-side:left;--blakfy-fab-offset-x:20px;--blakfy-fab-offset-y:20px;--blakfy-fab-z:2147483640;--blakfy-fab-size:40px;--blakfy-fab-target:44px;--blakfy-fab-icon-size:20px;--blakfy-fab-bg:var(--blakfy-accent,#3E5C3A);--blakfy-fab-color:#fff;--blakfy-fab-radius:50%;--blakfy-fab-shadow:0 2px 8px rgb(0 0 0 / 0.18);--blakfy-fab-opacity:0.55;--blakfy-fab-opacity-hover:1}",
   ".blakfy-fab{position:fixed;z-index:var(--blakfy-fab-z);width:var(--blakfy-fab-target);height:var(--blakfy-fab-target);display:flex;align-items:center;justify-content:center;padding:0;border:none;cursor:pointer;background:transparent;bottom:calc(var(--blakfy-fab-offset-y) + env(safe-area-inset-bottom,0px))}",
   ".blakfy-fab::before{content:'';position:absolute;width:var(--blakfy-fab-size);height:var(--blakfy-fab-size);border-radius:var(--blakfy-fab-radius);background:var(--blakfy-fab-bg);box-shadow:var(--blakfy-fab-shadow);opacity:var(--blakfy-fab-opacity);transition:opacity .15s}",
   ".blakfy-fab:hover::before,.blakfy-fab:focus-visible::before{opacity:var(--blakfy-fab-opacity-hover)}",
@@ -153,10 +158,15 @@ const RULES = [
   "@media (max-width:640px){:root{--blakfy-fab-offset-x:12px;--blakfy-fab-offset-y:12px;--blakfy-fab-size:36px}}",
 ];
 
-export const injectStyles = () => {
-  if (document.getElementById(STYLE_ID)) return;
+// #35: `root` is the shadow root (or its light-DOM fallback) the widget mounts into —
+// pass it so the stylesheet lives inside the isolation boundary instead of leaking
+// into/out of the host document via document.head. Falls back to document.head when
+// no root is given (keeps this module usable standalone, e.g. in older tests).
+export const injectStyles = (root) => {
+  const target = root || (typeof document !== "undefined" ? document.head : null);
+  if (!target || target.querySelector("#" + STYLE_ID)) return;
   const css = document.createElement("style");
   css.id = STYLE_ID;
   css.textContent = RULES.join("");
-  document.head.appendChild(css);
+  target.appendChild(css);
 };

@@ -21,13 +21,30 @@ let prevScrollY = 0;
 const supportsInert = () =>
   typeof document !== "undefined" && "inert" in document.createElement("div");
 
+// #35: with the widget mounted in a shadow root, `document.activeElement` only ever
+// resolves to the SHADOW HOST (per spec, a light-DOM `document.activeElement` read
+// does not pierce an open shadow boundary) — never the actual focused node inside.
+// Walk down through nested open shadow roots to find the real focused element.
+export const getDeepActiveElement = () => {
+  if (typeof document === "undefined") return null;
+  let el = document.activeElement;
+  while (el && el.shadowRoot && el.shadowRoot.activeElement) {
+    el = el.shadowRoot.activeElement;
+  }
+  return el;
+};
+
 const applyBackgroundInert = (skipEl) => {
   if (typeof document === "undefined" || !document.body) return;
   const useInert = supportsInert();
   const children = document.body.children;
   for (let i = 0; i < children.length; i++) {
     const node = children[i];
-    if (node === skipEl || (skipEl && node.contains(skipEl))) continue;
+    // skipEl may live inside a shadow root (e.g. the #blakfy-cookie-root host) —
+    // Node.contains() does not pierce shadow boundaries, so a direct identity
+    // check against the (light-DOM) skip element is what actually matters here;
+    // callers pass the shadow HOST, not the overlay inside it, for this reason.
+    if (node === skipEl || (skipEl && node.contains && node.contains(skipEl))) continue;
     if (useInert) {
       inertedNodes.push({ node: node, hadInert: node.hasAttribute("inert") });
       node.setAttribute("inert", "");
@@ -88,7 +105,7 @@ export const installFocusTrap = (rootEl, options) => {
   // below moves focus back to ITS OWN restoreFocusTarget, which would otherwise
   // clobber this one when one trap replaces another (e.g. banner → preferences modal).
   const opener =
-    opts.returnFocus === false || typeof document === "undefined" ? null : document.activeElement;
+    opts.returnFocus === false || typeof document === "undefined" ? null : getDeepActiveElement();
 
   removeFocusTrap();
   if (!rootEl) return;
@@ -97,7 +114,10 @@ export const installFocusTrap = (rootEl, options) => {
   restoreFocusTarget = opener;
 
   if (opts.trapBackground) {
-    const overlayRoot = rootEl.parentNode || rootEl;
+    // #35: pass inertSkipEl explicitly when the trapped root lives inside a shadow
+    // root — the light-DOM body child to leave interactive is the shadow HOST
+    // element, not rootEl's own (shadow-internal) parentNode.
+    const overlayRoot = opts.inertSkipEl || rootEl.parentNode || rootEl;
     applyBackgroundInert(overlayRoot);
   }
   if (opts.lockScroll) lockBodyScroll();
@@ -116,10 +136,11 @@ export const installFocusTrap = (rootEl, options) => {
     if (!nodes.length) return;
     const first = nodes[0];
     const last = nodes[nodes.length - 1];
-    if (e.shiftKey && document.activeElement === first) {
+    const current = getDeepActiveElement();
+    if (e.shiftKey && current === first) {
       e.preventDefault();
       last.focus();
-    } else if (!e.shiftKey && document.activeElement === last) {
+    } else if (!e.shiftKey && current === last) {
       e.preventDefault();
       first.focus();
     }
@@ -137,12 +158,15 @@ export const removeFocusTrap = () => {
   }
   removeBackgroundInert();
   unlockBodyScroll();
+  // #35: restoreFocusTarget can live inside a shadow root (e.g. the banner's
+  // "Preferences" button, when the modal that opened on top of it closes) —
+  // document.body.contains() does not pierce shadow boundaries and would always
+  // report false there. isConnected reports true for any node attached anywhere
+  // in the document, shadow tree included, which is the actual check intended.
   if (
     restoreFocusTarget &&
     typeof restoreFocusTarget.focus === "function" &&
-    typeof document !== "undefined" &&
-    document.body &&
-    document.body.contains(restoreFocusTarget)
+    restoreFocusTarget.isConnected
   ) {
     restoreFocusTarget.focus();
   }

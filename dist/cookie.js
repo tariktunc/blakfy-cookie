@@ -1,5 +1,5 @@
 /*!
- * Blakfy Cookie Widget v2.3.2
+ * Blakfy Cookie Widget v2.4.0
  * https://github.com/tariktunc/blakfy-cookie
  * MIT License | (c) Blakfy Studio
  *
@@ -7,6 +7,93 @@
  * 23 languages | 18 presets | Tag-gating | Powered by Blakfy Studio
  */
 (() => {
+  // src/adapters/host-adapters.js
+  var warnedNoBridge = {};
+  var warnOnce = (key, message) => {
+    if (warnedNoBridge[key]) return;
+    warnedNoBridge[key] = true;
+    if (typeof console !== "undefined" && console.info) console.info(message);
+  };
+  var detectHost = (scriptEl) => {
+    if (typeof window === "undefined") return null;
+    const override = scriptEl && typeof scriptEl.getAttribute === "function" ? scriptEl.getAttribute("data-blakfy-host") : null;
+    if (override === "shopify" || override === "squarespace" || override === "wordpress") {
+      return override;
+    }
+    if (typeof window.Shopify === "object" && window.Shopify) return "shopify";
+    if (window.Static && window.Static.SQUARESPACE_CONTEXT) return "squarespace";
+    if (typeof window.wp_set_consent === "function" || typeof window.wp_has_consent === "function") {
+      return "wordpress";
+    }
+    return null;
+  };
+  var bridgeShopify = (state) => {
+    if (typeof window === "undefined") return false;
+    const cp = window.Shopify && window.Shopify.customerPrivacy;
+    if (!cp || typeof cp.setTrackingConsent !== "function") {
+      warnOnce(
+        "shopify",
+        "[Blakfy Cookie] Shopify detected but window.Shopify.customerPrivacy is not available yet (it loads after Shopify's own privacy banner script). No bridge installed for this page load \u2014 see tariktunc/blakfy-cookie#24."
+      );
+      return false;
+    }
+    const s = state || {};
+    try {
+      cp.setTrackingConsent(
+        {
+          analytics: !!s.analytics,
+          marketing: !!s.marketing,
+          preferences: !!s.functional
+        },
+        function() {
+        }
+      );
+      return true;
+    } catch (e) {
+      return false;
+    }
+  };
+  var bridgeWordPress = (state) => {
+    if (typeof window === "undefined") return false;
+    if (typeof window.wp_set_consent !== "function") {
+      warnOnce(
+        "wordpress",
+        '[Blakfy Cookie] WordPress host detected (data-blakfy-host="wordpress" or a consent-plugin marker) but no WP Consent API (wp_set_consent) is present on this page. Vanilla WordPress has no native consent API to bridge to \u2014 install a WP Consent API-compatible plugin if two-way sync is needed. See tariktunc/blakfy-cookie#24.'
+      );
+      return false;
+    }
+    const s = state || {};
+    try {
+      window.wp_set_consent("functional", s.functional ? "allow" : "deny");
+      window.wp_set_consent("preferences", s.functional ? "allow" : "deny");
+      window.wp_set_consent("statistics", s.analytics ? "allow" : "deny");
+      window.wp_set_consent("statistics-anonymous", "allow");
+      window.wp_set_consent("marketing", s.marketing ? "allow" : "deny");
+      return true;
+    } catch (e) {
+      return false;
+    }
+  };
+  var bridgeSquarespace = () => {
+    warnOnce(
+      "squarespace",
+      "[Blakfy Cookie] Squarespace detected. Squarespace has no documented public consent API for this widget to bridge into \u2014 running in detection-only mode. If Squarespace publishes one, or the owner's own Squarespace consent settings need coordinating by hand, see tariktunc/blakfy-cookie#24."
+    );
+    return false;
+  };
+  var BRIDGES = {
+    shopify: bridgeShopify,
+    wordpress: bridgeWordPress,
+    squarespace: bridgeSquarespace
+  };
+  var installHostAdapter = (state, scriptEl) => {
+    const host = detectHost(scriptEl);
+    if (!host) return { host: null, bridged: false };
+    const bridge = BRIDGES[host];
+    const bridged = typeof bridge === "function" ? !!bridge(state) : false;
+    return { host, bridged };
+  };
+
   // src/core/audit.js
   var postAudit = (endpoint, payload) => {
     if (!endpoint) return;
@@ -463,13 +550,14 @@
     let modalRoot = null;
     let warnedNoAuditEndpoint = false;
     let bannerRoot = null;
-    const setUI = (which, root) => {
-      if (which === "modal") modalRoot = root;
-      if (which === "banner") bannerRoot = root;
+    const setUI = (which, root2) => {
+      if (which === "modal") modalRoot = root2;
+      if (which === "banner") bannerRoot = root2;
     };
     const closeUI = () => {
-      if (typeof document !== "undefined") {
-        const overlays = document.querySelectorAll(".blakfy-overlay");
+      const queryRoot = ctx.shadowRoot || (typeof document !== "undefined" ? document : null);
+      if (queryRoot) {
+        const overlays = queryRoot.querySelectorAll(".blakfy-overlay");
         for (let i = 0; i < overlays.length; i++) {
           const o = overlays[i];
           if (o && o.parentNode) o.parentNode.removeChild(o);
@@ -544,6 +632,7 @@
       }
       if (deps && typeof deps.pushGCM === "function") deps.pushGCM(state);
       if (deps && typeof deps.pushUET === "function") deps.pushUET(state);
+      if (deps && typeof deps.installHostAdapter === "function") deps.installHostAdapter(state);
       if (deps && typeof deps.applyYandex === "function") {
         deps.applyYandex(state, {
           unblock: (cat) => {
@@ -1252,7 +1341,7 @@
   };
 
   // src/core/config.js
-  var RUNTIME_VERSION = "2.3.2" ? "2.3.2" : "2";
+  var RUNTIME_VERSION = "2.4.0" ? "2.4.0" : "2";
   var STATUS_BASE = "https://cdn.jsdelivr.net/npm/@blakfy/cookie@" + RUNTIME_VERSION;
   var DEFAULTS = {
     locale: "auto",
@@ -1452,7 +1541,7 @@
   var expireCookie = (name) => {
     if (typeof document === "undefined") return;
     const host = typeof location !== "undefined" && location.hostname || "";
-    const root = getRootDomain(host);
+    const root2 = getRootDomain(host);
     const past = "Thu, 01 Jan 1970 00:00:00 GMT";
     try {
       document.cookie = name + "=; expires=" + past + "; path=/";
@@ -1468,13 +1557,13 @@
       } catch (e) {
       }
     }
-    if (root && root !== host) {
+    if (root2 && root2 !== host) {
       try {
-        document.cookie = name + "=; expires=" + past + "; path=/; domain=" + root;
+        document.cookie = name + "=; expires=" + past + "; path=/; domain=" + root2;
       } catch (e) {
       }
       try {
-        document.cookie = name + "=; expires=" + past + "; path=/; domain=." + root;
+        document.cookie = name + "=; expires=" + past + "; path=/; domain=." + root2;
       } catch (e) {
       }
     }
@@ -2648,6 +2737,8 @@
   var observer = null;
   var intervalId = null;
   var rootRef = null;
+  var styleRootRef = null;
+  var resolveStyleRoot = () => styleRootRef || (typeof document !== "undefined" ? document.head : null);
   var buildBadgeHref = (medium = "cookie-badge") => {
     try {
       const url = new URL(BADGE_HREF);
@@ -2688,11 +2779,12 @@
   };
   var injectProtectStyle = () => {
     if (typeof document === "undefined") return;
-    if (document.getElementById(PROTECT_STYLE_ID)) return;
+    const target = resolveStyleRoot() || document.head || document.documentElement;
+    if (!target || target.querySelector("#" + PROTECT_STYLE_ID)) return;
     const style = document.createElement("style");
     style.id = PROTECT_STYLE_ID;
     style.textContent = PROTECT_CSS;
-    (document.head || document.documentElement).appendChild(style);
+    target.appendChild(style);
   };
   var replaceBadge = (oldBadge) => {
     const slot = slotMap.get(oldBadge);
@@ -2767,7 +2859,8 @@
         replaceBadge(badge);
       }
     }
-    if (!document.getElementById(PROTECT_STYLE_ID)) {
+    const styleRoot = resolveStyleRoot();
+    if (!styleRoot || !styleRoot.querySelector("#" + PROTECT_STYLE_ID)) {
       injectProtectStyle();
     }
   };
@@ -2814,9 +2907,10 @@
       replaceBadge(mutatedBadges[i]);
     }
   };
-  var installAntiTamper = (rootEl) => {
+  var installAntiTamper = (rootEl, styleRoot) => {
     if (!rootEl || typeof MutationObserver === "undefined") return;
     rootRef = rootEl;
+    styleRootRef = styleRoot || resolveStyleRoot();
     injectProtectStyle();
     if (observer) observer.disconnect();
     observer = new MutationObserver(handleMutations);
@@ -2826,8 +2920,8 @@
       subtree: true,
       attributeFilter: ["style", "class", "hidden"]
     });
-    if (document.head) {
-      observer.observe(document.head, { childList: true, subtree: false });
+    if (styleRootRef && typeof styleRootRef.querySelector === "function") {
+      observer.observe(styleRootRef, { childList: true, subtree: false });
     }
     if (intervalId) clearInterval(intervalId);
     intervalId = setInterval(verifyBadges, 2e3);
@@ -3058,13 +3152,21 @@
   var prevBodyOverflow = "";
   var prevScrollY = 0;
   var supportsInert = () => typeof document !== "undefined" && "inert" in document.createElement("div");
+  var getDeepActiveElement = () => {
+    if (typeof document === "undefined") return null;
+    let el2 = document.activeElement;
+    while (el2 && el2.shadowRoot && el2.shadowRoot.activeElement) {
+      el2 = el2.shadowRoot.activeElement;
+    }
+    return el2;
+  };
   var applyBackgroundInert = (skipEl) => {
     if (typeof document === "undefined" || !document.body) return;
     const useInert = supportsInert();
     const children = document.body.children;
     for (let i = 0; i < children.length; i++) {
       const node = children[i];
-      if (node === skipEl || skipEl && node.contains(skipEl)) continue;
+      if (node === skipEl || skipEl && node.contains && node.contains(skipEl)) continue;
       if (useInert) {
         inertedNodes.push({ node, hadInert: node.hasAttribute("inert") });
         node.setAttribute("inert", "");
@@ -3114,14 +3216,14 @@
   };
   var installFocusTrap = (rootEl, options) => {
     const opts = options || {};
-    const opener = opts.returnFocus === false || typeof document === "undefined" ? null : document.activeElement;
+    const opener = opts.returnFocus === false || typeof document === "undefined" ? null : getDeepActiveElement();
     removeFocusTrap();
     if (!rootEl) return;
     activeRoot = rootEl;
     activeEscape = opts.onEscape;
     restoreFocusTarget = opener;
     if (opts.trapBackground) {
-      const overlayRoot = rootEl.parentNode || rootEl;
+      const overlayRoot = opts.inertSkipEl || rootEl.parentNode || rootEl;
       applyBackgroundInert(overlayRoot);
     }
     if (opts.lockScroll) lockBodyScroll();
@@ -3139,10 +3241,11 @@
       if (!nodes.length) return;
       const first = nodes[0];
       const last = nodes[nodes.length - 1];
-      if (e.shiftKey && document.activeElement === first) {
+      const current = getDeepActiveElement();
+      if (e.shiftKey && current === first) {
         e.preventDefault();
         last.focus();
-      } else if (!e.shiftKey && document.activeElement === last) {
+      } else if (!e.shiftKey && current === last) {
         e.preventDefault();
         first.focus();
       }
@@ -3157,7 +3260,7 @@
     }
     removeBackgroundInert();
     unlockBodyScroll();
-    if (restoreFocusTarget && typeof restoreFocusTarget.focus === "function" && typeof document !== "undefined" && document.body && document.body.contains(restoreFocusTarget)) {
+    if (restoreFocusTarget && typeof restoreFocusTarget.focus === "function" && restoreFocusTarget.isConnected) {
       restoreFocusTarget.focus();
     }
     restoreFocusTarget = null;
@@ -3640,6 +3743,47 @@
     return card;
   };
 
+  // src/ui/shadow-root.js
+  var HOST_ID = "blakfy-cookie-root";
+  var hostEl = null;
+  var root = null;
+  var usingShadow = false;
+  var ensureHost = () => {
+    if (typeof document === "undefined") return null;
+    if (hostEl && hostEl.isConnected) return hostEl;
+    hostEl = document.getElementById(HOST_ID);
+    if (!hostEl) {
+      hostEl = document.createElement("div");
+      hostEl.id = HOST_ID;
+      hostEl.style.all = "initial";
+      hostEl.style.display = "block";
+      (document.body || document.documentElement).appendChild(hostEl);
+    }
+    return hostEl;
+  };
+  var getShadowRoot = () => {
+    if (root) return root;
+    const host = ensureHost();
+    if (!host) return null;
+    if (host.shadowRoot) {
+      root = host.shadowRoot;
+      usingShadow = true;
+      return root;
+    }
+    if (typeof host.attachShadow === "function") {
+      try {
+        root = host.attachShadow({ mode: "open" });
+        usingShadow = true;
+        return root;
+      } catch (e) {
+      }
+    }
+    root = host;
+    usingShadow = false;
+    return root;
+  };
+  var getShadowHost = () => hostEl;
+
   // src/ui/status-bar.js
   var STATUS_COLORS = {
     info: "#1a56db",
@@ -3678,23 +3822,23 @@
     if (statusRoot && statusRoot.parentNode) {
       statusRoot.parentNode.removeChild(statusRoot);
     }
-    const root = document.createElement("div");
-    root.className = "blakfy-status";
-    root.setAttribute("role", "status");
-    root.setAttribute("dir", rtl ? "rtl" : "ltr");
-    root.style.cssText = "background:" + bg + ";color:#fff";
+    const root2 = document.createElement("div");
+    root2.className = "blakfy-status";
+    root2.setAttribute("role", "status");
+    root2.setAttribute("dir", rtl ? "rtl" : "ltr");
+    root2.style.cssText = "background:" + bg + ";color:#fff";
     const span = document.createElement("span");
     span.className = "blakfy-status-msg";
     span.textContent = msg;
-    root.appendChild(span);
+    root2.appendChild(span);
     const btn = document.createElement("button");
     btn.className = "blakfy-status-dismiss";
     btn.setAttribute("aria-label", "close");
     btn.textContent = "\u2715";
     btn.addEventListener("click", dismissStatus);
-    root.appendChild(btn);
-    document.body.appendChild(root);
-    statusRoot = root;
+    root2.appendChild(btn);
+    document.body.appendChild(root2);
+    statusRoot = root2;
     statusData = data;
   };
   var STATUS_CACHE_TTL_MS = 5 * 60 * 1e3;
@@ -3875,7 +4019,12 @@
     ".blakfy-card[data-blakfy-theme=dark] .blakfy-cookie-meta{color:#999}",
     ".blakfy-card[data-blakfy-theme=dark] .blakfy-cookie-essential{color:#999}",
     // ── Reopen FAB (#34) — token API, see docs in src/ui/fab.js ────────────────
-    ":root{--blakfy-fab-side:left;--blakfy-fab-offset-x:20px;--blakfy-fab-offset-y:20px;--blakfy-fab-z:2147483640;--blakfy-fab-size:40px;--blakfy-fab-target:44px;--blakfy-fab-icon-size:20px;--blakfy-fab-bg:var(--blakfy-accent,#3E5C3A);--blakfy-fab-color:#fff;--blakfy-fab-radius:50%;--blakfy-fab-shadow:0 2px 8px rgb(0 0 0 / 0.18);--blakfy-fab-opacity:0.55;--blakfy-fab-opacity-hover:1}",
+    // #35: declared on :host (the shadow root's own element), not :root — a shadow-scoped
+    // stylesheet's :root never matches the document, only the shadow tree. --blakfy-accent
+    // and any --blakfy-fab-* override a site sets on ITS OWN :root still inherit in across
+    // the shadow boundary (custom properties are inheritable), so a site override always
+    // wins; these are only the widget's own defaults.
+    ":host,:root{--blakfy-fab-side:left;--blakfy-fab-offset-x:20px;--blakfy-fab-offset-y:20px;--blakfy-fab-z:2147483640;--blakfy-fab-size:40px;--blakfy-fab-target:44px;--blakfy-fab-icon-size:20px;--blakfy-fab-bg:var(--blakfy-accent,#3E5C3A);--blakfy-fab-color:#fff;--blakfy-fab-radius:50%;--blakfy-fab-shadow:0 2px 8px rgb(0 0 0 / 0.18);--blakfy-fab-opacity:0.55;--blakfy-fab-opacity-hover:1}",
     ".blakfy-fab{position:fixed;z-index:var(--blakfy-fab-z);width:var(--blakfy-fab-target);height:var(--blakfy-fab-target);display:flex;align-items:center;justify-content:center;padding:0;border:none;cursor:pointer;background:transparent;bottom:calc(var(--blakfy-fab-offset-y) + env(safe-area-inset-bottom,0px))}",
     ".blakfy-fab::before{content:'';position:absolute;width:var(--blakfy-fab-size);height:var(--blakfy-fab-size);border-radius:var(--blakfy-fab-radius);background:var(--blakfy-fab-bg);box-shadow:var(--blakfy-fab-shadow);opacity:var(--blakfy-fab-opacity);transition:opacity .15s}",
     ".blakfy-fab:hover::before,.blakfy-fab:focus-visible::before{opacity:var(--blakfy-fab-opacity-hover)}",
@@ -3888,12 +4037,13 @@
     "@media (prefers-reduced-motion:reduce){.blakfy-fab::before{transition:none}}",
     "@media (max-width:640px){:root{--blakfy-fab-offset-x:12px;--blakfy-fab-offset-y:12px;--blakfy-fab-size:36px}}"
   ];
-  var injectStyles = () => {
-    if (document.getElementById(STYLE_ID)) return;
+  var injectStyles = (root2) => {
+    const target = root2 || (typeof document !== "undefined" ? document.head : null);
+    if (!target || target.querySelector("#" + STYLE_ID)) return;
     const css = document.createElement("style");
     css.id = STYLE_ID;
     css.textContent = RULES.join("");
-    document.head.appendChild(css);
+    target.appendChild(css);
   };
 
   // src/ui/theme-bridge.js
@@ -4067,7 +4217,7 @@
       unwatchTheme = watchSiteTheme((next) => {
         theme = next;
         trackedCards.forEach((card) => {
-          if (!card || !document.body.contains(card)) {
+          if (!card || !card.isConnected) {
             trackedCards.delete(card);
             return;
           }
@@ -4075,7 +4225,8 @@
         });
       });
     }
-    injectStyles();
+    const shadowRoot = getShadowRoot();
+    injectStyles(shadowRoot);
     const emitter = createEmitter();
     let jurisdiction = "default";
     try {
@@ -4154,6 +4305,9 @@
       baseHref: scriptEl && scriptEl.src,
       mainLang,
       jurisdiction,
+      // #35: closeUI() needs to query overlays inside the shadow root, not document —
+      // document.querySelectorAll cannot see across the shadow boundary.
+      shadowRoot,
       deps: {
         unblockScripts,
         unblockIframes,
@@ -4163,6 +4317,10 @@
         pushGCM,
         pushUET,
         applyYandex,
+        // #24 (item 3): auto-bridge to a documented host-platform consent API when one
+        // exists (Shopify Customer Privacy API, WP Consent API); detection-only warning
+        // otherwise. `scriptEl` carries the optional data-blakfy-host override.
+        installHostAdapter: (s) => installHostAdapter(s, scriptEl),
         getTCString,
         optOutCCPA: optOut,
         isOptedOutCCPA: isOptedOut,
@@ -4245,11 +4403,11 @@
         onOpenPolicy: () => mountModal({ t, tab: "policy" })
       });
       overlay.appendChild(card);
-      document.body.appendChild(overlay);
+      shadowRoot.appendChild(overlay);
       api.__internal.setUI("banner", overlay);
       if (!isExplicit) trackedCards.add(card);
       mountBadges(card);
-      installAntiTamper(card);
+      installAntiTamper(card, shadowRoot);
       installFocusTrap(card, {
         onEscape: () => {
         }
@@ -4257,7 +4415,7 @@
       return overlay;
     };
     function mountModal(opts) {
-      const existing = document.querySelectorAll("." + ROOT_OVERLAY_CLASS + ".modal");
+      const existing = shadowRoot.querySelectorAll("." + ROOT_OVERLAY_CLASS + ".modal");
       for (let i = 0; i < existing.length; i++) {
         if (existing[i].parentNode) existing[i].parentNode.removeChild(existing[i]);
       }
@@ -4296,15 +4454,19 @@
         onDeleteCookie: (name) => deleteObservedCookie(name)
       });
       overlay.appendChild(card);
-      document.body.appendChild(overlay);
+      shadowRoot.appendChild(overlay);
       api.__internal.setUI("modal", overlay);
       if (!isExplicit) trackedCards.add(card);
       mountBadges(card);
-      installAntiTamper(card);
+      installAntiTamper(card, shadowRoot);
       installFocusTrap(card, {
         onEscape: () => api.__internal.closeUI(),
         trapBackground: true,
-        lockScroll: true
+        lockScroll: true,
+        // #35: the light-DOM body child to leave interactive while the modal traps
+        // focus is the shadow host itself — everything the widget renders (banner,
+        // modal, FAB) lives inside it, in the same shadow root.
+        inertSkipEl: getShadowHost()
       });
       return overlay;
     }
@@ -4328,12 +4490,13 @@
       });
       if (!fab) return;
       applyFabTokens(fab, resolved);
-      document.body.appendChild(fab);
+      shadowRoot.appendChild(fab);
       fabMounted = true;
     };
     if (state) {
       pushGCM(state);
       pushUET(state);
+      installHostAdapter(state, scriptEl);
       applyYandex(state, {
         unblock: (cat) => {
           unblockScripts(cat);
