@@ -27,6 +27,28 @@ describe("createBanner", () => {
     expect(card.getAttribute("aria-describedby")).toBe("blakfy-desc");
   });
 
+  it("#27: aria-modal absent — the banner is non-modal (page stays reachable)", () => {
+    const card = createBanner({ t, isRTL: false, accent: "#000", theme: "auto", policyUrl: "/p" });
+    expect(card.getAttribute("aria-modal")).toBeNull();
+  });
+
+  it("#27: lang set on the widget root when a locale is passed", () => {
+    const card = createBanner({
+      t,
+      isRTL: false,
+      accent: "#000",
+      theme: "auto",
+      locale: "tr",
+      policyUrl: "/p",
+    });
+    expect(card.getAttribute("lang")).toBe("tr");
+  });
+
+  it("#27: lang omitted when no locale is passed (no regression)", () => {
+    const card = createBanner({ t, isRTL: false, accent: "#000", theme: "auto", policyUrl: "/p" });
+    expect(card.hasAttribute("lang")).toBe(false);
+  });
+
   it("dir='rtl' when isRTL=true", () => {
     const card = createBanner({ t, isRTL: true, accent: "#000", theme: "auto", policyUrl: "/p" });
     expect(card.getAttribute("dir")).toBe("rtl");

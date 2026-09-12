@@ -5,6 +5,7 @@ export const createBanner = ({
   isRTL,
   accent,
   theme,
+  locale,
   policyUrl,
   onAccept,
   onReject,
@@ -14,8 +15,12 @@ export const createBanner = ({
   card.className = "blakfy-card";
   card.setAttribute("dir", isRTL ? "rtl" : "ltr");
   card.setAttribute("role", "dialog");
+  // #27: NOT aria-modal — the banner never blocks page content (overlay is
+  // pointer-events:none), so it is a non-modal dialog per the ARIA APG. Background
+  // inert/scroll-lock stay reserved for the true modal (see modal.js + focus-trap.js).
   card.setAttribute("aria-labelledby", "blakfy-title");
   card.setAttribute("aria-describedby", "blakfy-desc");
+  if (locale) card.setAttribute("lang", locale);
   card.style.cssText = "--blakfy-accent:" + accent;
   if (theme && theme !== "light") card.setAttribute("data-blakfy-theme", theme);
 

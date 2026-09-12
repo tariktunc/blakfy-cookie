@@ -109,3 +109,132 @@ describe("installFocusTrap / removeFocusTrap", () => {
     expect(() => installFocusTrap(undefined, {})).not.toThrow();
   });
 });
+
+describe("#27: trapBackground (inert / fallback)", () => {
+  let overlay, root, sibling;
+
+  beforeEach(() => {
+    sibling = document.createElement("main");
+    sibling.innerHTML = '<a href="#">Page link</a>';
+    document.body.appendChild(sibling);
+
+    overlay = document.createElement("div");
+    root = document.createElement("div");
+    root.innerHTML = '<button id="mb1">Modal button</button>';
+    overlay.appendChild(root);
+    document.body.appendChild(overlay);
+  });
+
+  afterEach(() => {
+    removeFocusTrap();
+    if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
+    if (sibling.parentNode) sibling.parentNode.removeChild(sibling);
+  });
+
+  it("marks background siblings inert (or the tabindex/aria-hidden fallback), never the overlay itself", () => {
+    installFocusTrap(root, { trapBackground: true });
+    const usesNativeInert = "inert" in document.createElement("div");
+    if (usesNativeInert) {
+      expect(sibling.hasAttribute("inert")).toBe(true);
+    } else {
+      expect(sibling.getAttribute("tabindex")).toBe("-1");
+      expect(sibling.getAttribute("aria-hidden")).toBe("true");
+    }
+    expect(overlay.hasAttribute("inert")).toBe(false);
+  });
+
+  it("restores the background on removeFocusTrap", () => {
+    installFocusTrap(root, { trapBackground: true });
+    removeFocusTrap();
+    expect(sibling.hasAttribute("inert")).toBe(false);
+    expect(sibling.hasAttribute("tabindex")).toBe(false);
+    expect(sibling.hasAttribute("aria-hidden")).toBe(false);
+  });
+
+  it("without trapBackground, siblings are left untouched (banner stays non-modal)", () => {
+    installFocusTrap(root, {});
+    expect(sibling.hasAttribute("inert")).toBe(false);
+  });
+});
+
+describe("#27: lockScroll (body scroll lock + restore)", () => {
+  let root;
+
+  beforeEach(() => {
+    root = document.createElement("div");
+    root.innerHTML = '<button id="mb1">Modal button</button>';
+    document.body.appendChild(root);
+    document.body.style.overflow = "";
+  });
+
+  afterEach(() => {
+    removeFocusTrap();
+    document.body.style.overflow = "";
+    if (root.parentNode) root.parentNode.removeChild(root);
+  });
+
+  it("sets body overflow:hidden while locked, restores previous value on remove", () => {
+    document.body.style.overflow = "auto";
+    installFocusTrap(root, { lockScroll: true });
+    expect(document.body.style.overflow).toBe("hidden");
+    removeFocusTrap();
+    expect(document.body.style.overflow).toBe("auto");
+  });
+
+  it("without lockScroll, body overflow is untouched (banner stays scrollable)", () => {
+    installFocusTrap(root, {});
+    expect(document.body.style.overflow).toBe("");
+  });
+});
+
+describe("#27: opener focus return on close", () => {
+  let opener, root;
+
+  beforeEach(() => {
+    opener = document.createElement("button");
+    opener.id = "opener";
+    document.body.appendChild(opener);
+    root = document.createElement("div");
+    root.innerHTML = '<button id="mb1">Modal button</button>';
+    document.body.appendChild(root);
+  });
+
+  afterEach(() => {
+    removeFocusTrap();
+    if (opener.parentNode) opener.parentNode.removeChild(opener);
+    if (root.parentNode) root.parentNode.removeChild(root);
+  });
+
+  it("returns focus to the element that had it before install, once the trap is removed", () => {
+    opener.focus();
+    expect(document.activeElement).toBe(opener);
+
+    installFocusTrap(root, {});
+    expect(document.activeElement).toBe(root.querySelector("#mb1"));
+
+    removeFocusTrap();
+    expect(document.activeElement).toBe(opener);
+  });
+
+  it("returnFocus:false opts out of restoring the opener", () => {
+    opener.focus();
+    installFocusTrap(root, { returnFocus: false });
+    removeFocusTrap();
+    expect(document.activeElement).not.toBe(opener);
+  });
+
+  it("banner → modal handoff keeps the ORIGINAL opener, not the intermediate trap's target", () => {
+    opener.focus();
+    const bannerRoot = document.createElement("div");
+    bannerRoot.innerHTML = '<button id="bb1">Banner button</button>';
+    document.body.appendChild(bannerRoot);
+
+    installFocusTrap(bannerRoot, {}); // banner opens, steals focus from opener
+    const modalOpener = document.activeElement; // e.g. banner's "Preferences" button
+    installFocusTrap(root, {}); // user opens the preferences modal
+    removeFocusTrap();
+    expect(document.activeElement).toBe(modalOpener);
+
+    if (bannerRoot.parentNode) bannerRoot.parentNode.removeChild(bannerRoot);
+  });
+});

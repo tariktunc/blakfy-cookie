@@ -270,6 +270,7 @@ const bootstrap = async () => {
       isRTL: isRTL,
       accent: config.accent,
       theme: theme,
+      locale: currentLocale,
       policyUrl: config.policyUrl,
       onAccept: () => api.acceptAll(),
       onReject: () => api.rejectAll(),
@@ -287,6 +288,11 @@ const bootstrap = async () => {
     if (!isExplicit) trackedCards.add(card);
     mountBadges(card);
     installAntiTamper(card);
+    // #27: no separate aria-live announcement region — the banner is a non-modal
+    // dialog (role="dialog", no aria-modal, background stays reachable) and
+    // installFocusTrap() moves focus onto it the moment it renders, which already
+    // triggers the screen reader's dialog announcement (label + description) per
+    // the ARIA APG. Documented here per the issue's "pick one and document why".
     installFocusTrap(card, {
       onEscape: () => {
         /* banner non-dismissible via ESC */
@@ -311,6 +317,7 @@ const bootstrap = async () => {
       isRTL: isRTL,
       accent: config.accent,
       theme: theme,
+      locale: currentLocale,
       currentState: state,
       presets: activePresetList,
       version: api.version,
@@ -324,7 +331,15 @@ const bootstrap = async () => {
     if (!isExplicit) trackedCards.add(card);
     mountBadges(card);
     installAntiTamper(card);
-    installFocusTrap(card, { onEscape: () => api.__internal.closeUI() });
+    // #27: this IS the true modal dialog — trap background content with `inert`
+    // (tabindex/aria-hidden fallback for older browsers), lock body scroll while
+    // open, and return focus to whatever opened it (e.g. the banner's "Preferences"
+    // button) once it closes.
+    installFocusTrap(card, {
+      onEscape: () => api.__internal.closeUI(),
+      trapBackground: true,
+      lockScroll: true,
+    });
     return overlay;
   }
 

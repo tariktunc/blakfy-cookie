@@ -34,9 +34,10 @@ const safeGet = (obj, path, fallback) => {
 const buildCatRow = (key, t, alwaysOn, checked) => {
   const c = safeGet(t, "cat." + key, {});
   const row = el("div", { class: "blakfy-cat" });
+  const titleId = "blakfy-cat-title-" + key;
 
   const text = el("div", { class: "blakfy-cat-text" });
-  const strong = el("strong", { text: c.title || key });
+  const strong = el("strong", { id: titleId, text: c.title || key });
   text.appendChild(strong);
   const span = el("span", {
     text: (c.desc || "") + (alwaysOn ? " (" + (c.always || "") + ")" : ""),
@@ -44,10 +45,13 @@ const buildCatRow = (key, t, alwaysOn, checked) => {
   text.appendChild(span);
   row.appendChild(text);
 
+  // #27: name the switch off the existing translated title instead of a duplicated
+  // aria-label, so every shipped locale (and the raw-key fallback) stays in sync.
   const sw = el("button", {
     class: "blakfy-switch",
     role: "switch",
     "aria-checked": checked ? "true" : "false",
+    "aria-labelledby": titleId,
     "data-cat": key,
   });
   if (alwaysOn) sw.disabled = true;
@@ -306,6 +310,7 @@ export const createModal = ({
   isRTL,
   accent,
   theme,
+  locale,
   currentState,
   presets,
   version,
@@ -318,9 +323,11 @@ export const createModal = ({
   const card = el("div", {
     class: "blakfy-card",
     role: "dialog",
+    "aria-modal": "true",
     "aria-labelledby": "blakfy-mtitle",
   });
   card.setAttribute("dir", isRTL ? "rtl" : "ltr");
+  if (locale) card.setAttribute("lang", locale);
   card.style.cssText = "--blakfy-accent:" + accent + ";position:relative";
   if (theme && theme !== "light") card.setAttribute("data-blakfy-theme", theme);
 
