@@ -59,7 +59,8 @@
     jurisdiction,
     tcString,
     uspString,
-    prevId
+    prevId,
+    source
   }) => ({
     id: prevId || newId(),
     essential: true,
@@ -73,7 +74,10 @@
     mainLang,
     jurisdiction: jurisdiction || "default",
     tcString: tcString || null,
-    uspString: uspString || null
+    uspString: uspString || null,
+    // #32: who produced this record — "click" (default, user interacted with the banner/modal)
+    // or "gpc" (Global Privacy Control signal auto-applied the decision, CCPA/CPRA jurisdictions).
+    source: source || "click"
   });
 
   // src/gating/observer.js
@@ -472,9 +476,10 @@
       }
       return out;
     };
-    const commit = (prefs, action) => {
+    const commit = (prefs, action, opts) => {
       const prevState = state;
       const prevGranted = grantedCategories(prevState);
+      const o = opts || {};
       const next = buildState({
         prefs: prefs || {},
         currentLocale,
@@ -483,7 +488,8 @@
         jurisdiction,
         tcString: deps && typeof deps.getTCString === "function" ? deps.getTCString() : null,
         uspString: null,
-        prevId: prevState && prevState.id
+        prevId: prevState && prevState.id,
+        source: o.source
       });
       state = next;
       try {
@@ -847,6 +853,123 @@
     }
     if (setPrefs) setPrefs({ analytics: false, marketing: false });
     return { applied: true, reason: "gpc-auto-deny" };
+  };
+
+  // src/compliance/gpp.js
+  var SID_USNAT = 7;
+  var buildUSNatSection = (state) => {
+    const s = state || {};
+    const saleOptOut = s.marketing ? 2 : 1;
+    const sharingOptOut = s.marketing ? 2 : 1;
+    const targetedAdvertisingOptOut = s.marketing ? 2 : 1;
+    return {
+      Version: 1,
+      SaleOptOut: saleOptOut,
+      SharingOptOut: sharingOptOut,
+      TargetedAdvertisingOptOut: targetedAdvertisingOptOut,
+      Gpc: s.gpc === true
+    };
+  };
+  var installGPPAPI = (opts) => {
+    if (typeof window === "undefined") return null;
+    const o = opts || {};
+    const getConsent = typeof o.getConsent === "function" ? o.getConsent : () => ({});
+    const getGpcFlag = typeof o.getGpc === "function" ? o.getGpc : () => false;
+    const applicableSections = Array.isArray(o.applicableSections) ? o.applicableSections : [SID_USNAT];
+    const subscribe = typeof o.on === "function" ? o.on : null;
+    const listeners2 = /* @__PURE__ */ Object.create(null);
+    let nextId = 1;
+    let cmpStatus = "loaded";
+    const currentUSNat = () => buildUSNatSection(Object.assign({}, getConsent(), { gpc: getGpcFlag() }));
+    const buildGPPData = (listenerId) => ({
+      gppVersion: "1.1",
+      cmpStatus,
+      cmpDisplayStatus: "hidden",
+      signalStatus: "ready",
+      supportedAPIs: ["6:uspv1", "7:usnat"],
+      cmpId: o.cmpId || 0,
+      sectionList: applicableSections,
+      applicableSections,
+      gppString: "",
+      // official bitstring encoding not implemented — see file header
+      parsedSections: { usnat: currentUSNat() },
+      listenerId: typeof listenerId === "number" ? listenerId : null
+    });
+    const handle = (command, callback, parameter) => {
+      if (typeof callback !== "function") return;
+      if (command === "ping") {
+        callback(
+          {
+            gppVersion: "1.1",
+            cmpStatus,
+            cmpDisplayStatus: "hidden",
+            supportedAPIs: ["6:uspv1", "7:usnat"],
+            cmpId: o.cmpId || 0,
+            sectionList: applicableSections,
+            applicableSections
+          },
+          true
+        );
+        return;
+      }
+      if (command === "getGPPData" || command === "getField") {
+        callback(buildGPPData(null), true);
+        return;
+      }
+      if (command === "addEventListener") {
+        const id = nextId++;
+        listeners2[id] = callback;
+        callback(buildGPPData(id), true);
+        return;
+      }
+      if (command === "removeEventListener") {
+        if (listeners2[parameter]) {
+          delete listeners2[parameter];
+          callback({ success: true }, true);
+        } else callback({ success: false }, true);
+        return;
+      }
+      callback(null, false);
+    };
+    const queue = window.__gpp && window.__gpp.queue ? window.__gpp.queue : [];
+    if (!window.__gpp || !window.__gpp.__blakfy) {
+      const gppFn = (command, callback, parameter) => handle(command, callback, parameter);
+      gppFn.queue = [];
+      gppFn.__blakfy = true;
+      window.__gpp = gppFn;
+      for (let i = 0; i < queue.length; i++) {
+        const args = queue[i];
+        try {
+          handle(args[0], args[1], args[2]);
+        } catch (e) {
+        }
+      }
+    }
+    if (typeof document !== "undefined" && !document.querySelector('iframe[name="__gppLocator"]')) {
+      try {
+        const iframe = document.createElement("iframe");
+        iframe.style.cssText = "display:none;position:absolute;width:0;height:0;border:0";
+        iframe.name = "__gppLocator";
+        (document.body || document.documentElement).appendChild(iframe);
+      } catch (e) {
+      }
+    }
+    const fireAll = (eventName) => {
+      const ids = Object.keys(listeners2);
+      for (let i = 0; i < ids.length; i++) {
+        const id = ids[i];
+        try {
+          const data = buildGPPData(parseInt(id, 10));
+          data.pingData = { signalStatus: eventName || "ready" };
+          listeners2[id](data, true);
+        } catch (e) {
+        }
+      }
+    };
+    if (subscribe) {
+      subscribe("change", () => fireAll("useractioncomplete"));
+    }
+    return { fireAll };
   };
 
   // src/compliance/microsoft-uet.js
@@ -3696,6 +3819,12 @@
     if (ccpaOn) {
       installUSP({});
       installDoNotSellLink({ t });
+      installGPPAPI({
+        getConsent: () => state || {},
+        getGpc: getGPC,
+        applicableSections: [7],
+        on: emitter.on
+      });
     }
     if (getDNT() && config.dnt === "auto-deny" && !state) {
       applyDNT({
@@ -3705,12 +3834,27 @@
       });
     }
     if (getGPC() && config.gpc === "respect" && !state) {
-      applyGPC({
+      const gpcResult = applyGPC({
         mode: "respect",
         currentState: null,
         setPrefs: () => {
         }
       });
+      if (gpcResult.applied && jurisdiction === "CCPA") {
+        state = buildState({
+          prefs: { analytics: false, marketing: false, functional: false, recording: false },
+          currentLocale,
+          mainLang,
+          policyVersion: config.policyVersion,
+          jurisdiction,
+          source: "gpc"
+        });
+        try {
+          writeCookie(state);
+        } catch (e) {
+        }
+        optOut();
+      }
     }
     let activePresetList = [];
     if (config.presets) {

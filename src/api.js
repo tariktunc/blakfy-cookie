@@ -74,9 +74,10 @@ export const createAPI = (ctx) => {
     return out;
   };
 
-  const commit = (prefs, action) => {
+  const commit = (prefs, action, opts) => {
     const prevState = state;
     const prevGranted = grantedCategories(prevState);
+    const o = opts || {};
 
     const next = buildState({
       prefs: prefs || {},
@@ -87,6 +88,7 @@ export const createAPI = (ctx) => {
       tcString: deps && typeof deps.getTCString === "function" ? deps.getTCString() : null,
       uspString: null,
       prevId: prevState && prevState.id,
+      source: o.source,
     });
 
     state = next;

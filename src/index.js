@@ -14,6 +14,7 @@ import {
   isDefaultsInstalled as isGCMDefaultsInstalled,
 } from "./compliance/google-cmv2.js";
 import { getGPC, applyGPC } from "./compliance/gpc.js";
+import { installGPPAPI } from "./compliance/gpp.js";
 import { installDefaults as installUETDefaults, pushUET } from "./compliance/microsoft-uet.js";
 import { installTCFAPI, getTCString } from "./compliance/tcf-v2.js";
 import {
@@ -21,7 +22,7 @@ import {
   applyYandex,
 } from "./compliance/yandex-metrica.js";
 import { getScriptEl, readConfig, detectPlacementIssue } from "./core/config.js";
-import { readCookie } from "./core/consent-store.js";
+import { readCookie, writeCookie, buildState } from "./core/consent-store.js";
 import { createEmitter } from "./core/events.js";
 import {
   runCleanup,
@@ -171,11 +172,18 @@ const bootstrap = async () => {
     });
   }
 
-  // 8. CCPA
+  // 8. CCPA (+ GPP, #32 — kept alongside __uspapi for backwards compatibility during the
+  // industry's USP -> GPP transition; see compliance/gpp.js for scope limits)
   const ccpaOn = config.ccpa === "true" || (config.ccpa === "auto" && jurisdiction === "CCPA");
   if (ccpaOn) {
     installUSP({});
     installDoNotSellLink({ t: t });
+    installGPPAPI({
+      getConsent: () => state || {},
+      getGpc: getGPC,
+      applicableSections: [7],
+      on: emitter.on,
+    });
   }
 
   // 10. DNT
@@ -188,15 +196,38 @@ const bootstrap = async () => {
     });
   }
 
-  // 11. GPC — only mutate defaults if user has not yet decided
+  // 11. GPC (#32) — only act if the user has not yet made an explicit decision.
+  // CCPA/CPRA jurisdictions: GPC is a legally binding opt-out signal and must be
+  // enforced without presenting it as a choice — persist a denied consent record
+  // now (source: "gpc") and flip the CCPA opt-out flag, rather than just leaving
+  // in-memory defaults denied. GDPR/default jurisdictions: opt-in already denies
+  // analytics/marketing by default, so GPC has no additional effect there — this
+  // is a deliberate decision (EDPB treats automated signals favourably but does
+  // not require CCPA-style enforcement under GDPR), not an oversight.
   if (getGPC() && config.gpc === "respect" && !state) {
-    applyGPC({
+    const gpcResult = applyGPC({
       mode: "respect",
       currentState: null,
       setPrefs: () => {
-        /* defaults remain denied */
+        /* defaults remain denied for non-CCPA jurisdictions */
       },
     });
+    if (gpcResult.applied && jurisdiction === "CCPA") {
+      state = buildState({
+        prefs: { analytics: false, marketing: false, functional: false, recording: false },
+        currentLocale: currentLocale,
+        mainLang: mainLang,
+        policyVersion: config.policyVersion,
+        jurisdiction: jurisdiction,
+        source: "gpc",
+      });
+      try {
+        writeCookie(state);
+      } catch (e) {
+        /* ignore */
+      }
+      optOutCCPA();
+    }
   }
 
   // 12. Apply presets (list kept in closure for Services tab)

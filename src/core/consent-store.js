@@ -48,6 +48,7 @@ export const buildState = ({
   tcString,
   uspString,
   prevId,
+  source,
 }) => ({
   id: prevId || newId(),
   essential: true,
@@ -62,4 +63,7 @@ export const buildState = ({
   jurisdiction: jurisdiction || "default",
   tcString: tcString || null,
   uspString: uspString || null,
+  // #32: who produced this record — "click" (default, user interacted with the banner/modal)
+  // or "gpc" (Global Privacy Control signal auto-applied the decision, CCPA/CPRA jurisdictions).
+  source: source || "click",
 });
