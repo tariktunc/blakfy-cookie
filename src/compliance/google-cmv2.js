@@ -77,6 +77,9 @@ export const installDefaults = () => {
   });
 };
 
+// #43 (diagnose()): expose whether GCM defaults have actually fired in this page.
+export const isDefaultsInstalled = () => defaultsInstalled;
+
 export const pushGCM = (state) => {
   if (typeof window === "undefined") return;
   if (typeof window.gtag !== "function") return;

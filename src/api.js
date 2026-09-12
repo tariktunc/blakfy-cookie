@@ -39,10 +39,30 @@ export const createAPI = (ctx) => {
     if (deps && typeof deps.removeFocusTrap === "function") deps.removeFocusTrap();
   };
 
+  let warnedNoCategoryArg = false;
+
+  // #43 (comment): getConsent() called with no category silently reads state[undefined]
+  // -> false, which looks exactly like "visitor rejected everything" even when they
+  // accepted everything. Warn once so a wrong call is caught instead of trusted.
   const getConsent = (cat) => {
     if (cat === "essential") return true;
+    if (cat === undefined && !warnedNoCategoryArg) {
+      warnedNoCategoryArg = true;
+      if (typeof console !== "undefined" && console.warn) {
+        console.warn(
+          "[Blakfy Cookie] getConsent() called with no category argument — this always " +
+            "returns false, which reads as 'consent denied' even for a visitor who accepted " +
+            "everything. Pass a category ('analytics', 'marketing', 'functional', " +
+            "'recording'), or use hasDecided() to check whether the visitor has answered at all."
+        );
+      }
+    }
     return state ? !!state[cat] : false;
   };
+
+  // #43 (comment): what a no-argument getConsent() call almost certainly wants —
+  // "has this visitor made ANY choice yet", not "did they grant this specific category".
+  const hasDecided = () => !!state;
 
   const grantedCategories = (s) => {
     const out = [];
@@ -217,12 +237,31 @@ export const createAPI = (ctx) => {
       deps && typeof deps.isOptedOutCCPA === "function" ? !!deps.isOptedOutCCPA() : false,
   };
 
+  // #43: BlakfyCookie.diagnose() — one call instead of a manual browser session to
+  // answer "is this install actually working". Filled in by index.js bootstrap via
+  // deps.getDiagnostics, which has access to placement/defaults/preset/cookie state
+  // this module does not hold directly.
+  const diagnose = () => {
+    if (deps && typeof deps.getDiagnostics === "function") {
+      return deps.getDiagnostics({ state: state, jurisdiction: jurisdiction });
+    }
+    return {
+      placementOk: null,
+      defaultsFired: null,
+      presetsRegistered: [],
+      unrecognizedCookies: [],
+      googleConsentState: null,
+      note: "diagnostics unavailable — deps.getDiagnostics was not wired by bootstrap",
+    };
+  };
+
   return {
     version: VERSION,
     open: open,
     acceptAll: acceptAll,
     rejectAll: rejectAll,
     getConsent: getConsent,
+    hasDecided: hasDecided,
     getState: getState,
     onChange: onChange,
     setLocale: setLocale,
@@ -235,6 +274,7 @@ export const createAPI = (ctx) => {
     tcf: tcf,
     ccpa: ccpa,
     getJurisdiction: getJurisdiction,
+    diagnose: diagnose,
     __internal: { commit: commit, setUI: setUI, closeUI: closeUI },
   };
 };

@@ -37,6 +37,44 @@ export const getScriptEl = () => {
   return all[all.length - 1] || null;
 };
 
+// #43: "wrong placement" produces a widget that is completely inert with no error —
+// the script tag is present and readable, so every surface-level integrator check
+// passes. document.currentScript is null for scripts with the `async` attribute per
+// spec, and the fallback (last <script> on the page) is guessing. Flag both shapes
+// so a bad install is loud instead of silent.
+export const detectPlacementIssue = (el) => {
+  if (!el) {
+    return (
+      "no usable <script> element could be resolved (document.currentScript was null " +
+      "and no fallback script was found) — this usually means the tag has the `async` " +
+      "attribute, which is not supported. Load this script WITHOUT async/defer, placed " +
+      "body-last, per the install docs."
+    );
+  }
+  if (typeof el.hasAttribute === "function" && el.hasAttribute("async")) {
+    return (
+      "this script tag has the `async` attribute. document.currentScript is null for " +
+      "async scripts per spec, so this install cannot reliably read its own " +
+      "data-blakfy-* attributes and may silently fall back to the wrong <script> tag on " +
+      "the page. Remove `async` and load this script body-last instead."
+    );
+  }
+  if (
+    typeof document !== "undefined" &&
+    document.head &&
+    typeof el.closest === "function" &&
+    el.closest("head") === document.head
+  ) {
+    return (
+      "this script tag is placed in <head>. The install docs call for body-last " +
+      "placement; loading in <head> risks executing before the DOM the widget mounts " +
+      "into exists, and commonly pairs with `async`/`defer` mistakes. Move the tag to " +
+      "just before </body>."
+    );
+  }
+  return null;
+};
+
 export const readConfig = (scriptEl) => {
   const el = scriptEl || getScriptEl();
   const attr = (name, fallback) => {

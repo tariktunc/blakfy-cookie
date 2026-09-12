@@ -5,6 +5,7 @@ import {
   runCleanup,
   clearAllRules,
   warnUnregisteredCookies,
+  warnPreConsentCookies,
 } from "../src/gating/cleaner.js";
 
 beforeEach(() => {
@@ -124,6 +125,35 @@ describe("warnUnregisteredCookies (#25)", () => {
   it("returns [] when there are no cookies at all", () => {
     const spy = vi.spyOn(console, "warn").mockImplementation(() => {});
     expect(warnUnregisteredCookies(FAKE_PRESETS)).toEqual([]);
+    expect(spy).not.toHaveBeenCalled();
+    spy.mockRestore();
+  });
+});
+
+describe("warnPreConsentCookies (#43)", () => {
+  it("warns when a registered category's cookie exists but consent is not granted", () => {
+    document.cookie = "_fbp=fb.1.111; path=/";
+    registerCleanup({ category: "marketing", cookies: [/^_fbp$/], storage: [] });
+    const spy = vi.spyOn(console, "warn").mockImplementation(() => {});
+    const getConsent = (cat) => cat !== "marketing";
+
+    const found = warnPreConsentCookies(FAKE_PRESETS, getConsent);
+
+    expect(found.length).toBe(1);
+    expect(found[0].preset).toBe("facebook");
+    expect(spy).toHaveBeenCalledTimes(1);
+    spy.mockRestore();
+  });
+
+  it("does not warn once consent for that category is granted", () => {
+    document.cookie = "_fbp=fb.1.111; path=/";
+    registerCleanup({ category: "marketing", cookies: [/^_fbp$/], storage: [] });
+    const spy = vi.spyOn(console, "warn").mockImplementation(() => {});
+    const getConsent = (cat) => cat === "marketing";
+
+    const found = warnPreConsentCookies(FAKE_PRESETS, getConsent);
+
+    expect(found.length).toBe(0);
     expect(spy).not.toHaveBeenCalled();
     spy.mockRestore();
   });

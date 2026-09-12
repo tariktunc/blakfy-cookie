@@ -98,6 +98,42 @@ describe("API behavior", () => {
     expect(api.getConsent("essential")).toBe(true);
   });
 
+  it("#43: getConsent() with no category warns once and returns false", () => {
+    const ctx = makeCtx();
+    const api = createAPI(ctx);
+    const spy = vi.spyOn(console, "warn").mockImplementation(() => {});
+    api.acceptAll(); // also warns once (#28, no audit endpoint) — unrelated to this check
+    spy.mockClear();
+    expect(api.getConsent()).toBe(false);
+    expect(api.getConsent()).toBe(false);
+    expect(spy).toHaveBeenCalledTimes(1);
+    expect(spy.mock.calls[0][0]).toContain("getConsent()");
+    spy.mockRestore();
+  });
+
+  it("#43: hasDecided() reflects whether the visitor has answered at all", () => {
+    const ctx = makeCtx();
+    const api = createAPI(ctx);
+    expect(api.hasDecided()).toBe(false);
+    api.acceptAll();
+    expect(api.hasDecided()).toBe(true);
+  });
+
+  it("#43: diagnose() falls back gracefully when deps.getDiagnostics is not wired", () => {
+    const ctx = makeCtx();
+    const api = createAPI(ctx);
+    const result = api.diagnose();
+    expect(result).toHaveProperty("note");
+    expect(result.placementOk).toBeNull();
+  });
+
+  it("#43: diagnose() delegates to deps.getDiagnostics when provided", () => {
+    const ctx = makeCtx({ deps: { getDiagnostics: vi.fn(() => ({ placementOk: true })) } });
+    const api = createAPI(ctx);
+    expect(api.diagnose()).toEqual({ placementOk: true });
+    expect(ctx.deps.getDiagnostics).toHaveBeenCalled();
+  });
+
   it("onChange(fn) is called when state changes", () => {
     const ctx = makeCtx();
     const api = createAPI(ctx);

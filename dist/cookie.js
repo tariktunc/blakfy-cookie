@@ -1735,6 +1735,7 @@
     const jurisdiction = ctx.jurisdiction || "default";
     let t = getTranslation(currentLocale);
     let modalRoot = null;
+    let warnedNoAuditEndpoint = false;
     let bannerRoot = null;
     const setUI = (which, root) => {
       if (which === "modal") modalRoot = root;
@@ -1752,10 +1753,20 @@
       bannerRoot = null;
       if (deps && typeof deps.removeFocusTrap === "function") deps.removeFocusTrap();
     };
+    let warnedNoCategoryArg = false;
     const getConsent = (cat) => {
       if (cat === "essential") return true;
+      if (cat === void 0 && !warnedNoCategoryArg) {
+        warnedNoCategoryArg = true;
+        if (typeof console !== "undefined" && console.warn) {
+          console.warn(
+            "[Blakfy Cookie] getConsent() called with no category argument \u2014 this always returns false, which reads as 'consent denied' even for a visitor who accepted everything. Pass a category ('analytics', 'marketing', 'functional', 'recording'), or use hasDecided() to check whether the visitor has answered at all."
+          );
+        }
+      }
       return state ? !!state[cat] : false;
     };
+    const hasDecided = () => !!state;
     const grantedCategories = (s) => {
       const out = [];
       if (!s) return out;
@@ -1796,6 +1807,11 @@
             recording: state.recording
           }
         });
+      } else if (!warnedNoAuditEndpoint && typeof console !== "undefined" && console.warn) {
+        warnedNoAuditEndpoint = true;
+        console.warn(
+          "[Blakfy Cookie] No data-blakfy-audit-endpoint configured \u2014 consent changes are not being recorded server-side. This means there is no proof-of-consent record (GDPR Art. 7(1) / KVKK Md.12) if ever challenged. See docs/compliance.md \xA710 for the payload shape and a reference endpoint, or set data-blakfy-audit-endpoint if you have already built one."
+        );
       }
       if (deps && typeof deps.pushGCM === "function") deps.pushGCM(state);
       if (deps && typeof deps.pushUET === "function") deps.pushUET(state);
@@ -1888,12 +1904,26 @@
       },
       isOptedOut: () => deps && typeof deps.isOptedOutCCPA === "function" ? !!deps.isOptedOutCCPA() : false
     };
+    const diagnose = () => {
+      if (deps && typeof deps.getDiagnostics === "function") {
+        return deps.getDiagnostics({ state, jurisdiction });
+      }
+      return {
+        placementOk: null,
+        defaultsFired: null,
+        presetsRegistered: [],
+        unrecognizedCookies: [],
+        googleConsentState: null,
+        note: "diagnostics unavailable \u2014 deps.getDiagnostics was not wired by bootstrap"
+      };
+    };
     return {
       version: VERSION,
       open,
       acceptAll,
       rejectAll,
       getConsent,
+      hasDecided,
       getState,
       onChange,
       setLocale,
@@ -1906,6 +1936,7 @@
       tcf,
       ccpa,
       getJurisdiction,
+      diagnose,
       __internal: { commit, setUI, closeUI }
     };
   };
@@ -2015,11 +2046,39 @@
 
   // src/compliance/google-cmv2.js
   var defaultsInstalled = false;
+  var warnedForeignDefault = false;
+  var STORAGE_KEYS = [
+    "ad_storage",
+    "ad_user_data",
+    "ad_personalization",
+    "analytics_storage",
+    "functionality_storage",
+    "personalization_storage"
+  ];
+  var warnIfForeignGrantedDefaultExists = (dataLayer) => {
+    if (warnedForeignDefault) return;
+    if (!Array.isArray(dataLayer) || dataLayer.length === 0) return;
+    if (typeof console === "undefined" || !console.warn) return;
+    for (const entry of dataLayer) {
+      if (!entry || typeof entry.length !== "number") continue;
+      if (entry[0] !== "consent" || entry[1] !== "default") continue;
+      const params = entry[2];
+      if (!params || typeof params !== "object") continue;
+      const grantedKeys = STORAGE_KEYS.filter((k) => params[k] === "granted");
+      if (grantedKeys.length === 0) continue;
+      warnedForeignDefault = true;
+      console.warn(
+        `[Blakfy Cookie] A gtag('consent','default', ...) call already in dataLayer grants [${grantedKeys.join(", ")}] before this widget's own denied-by-default signal. This usually means the host platform (Wix, Shopify, Squarespace, a WordPress consent plugin, ...) pushed its own default consent state ahead of ours \u2014 on Wix specifically this happens whenever the site's consentPolicy is left unset. Tags bound to that foreign default can fire before the visitor answers. Check the platform's own consent/privacy settings and confirm it is not shipping a conflicting default (see tariktunc/blakfy-cookie#24).`
+      );
+      return;
+    }
+  };
   var installDefaults = () => {
     if (typeof window === "undefined") return;
     if (defaultsInstalled) return;
     defaultsInstalled = true;
     window.dataLayer = window.dataLayer || [];
+    warnIfForeignGrantedDefaultExists(window.dataLayer);
     if (typeof window.gtag !== "function") {
       window.gtag = function() {
         window.dataLayer.push(arguments);
@@ -2036,6 +2095,7 @@
       wait_for_update: 500
     });
   };
+  var isDefaultsInstalled = () => defaultsInstalled;
   var pushGCM = (state) => {
     if (typeof window === "undefined") return;
     if (typeof window.gtag !== "function") return;
@@ -2349,10 +2409,24 @@
     statusUrl: CDN_BASE + "/status.json",
     statusEnabled: true
   };
+  var CAPTURED_SCRIPT_EL = typeof document !== "undefined" ? document.currentScript : null;
   var getScriptEl = () => {
-    if (document.currentScript) return document.currentScript;
+    if (CAPTURED_SCRIPT_EL) return CAPTURED_SCRIPT_EL;
+    if (typeof document === "undefined") return null;
     const all = document.getElementsByTagName("script");
     return all[all.length - 1] || null;
+  };
+  var detectPlacementIssue = (el2) => {
+    if (!el2) {
+      return "no usable <script> element could be resolved (document.currentScript was null and no fallback script was found) \u2014 this usually means the tag has the `async` attribute, which is not supported. Load this script WITHOUT async/defer, placed body-last, per the install docs.";
+    }
+    if (typeof el2.hasAttribute === "function" && el2.hasAttribute("async")) {
+      return "this script tag has the `async` attribute. document.currentScript is null for async scripts per spec, so this install cannot reliably read its own data-blakfy-* attributes and may silently fall back to the wrong <script> tag on the page. Remove `async` and load this script body-last instead.";
+    }
+    if (typeof document !== "undefined" && document.head && typeof el2.closest === "function" && el2.closest("head") === document.head) {
+      return "this script tag is placed in <head>. The install docs call for body-last placement; loading in <head> risks executing before the DOM the widget mounts into exists, and commonly pairs with `async`/`defer` mistakes. Move the tag to just before </body>.";
+    }
+    return null;
   };
   var readConfig = (scriptEl) => {
     const el2 = scriptEl || getScriptEl();
@@ -2423,11 +2497,54 @@
       storage: Array.isArray(storage) ? storage.slice() : []
     });
   };
+  var TWO_LABEL_PUBLIC_SUFFIXES = /* @__PURE__ */ new Set([
+    "com.tr",
+    "org.tr",
+    "net.tr",
+    "gov.tr",
+    "edu.tr",
+    "web.tr",
+    "gen.tr",
+    "av.tr",
+    "biz.tr",
+    "info.tr",
+    "name.tr",
+    "tv.tr",
+    "co.uk",
+    "org.uk",
+    "gov.uk",
+    "ac.uk",
+    "me.uk",
+    "ltd.uk",
+    "plc.uk",
+    "com.au",
+    "net.au",
+    "org.au",
+    "gov.au",
+    "edu.au",
+    "co.jp",
+    "or.jp",
+    "ne.jp",
+    "ac.jp",
+    "com.br",
+    "com.mx",
+    "com.ar",
+    "com.co",
+    "co.nz",
+    "co.za",
+    "co.in",
+    "co.id",
+    "co.kr"
+  ]);
   var getRootDomain = (host) => {
     if (!host) return "";
-    const parts = host.split(".");
+    const parts = host.split(".").filter(Boolean);
     if (parts.length <= 2) return host;
-    return parts.slice(-2).join(".");
+    const lastTwo = parts.slice(-2).join(".");
+    if (parts.length >= 3 && TWO_LABEL_PUBLIC_SUFFIXES.has(lastTwo)) {
+      return parts.slice(-3).join(".");
+    }
+    return lastTwo;
   };
   var expireCookie = (name) => {
     if (typeof document === "undefined") return;
@@ -2505,6 +2622,60 @@
       }
     }
     return { cookies: cookieCount, storage: storageCount };
+  };
+  var warnUnregisteredCookies = (presets) => {
+    if (!presets || typeof console === "undefined" || typeof console.warn !== "function") return [];
+    const allNames = readCookieNames();
+    if (!allNames.length) return [];
+    const found = [];
+    const presetKeys = Object.keys(presets);
+    for (let p = 0; p < presetKeys.length; p++) {
+      const preset = presets[presetKeys[p]];
+      if (!preset || rules.has(preset.category)) continue;
+      const matchers = preset.cookies || [];
+      for (let m = 0; m < matchers.length; m++) {
+        const matcher = matchers[m];
+        for (let n = 0; n < allNames.length; n++) {
+          const isMatch = matcher instanceof RegExp ? matcher.test(allNames[n]) : matcher === allNames[n];
+          if (!isMatch) continue;
+          found.push({ preset: presetKeys[p], name: preset.name, cookie: allNames[n] });
+        }
+      }
+    }
+    for (let i = 0; i < found.length; i++) {
+      console.warn(
+        "[Blakfy Cookie] Cookie '" + found[i].cookie + "' matches " + found[i].name + " but no data-blakfy-presets entry registers a cleanup rule for it. This cookie will NOT be deleted on reject/withdrawal. Add '" + found[i].preset + "' to data-blakfy-presets, or confirm this is expected."
+      );
+    }
+    return found;
+  };
+  var warnPreConsentCookies = (presets, getConsent) => {
+    if (!presets || typeof getConsent !== "function") return [];
+    if (typeof console === "undefined" || typeof console.warn !== "function") return [];
+    const allNames = readCookieNames();
+    if (!allNames.length) return [];
+    const found = [];
+    const presetKeys = Object.keys(presets);
+    for (let p = 0; p < presetKeys.length; p++) {
+      const preset = presets[presetKeys[p]];
+      if (!preset || !preset.category) continue;
+      if (getConsent(preset.category)) continue;
+      const matchers = preset.cookies || [];
+      for (let m = 0; m < matchers.length; m++) {
+        const matcher = matchers[m];
+        for (let n = 0; n < allNames.length; n++) {
+          const isMatch = matcher instanceof RegExp ? matcher.test(allNames[n]) : matcher === allNames[n];
+          if (!isMatch) continue;
+          found.push({ preset: presetKeys[p], name: preset.name, cookie: allNames[n] });
+        }
+      }
+    }
+    for (let i = 0; i < found.length; i++) {
+      console.warn(
+        "[Blakfy Cookie] Tracking cookie '" + found[i].cookie + "' (" + found[i].name + ") is present but consent for its category has NOT been granted. Something is writing this cookie outside Blakfy's gating \u2014 commonly a host platform (Wix/Shopify) injecting its own copy of the same tool. This is a compliance risk (pre-consent tracking) even though the widget itself did not load it."
+      );
+    }
+    return found;
   };
 
   // src/gating/placeholder.js
@@ -3265,6 +3436,7 @@
     isRTL,
     accent,
     theme,
+    locale,
     policyUrl,
     onAccept,
     onReject,
@@ -3276,6 +3448,7 @@
     card.setAttribute("role", "dialog");
     card.setAttribute("aria-labelledby", "blakfy-title");
     card.setAttribute("aria-describedby", "blakfy-desc");
+    if (locale) card.setAttribute("lang", locale);
     card.style.cssText = "--blakfy-accent:" + accent;
     if (theme && theme !== "light") card.setAttribute("data-blakfy-theme", theme);
     const h2 = document.createElement("h2");
@@ -3328,11 +3501,79 @@
   var activeRoot = null;
   var activeHandler = null;
   var activeEscape = null;
+  var restoreFocusTarget = null;
+  var inertedNodes = [];
+  var scrollLockApplied = false;
+  var prevBodyOverflow = "";
+  var prevScrollY = 0;
+  var supportsInert = () => typeof document !== "undefined" && "inert" in document.createElement("div");
+  var applyBackgroundInert = (skipEl) => {
+    if (typeof document === "undefined" || !document.body) return;
+    const useInert = supportsInert();
+    const children = document.body.children;
+    for (let i = 0; i < children.length; i++) {
+      const node = children[i];
+      if (node === skipEl || skipEl && node.contains(skipEl)) continue;
+      if (useInert) {
+        inertedNodes.push({ node, hadInert: node.hasAttribute("inert") });
+        node.setAttribute("inert", "");
+      } else {
+        inertedNodes.push({
+          node,
+          hadTabindex: node.hasAttribute("tabindex"),
+          prevTabindex: node.getAttribute("tabindex"),
+          hadAriaHidden: node.hasAttribute("aria-hidden")
+        });
+        node.setAttribute("tabindex", "-1");
+        node.setAttribute("aria-hidden", "true");
+      }
+    }
+  };
+  var removeBackgroundInert = () => {
+    const useInert = supportsInert();
+    for (let i = 0; i < inertedNodes.length; i++) {
+      const entry = inertedNodes[i];
+      if (useInert) {
+        if (!entry.hadInert) entry.node.removeAttribute("inert");
+      } else {
+        if (entry.hadTabindex) entry.node.setAttribute("tabindex", entry.prevTabindex);
+        else entry.node.removeAttribute("tabindex");
+        if (!entry.hadAriaHidden) entry.node.removeAttribute("aria-hidden");
+      }
+    }
+    inertedNodes = [];
+  };
+  var lockBodyScroll = () => {
+    if (typeof document === "undefined" || !document.body) return;
+    scrollLockApplied = true;
+    prevScrollY = typeof window !== "undefined" && (window.scrollY || window.pageYOffset) || 0;
+    prevBodyOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+  };
+  var unlockBodyScroll = () => {
+    if (!scrollLockApplied || typeof document === "undefined" || !document.body) return;
+    document.body.style.overflow = prevBodyOverflow;
+    scrollLockApplied = false;
+    if (typeof window !== "undefined" && typeof window.scrollTo === "function") {
+      try {
+        window.scrollTo(0, prevScrollY);
+      } catch (e) {
+      }
+    }
+  };
   var installFocusTrap = (rootEl, options) => {
+    const opts = options || {};
+    const opener = opts.returnFocus === false || typeof document === "undefined" ? null : document.activeElement;
     removeFocusTrap();
     if (!rootEl) return;
     activeRoot = rootEl;
-    activeEscape = options && options.onEscape;
+    activeEscape = opts.onEscape;
+    restoreFocusTarget = opener;
+    if (opts.trapBackground) {
+      const overlayRoot = rootEl.parentNode || rootEl;
+      applyBackgroundInert(overlayRoot);
+    }
+    if (opts.lockScroll) lockBodyScroll();
     activeHandler = (e) => {
       if (!activeRoot) return;
       if (e.key === "Escape") {
@@ -3363,6 +3604,12 @@
     if (activeHandler) {
       document.removeEventListener("keydown", activeHandler);
     }
+    removeBackgroundInert();
+    unlockBodyScroll();
+    if (restoreFocusTarget && typeof restoreFocusTarget.focus === "function" && typeof document !== "undefined" && document.body && document.body.contains(restoreFocusTarget)) {
+      restoreFocusTarget.focus();
+    }
+    restoreFocusTarget = null;
     activeRoot = null;
     activeHandler = null;
     activeEscape = null;
@@ -3816,8 +4063,9 @@
   var buildCatRow = (key, t, alwaysOn, checked) => {
     const c = safeGet(t, "cat." + key, {});
     const row = el("div", { class: "blakfy-cat" });
+    const titleId = "blakfy-cat-title-" + key;
     const text = el("div", { class: "blakfy-cat-text" });
-    const strong = el("strong", { text: c.title || key });
+    const strong = el("strong", { id: titleId, text: c.title || key });
     text.appendChild(strong);
     const span = el("span", {
       text: (c.desc || "") + (alwaysOn ? " (" + (c.always || "") + ")" : "")
@@ -3828,6 +4076,7 @@
       class: "blakfy-switch",
       role: "switch",
       "aria-checked": checked ? "true" : "false",
+      "aria-labelledby": titleId,
       "data-cat": key
     });
     if (alwaysOn) sw.disabled = true;
@@ -4034,6 +4283,7 @@
     isRTL,
     accent,
     theme,
+    locale,
     currentState,
     presets,
     version,
@@ -4045,9 +4295,11 @@
     const card = el("div", {
       class: "blakfy-card",
       role: "dialog",
+      "aria-modal": "true",
       "aria-labelledby": "blakfy-mtitle"
     });
     card.setAttribute("dir", isRTL ? "rtl" : "ltr");
+    if (locale) card.setAttribute("lang", locale);
     card.style.cssText = "--blakfy-accent:" + accent + ";position:relative";
     if (theme && theme !== "light") card.setAttribute("data-blakfy-theme", theme);
     const closeBtn = el("button", {
@@ -4444,6 +4696,16 @@
     if (window.BlakfyCookie && window.BlakfyCookie.__bootstrapped) return;
     const scriptEl = getScriptEl();
     const config = readConfig(scriptEl);
+    const placementIssue = detectPlacementIssue(scriptEl);
+    if (placementIssue && typeof console !== "undefined" && console.error) {
+      console.error("[Blakfy Cookie] Installation problem: " + placementIssue);
+    }
+    const defaultsFileRanFirst = typeof window !== "undefined" && !!window.__blakfyConsentDefaultsLoaded;
+    if (!defaultsFileRanFirst && typeof console !== "undefined" && console.warn) {
+      console.warn(
+        "[Blakfy Cookie] cookie-defaults.min.js did not run before this bundle initialised (window.__blakfyConsentDefaultsLoaded was not set). Consent Mode denied-by-default signals are being installed late by this bundle instead of at head-load time \u2014 any tag that fired before now had no default to respect. Add cookie-defaults.min.js in <head>, loaded first, per the install docs."
+      );
+    }
     const currentLocale = detectLocale({ configLocale: config.locale });
     const mainLang = detectMainLang({ configMainLang: config.mainLang });
     let t = getTranslation(currentLocale);
@@ -4535,7 +4797,19 @@
         optOutCCPA: optOut,
         isOptedOutCCPA: isOptedOut,
         removeFocusTrap,
-        openModal: (opts) => mountModal(opts)
+        openModal: (opts) => mountModal(opts),
+        // #43: BlakfyCookie.diagnose() — the self-check the issue asks for, one call
+        // instead of a manual browser session.
+        getDiagnostics: ({ jurisdiction: jur }) => ({
+          placementOk: !placementIssue,
+          placementIssue,
+          defaultsFileRanFirst,
+          gcmDefaultsFired: isDefaultsInstalled(),
+          presetsRegistered: activePresetList.slice(),
+          unrecognizedCookies: warnUnregisteredCookies(PRESETS).map((f) => f.cookie),
+          preConsentCookies: warnPreConsentCookies(PRESETS, api.getConsent).map((f) => f.cookie),
+          jurisdiction: jur
+        })
       }
     });
     api.__bootstrapped = true;
@@ -4546,7 +4820,11 @@
       t = info.t;
       isRTL = info.isRTL;
     });
-    api.getLeaks = () => scanForLeaks({ activePresetNames: activePresetList, presets: PRESETS, getConsent: api.getConsent });
+    api.getLeaks = () => scanForLeaks({
+      activePresetNames: activePresetList,
+      presets: PRESETS,
+      getConsent: api.getConsent
+    });
     if (!window.BlakfyCookie) {
       window.BlakfyCookie = api;
       try {
@@ -4562,6 +4840,18 @@
         }
       }, 3e3);
     }
+    if (typeof window.setTimeout === "function") {
+      window.setTimeout(() => {
+        try {
+          warnUnregisteredCookies(PRESETS);
+        } catch (e) {
+        }
+        try {
+          warnPreConsentCookies(PRESETS, api.getConsent);
+        } catch (e) {
+        }
+      }, 3e3);
+    }
     const mountBanner = () => {
       const overlay = document.createElement("div");
       overlay.className = ROOT_OVERLAY_CLASS + " widget " + resolvePosition(config.position);
@@ -4571,6 +4861,7 @@
         isRTL,
         accent: config.accent,
         theme,
+        locale: currentLocale,
         policyUrl: config.policyUrl,
         onAccept: () => api.acceptAll(),
         onReject: () => api.rejectAll(),
@@ -4608,6 +4899,7 @@
         isRTL,
         accent: config.accent,
         theme,
+        locale: currentLocale,
         currentState: state,
         presets: activePresetList,
         version: api.version,
@@ -4621,7 +4913,11 @@
       if (!isExplicit) trackedCards.add(card);
       mountBadges(card);
       installAntiTamper(card);
-      installFocusTrap(card, { onEscape: () => api.__internal.closeUI() });
+      installFocusTrap(card, {
+        onEscape: () => api.__internal.closeUI(),
+        trapBackground: true,
+        lockScroll: true
+      });
       return overlay;
     }
     if (state) {

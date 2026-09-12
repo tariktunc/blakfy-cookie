@@ -1,6 +1,12 @@
 import { describe, it, expect, vi, afterEach } from "vitest";
 
-import { readConfig, DEFAULTS, CDN_BASE, getScriptEl } from "../src/core/config.js";
+import {
+  readConfig,
+  DEFAULTS,
+  CDN_BASE,
+  getScriptEl,
+  detectPlacementIssue,
+} from "../src/core/config.js";
 
 const makeScript = (attrs) => {
   const el = document.createElement("script");
@@ -106,5 +112,35 @@ describe("getScriptEl (#22 regression)", () => {
     // no currentScript ever set in this environment for this call path
     Object.defineProperty(document, "currentScript", { value: null, configurable: true });
     expect(getScriptEl()).toBe(s2);
+  });
+});
+
+describe("detectPlacementIssue (#43)", () => {
+  afterEach(() => {
+    document.body.innerHTML = "";
+    document.head.innerHTML = "";
+  });
+
+  it("returns null for a normal body-last, non-async script", () => {
+    const el = document.createElement("script");
+    document.body.appendChild(el);
+    expect(detectPlacementIssue(el)).toBeNull();
+  });
+
+  it("flags a script with the async attribute", () => {
+    const el = document.createElement("script");
+    el.setAttribute("async", "");
+    document.body.appendChild(el);
+    expect(detectPlacementIssue(el)).toMatch(/async/);
+  });
+
+  it("flags a script placed in <head>", () => {
+    const el = document.createElement("script");
+    document.head.appendChild(el);
+    expect(detectPlacementIssue(el)).toMatch(/<head>/);
+  });
+
+  it("flags a missing/unresolvable script element", () => {
+    expect(detectPlacementIssue(null)).toMatch(/no usable/);
   });
 });

@@ -201,3 +201,50 @@ export const warnUnregisteredCookies = (presets) => {
 
   return found;
 };
+
+// #43: even when a category IS registered (data-blakfy-presets is correct), a
+// platform can still write that category's cookies before the visitor answers
+// (e.g. a Wix-injected Meta Pixel writing _fbp regardless of our gating, or any
+// tag loaded outside our type="text/plain" gate). warnUnregisteredCookies() above
+// only catches the "nothing registered at all" shape; this catches "registered,
+// but already present while consent for it is not granted" — cheap, and it
+// surfaces exactly the platform-injected-tag class of problem from the issue.
+export const warnPreConsentCookies = (presets, getConsent) => {
+  if (!presets || typeof getConsent !== "function") return [];
+  if (typeof console === "undefined" || typeof console.warn !== "function") return [];
+  const allNames = readCookieNames();
+  if (!allNames.length) return [];
+
+  const found = [];
+  const presetKeys = Object.keys(presets);
+  for (let p = 0; p < presetKeys.length; p++) {
+    const preset = presets[presetKeys[p]];
+    if (!preset || !preset.category) continue;
+    if (getConsent(preset.category)) continue; // consent granted — cookie is expected
+    const matchers = preset.cookies || [];
+    for (let m = 0; m < matchers.length; m++) {
+      const matcher = matchers[m];
+      for (let n = 0; n < allNames.length; n++) {
+        const isMatch =
+          matcher instanceof RegExp ? matcher.test(allNames[n]) : matcher === allNames[n];
+        if (!isMatch) continue;
+        found.push({ preset: presetKeys[p], name: preset.name, cookie: allNames[n] });
+      }
+    }
+  }
+
+  for (let i = 0; i < found.length; i++) {
+    console.warn(
+      "[Blakfy Cookie] Tracking cookie '" +
+        found[i].cookie +
+        "' (" +
+        found[i].name +
+        ") is present but consent for its category has NOT been granted. Something is " +
+        "writing this cookie outside Blakfy's gating — commonly a host platform " +
+        "(Wix/Shopify) injecting its own copy of the same tool. This is a compliance risk " +
+        "(pre-consent tracking) even though the widget itself did not load it."
+    );
+  }
+
+  return found;
+};

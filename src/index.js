@@ -8,7 +8,11 @@ import {
   isOptedOut as isOptedOutCCPA,
 } from "./compliance/ccpa.js";
 import { getDNT, applyDNT } from "./compliance/dnt.js";
-import { installDefaults as installGCMDefaults, pushGCM } from "./compliance/google-cmv2.js";
+import {
+  installDefaults as installGCMDefaults,
+  pushGCM,
+  isDefaultsInstalled as isGCMDefaultsInstalled,
+} from "./compliance/google-cmv2.js";
 import { getGPC, applyGPC } from "./compliance/gpc.js";
 import { installDefaults as installUETDefaults, pushUET } from "./compliance/microsoft-uet.js";
 import { installTCFAPI, getTCString } from "./compliance/tcf-v2.js";
@@ -16,10 +20,15 @@ import {
   installDefaults as installYandexDefaults,
   applyYandex,
 } from "./compliance/yandex-metrica.js";
-import { getScriptEl, readConfig } from "./core/config.js";
+import { getScriptEl, readConfig, detectPlacementIssue } from "./core/config.js";
 import { readCookie } from "./core/consent-store.js";
 import { createEmitter } from "./core/events.js";
-import { runCleanup, registerCleanup, warnUnregisteredCookies } from "./gating/cleaner.js";
+import {
+  runCleanup,
+  registerCleanup,
+  warnUnregisteredCookies,
+  warnPreConsentCookies,
+} from "./gating/cleaner.js";
 import { unblockIframes, installPlaceholders } from "./gating/iframe-unblocker.js";
 import { scanForLeaks, warnLeaks } from "./gating/leak-detector.js";
 import { startObserver, scanAll } from "./gating/observer.js";
@@ -73,6 +82,30 @@ const bootstrap = async () => {
   // 1. config
   const scriptEl = getScriptEl();
   const config = readConfig(scriptEl);
+
+  // #43: an inert widget with no error is the worst failure shape for a compliance
+  // product. Catch the two placement mistakes found in the field (async attribute,
+  // <head> placement) before anything else runs.
+  const placementIssue = detectPlacementIssue(scriptEl);
+  if (placementIssue && typeof console !== "undefined" && console.error) {
+    console.error("[Blakfy Cookie] Installation problem: " + placementIssue);
+  }
+
+  // #43: was window.__blakfyConsentDefaultsLoaded (cookie-defaults.min.js) set BEFORE
+  // this main bundle ran? If not, any tag that fired between page load and this point
+  // never saw a "denied" Consent Mode default — the file that "makes the whole thing
+  // lawful for Google tags" (issue #43) silently never loaded.
+  const defaultsFileRanFirst =
+    typeof window !== "undefined" && !!window.__blakfyConsentDefaultsLoaded;
+  if (!defaultsFileRanFirst && typeof console !== "undefined" && console.warn) {
+    console.warn(
+      "[Blakfy Cookie] cookie-defaults.min.js did not run before this bundle initialised " +
+        "(window.__blakfyConsentDefaultsLoaded was not set). Consent Mode denied-by-default " +
+        "signals are being installed late by this bundle instead of at head-load time — any " +
+        "tag that fired before now had no default to respect. Add cookie-defaults.min.js in " +
+        "<head>, loaded first, per the install docs."
+    );
+  }
 
   // 2. locale + translations
   const currentLocale = detectLocale({ configLocale: config.locale });
@@ -199,6 +232,18 @@ const bootstrap = async () => {
       isOptedOutCCPA: isOptedOutCCPA,
       removeFocusTrap: removeFocusTrap,
       openModal: (opts) => mountModal(opts),
+      // #43: BlakfyCookie.diagnose() — the self-check the issue asks for, one call
+      // instead of a manual browser session.
+      getDiagnostics: ({ jurisdiction: jur }) => ({
+        placementOk: !placementIssue,
+        placementIssue: placementIssue,
+        defaultsFileRanFirst: defaultsFileRanFirst,
+        gcmDefaultsFired: isGCMDefaultsInstalled(),
+        presetsRegistered: activePresetList.slice(),
+        unrecognizedCookies: warnUnregisteredCookies(PRESETS).map((f) => f.cookie),
+        preConsentCookies: warnPreConsentCookies(PRESETS, api.getConsent).map((f) => f.cookie),
+        jurisdiction: jur,
+      }),
     },
   });
 
@@ -254,6 +299,13 @@ const bootstrap = async () => {
     window.setTimeout(() => {
       try {
         warnUnregisteredCookies(PRESETS);
+      } catch (e) {
+        /* ignore */
+      }
+      // #43: registered-but-already-present pre-consent cookies (platform-injected
+      // tags bypassing our gate). Same delayed timing, same reason.
+      try {
+        warnPreConsentCookies(PRESETS, api.getConsent);
       } catch (e) {
         /* ignore */
       }
