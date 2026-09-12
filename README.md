@@ -21,6 +21,14 @@
 
 unpkg da çalışır: `unpkg.com/@blakfy/cookie@2.2.0/dist/cookie.min.js`.
 
+> ⚠️ **SRI (Subresource Integrity) — zorunlu okuma.** Bu script `<head>`'de en önce yüklenen,
+> `ESSENTIAL` kategoride tag-gating'den muaf, tüm sayfa üzerinde en yüksek yetkiye sahip
+> script'tir. CDN'den `integrity`/`crossorigin` olmadan yüklemek, tedarik zinciri (supply-chain)
+> saldırısına açık kapı bırakır — bkz. [docs/compliance.md §13](./docs/compliance.md#13-content-security-policy-csp--sri-subresource-integrity).
+> Her zaman **pinned** bir sürüm (`@2.3.2`, ASLA `@2`/`@latest`) + `integrity` hash'i birlikte
+> kullan; auto-patch tag SRI'yı by design bozar (hash sürümle birlikte değişir). Hash'ler her
+> release'de `npm run sri` ile üretilir — bkz. Quick Start adım 1 ve 3.
+
 ### B) npm / bundler (Vite, Webpack, Rollup, Astro)
 
 ```bash
@@ -47,7 +55,12 @@ Bundler ile gelen versiyonu kontrol etmek için: `import { version } from "@blak
 
 ```html
 <!-- Bootstrap: Tüm consent sinyallerini 'denied' olarak başlatır -->
-<script src="https://cdn.jsdelivr.net/npm/@blakfy/cookie@2.2.0/dist/cookie-defaults.min.js"></script>
+<!-- integrity: her release'de "npm run sri" ile üretilir (dist/sri-hashes.json) -->
+<script
+  src="https://cdn.jsdelivr.net/npm/@blakfy/cookie@2.2.0/dist/cookie-defaults.min.js"
+  integrity="sha384-<npm run sri çıktısındaki hash>"
+  crossorigin="anonymous"
+></script>
 ```
 
 ### 2. Site içerik script'lerin (GTM/GA4/Pixel/Clarity vb.)
@@ -73,8 +86,11 @@ Bunlar olduğu gibi kalır. Bootstrap zaten consent default'larını `denied` ol
 ### 3. Widget (body sonu, `</body>`'den önce)
 
 ```html
+<!-- integrity: her release'de "npm run sri" ile üretilir (dist/sri-hashes.json) -->
 <script
   src="https://cdn.jsdelivr.net/npm/@blakfy/cookie@2.2.0/dist/cookie.min.js"
+  integrity="sha384-<npm run sri çıktısındaki hash>"
+  crossorigin="anonymous"
   data-blakfy-locale="auto"
   data-blakfy-policy-url="/cerez-politikasi"
   data-blakfy-version="1.0"

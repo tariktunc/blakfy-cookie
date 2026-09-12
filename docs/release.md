@@ -17,6 +17,8 @@ Operator-facing guide for cutting a Blakfy Cookie release. Bu repository iki npm
 - [ ] Build çalışıyor: `npm run build:all` (esbuild + tsup)
 - [ ] Test green: `npm test`
 - [ ] Boyut bütçesi: `npm run size` (core ≤ 32 KB)
+- [ ] SRI hash'leri güncel: `npm run sri` (#29 — build'den SONRA, tag'ten ÖNCE çalıştır;
+      çıktıyı README Quick Start snippet'lerine ve `docs/compliance.md` §13'e yapıştır)
 - [ ] `npm pack --dry-run` (kök) ve `cd packages/cookie-next && npm pack --dry-run` ile tarball içeriği doğrulandı
   - Kök paket için: `dist/`, `status.json`, README, ARCHITECTURE.md, COMPLIANCE.md, TCF-CERTIFICATION.md, MIGRATION.md, CHANGELOG.md, LICENSE
   - cookie-next için: `dist/index.{js,mjs,d.ts,d.mts}`, README
@@ -58,6 +60,7 @@ Doğrulama: `npm whoami` → kullanıcı adın görünmeli.
 npm install                       # ilk kurulum veya lockfile değiştiyse
 npm run build:all                 # esbuild + tsup
 npm test
+npm run sri                       # #29: dist/sri-hashes.json — README + compliance.md §13'e yapıştır
 npm pack --dry-run                # ana paket içeriği
 cd packages/cookie-next
 npm pack --dry-run                # cookie-next içeriği

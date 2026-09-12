@@ -196,4 +196,84 @@ Her consent değişikliği `data-blakfy-audit-endpoint`'e POST edilir:
 - `yandex-metrica.test.js` — cookie engelleme, Webvisor ayrı kategori
 - `tcf-v2.test.js` — `__tcfapi` komut yüzeyi, TC string format
 - `ccpa.test.js` — USP string, DNT/GPC saygısı
+
+---
+
+## 13. Content Security Policy (CSP) + SRI (Subresource Integrity)
+
+> #29 kapsamı. Consent script'i `<head>`'de ilk yüklenen, `ESSENTIAL` kategoride
+> tag-gating'den muaf, sayfadaki her şeyden önce çalışan script — yani en yüksek
+> yetkiye sahip kod. Tedarik zinciri (supply-chain) riski buradan yönetilir.
+
+### 13.1 SRI — CDN'den yüklerken zorunlu
+
+Public CDN'den (jsDelivr/unpkg) yükleyen her site, `integrity` + `crossorigin="anonymous"`
+kullanmalı. Hash'ler elle yazılmaz — her release'de üretilir:
+
+```bash
+npm run build      # dist/ artefact'larını üretir
+npm run sri        # dist/sri-hashes.json + stdout tablosu
+```
+
+Script `dist/cookie-defaults.min.js` ve `dist/cookie.min.js` için sha384 hash üretir
+(bkz. `scripts/generate-sri.js`, `tests/scripts/generate-sri.test.js`). Kaynak:
+`docs/release.md` pre-release checklist'e `npm run sri` adımı eklendi — hash, o release'de
+gerçekten yayınlanan tarball'dan üretilir, elle girilmez ve sürümle birlikte drift edemez.
+
+**Kurallar:**
+
+- **Pinned sürüm zorunlu** (`@2.3.2`). `@2` / `@latest` gibi floating tag SRI'yı by
+  design bozar — dosya değiştikçe hash de değişir, tarayıcı script'i bloklar.
+- Hash her `dist/` değişikliğinde (her patch/minor/major) yeniden üretilmeli.
+- README Quick Start snippet'leri (adım 1 + adım 3) `integrity`/`crossorigin` içerir —
+  bkz. [README.md § Installation](../README.md#installation).
+
+### 13.2 Self-host seçeneği
+
+Üçüncü parti CDN'i kabul etmeyen client'lar için: `dist/` klasörünü indirip kendi
+origin'inden serve et.
+
+```bash
+npm pack @blakfy/cookie   # tarball indir, dist/ içeriğini çıkar
+```
+
+Kendi origin'inden servis edilen dosyada `integrity` gerekmez (aynı origin, tarayıcı
+zaten güveniyor) ama sürüm takibi elle yapılmalı — otomatik `@2` auto-patch avantajı kaybolur.
+
+### 13.3 CSP uyumluluğu
+
+Widget çalışma zamanında 3 adet `<style>` elementi enjekte eder:
+
+```js
+document.querySelectorAll('style[id^="blakfy"]').length; // 3
+```
+
+Bu, host site'ın CSP'sinde en az birini gerektirir:
+
+| Yaklaşım                        | Direktif                                         | Not                                                                                     |
+| ------------------------------- | ------------------------------------------------ | --------------------------------------------------------------------------------------- |
+| **En basit (sıkı olmayan CSP)** | `style-src 'unsafe-inline'`                      | Hızlı kurulum, ama CSP'yi zayıflatır                                                    |
+| **Nonce tabanlı**               | `style-src 'nonce-<random>'`                     | ⏳ Henüz desteklenmiyor — widget'ta configurable nonce yok (takip: issue #29 checklist) |
+| **Hash tabanlı**                | `style-src 'sha256-<her style bloğu için hash>'` | Enjekte edilen içerik dinamik (locale/theme'e göre değişir) → pratik değil              |
+
+Script tarafı: widget `eval`/`new Function` kullanmaz, `<script>` içine inline kod
+yazmaz — dolayısıyla `script-src 'self' https://cdn.jsdelivr.net` (veya self-host
+ediliyorsa sadece `'self'`) yeterlidir, `'unsafe-inline'` script-src'de gerekmez.
+
+**Minimum çalışan CSP (CDN kurulum):**
+
+```
+Content-Security-Policy:
+  script-src 'self' https://cdn.jsdelivr.net;
+  style-src 'self' 'unsafe-inline';
+  connect-src 'self' https://blakfy.com;
+```
+
+`connect-src` sadece `data-blakfy-audit-endpoint` (§10) veya status bar (`data-blakfy-status-url`)
+kullanılıyorsa gerekir.
+
+**Doğrulanmadı / açık:** Sıkı CSP (`default-src 'self'`, `style-src` olmadan) altında
+gerçek bir tarayıcıda uçtan uca test edilmedi — bkz. issue #29 "Not verified" bölümü.
+Configurable nonce desteği ve tek harici stylesheet'e geçiş ayrı bir iş kalemi.
+
 - `gpc.test.js` — auto-deny davranışı

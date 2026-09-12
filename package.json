@@ -64,6 +64,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "size": "node scripts/build.js --size-check",
+    "sri": "node scripts/generate-sri.js",
     "release:dry": "echo 'Run: git tag v2.x.x && git push --tags'",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
