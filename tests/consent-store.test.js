@@ -36,7 +36,7 @@ describe("consent-store readCookie", () => {
 });
 
 describe("consent-store writeCookie", () => {
-  it("sets SameSite=Strict (visible only via document.cookie attrs would be hidden in jsdom — assert via spy)", () => {
+  it("#30 item 2: sets SameSite=Strict — confirmed intentional, see the writeCookie comment (consent is read via document.cookie, never a cross-site request header, so Strict has no re-consent-on-external-link defect)", () => {
     let captured = "";
     const orig = Object.getOwnPropertyDescriptor(Document.prototype, "cookie");
     Object.defineProperty(document, "cookie", {

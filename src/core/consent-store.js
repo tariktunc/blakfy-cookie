@@ -19,6 +19,17 @@ export const readCookie = (policyVersion) => {
 // default — unchanged behaviour for every existing install. Passing ".example.com"
 // lets one consent decision carry across apex + subdomains instead of asking again
 // on each one.
+// #30 (item 2) — SameSite=Strict confirmed intentional, not changed to Lax:
+// SameSite governs whether the cookie is attached to the *HTTP request* on a cross-site
+// top-level navigation (e.g. a visitor clicking in from Google/an email/another site).
+// This widget never reads consent server-side from that request header — it reads
+// `document.cookie` client-side, after the page has loaded (see readCookie above), which is
+// unaffected by SameSite: the cookie is still in the jar and still visible to JS on the same
+// origin regardless of how the visitor arrived. So Strict causes no "banner re-shows after an
+// external link click" defect — there is nothing here for Lax to fix, and Strict is strictly
+// safer (blocks the record from ever being attached to a cross-site request at all, which
+// matters more for a consent cookie than for a session cookie). Covered by
+// tests/consent-store.test.js "#30 item 2: SameSite=Strict".
 export const writeCookie = (state, domain) => {
   const expires = new Date(Date.now() + COOKIE_TTL_DAYS * 86400000).toUTCString();
   const secure = window.location.protocol === "https:" ? "; Secure" : "";
