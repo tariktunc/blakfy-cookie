@@ -134,6 +134,15 @@
     "postcss": "^8.5.10",
     "esbuild": "^0.25.0"
   },
+  "browserslist": [
+    "chrome >= 63",
+    "edge >= 79",
+    "firefox >= 58",
+    "safari >= 12",
+    "ios >= 12",
+    "samsung >= 8",
+    "not ie 11"
+  ],
   "lint-staged": {
     "*.{js,ts,tsx,jsx}": [
       "eslint --fix --max-warnings=999",

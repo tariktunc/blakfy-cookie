@@ -70,4 +70,26 @@ describe("unblockScripts", () => {
     expect(unblockScripts(null)).toBe(0);
     expect(unblockScripts("")).toBe(0);
   });
+
+  // #30 item 5: fail-closed by construction — a gated tag stays exactly as the site author
+  // wrote it (type="text/plain", never executed by the browser) unless and until
+  // unblockScripts() is explicitly called for its category. There is no code path that
+  // "releases" a tag as a side effect of the widget merely loading, failing to load, or
+  // throwing during init — so an unsupported browser or a broken CDN can never leak a
+  // gated tag, without any dedicated error-handling code for that case.
+  it("a gated tag stays inert with zero interaction from this module (simulates widget never running at all)", () => {
+    const orig = document.createElement("script");
+    orig.setAttribute("type", "text/plain");
+    orig.setAttribute("data-blakfy-category", "marketing");
+    orig.setAttribute("data-blakfy-src", "https://example.test/never-unblocked.js");
+    document.body.appendChild(orig);
+
+    // No call to unblockScripts() at all — the "widget never initialised" case.
+    const live = document.querySelector('script[src="https://example.test/never-unblocked.js"]');
+    expect(live).toBeNull();
+    const stillBlocked = document.querySelector(
+      'script[type="text/plain"][data-blakfy-src="https://example.test/never-unblocked.js"]'
+    );
+    expect(stillBlocked).not.toBeNull();
+  });
 });

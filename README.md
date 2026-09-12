@@ -585,6 +585,32 @@ window.__tcfapi("getTCData", 2, (data, success) => console.log(data));
 
 ---
 
+## Browser Desteği (#30 item 5)
+
+`scripts/build.js` her hedefi esbuild `target: ["es2018"]` ile derler — bu, desteklenen
+tarayıcı matrisinin **build-time zorlaması**dır: kod bu hedefin üstüne çıkan sözdizimi
+kullanırsa build kırılır, o yüzden "declared matrix" ile "gerçekten çalışan matrix" kayamaz.
+
+| Tarayıcı                 | Minimum sürüm      | Not                                                                                                         |
+| ------------------------ | ------------------ | ----------------------------------------------------------------------------------------------------------- |
+| Chrome / Edge (Chromium) | 63+                | —                                                                                                           |
+| Firefox                  | 58+                | —                                                                                                           |
+| Safari / iOS Safari      | 12+                | —                                                                                                           |
+| Samsung Internet         | 8.0+               | Chromium tabanlı, Chrome ile hizalı                                                                         |
+| Internet Explorer        | **Desteklenmiyor** | `Promise`, `MutationObserver`, template literal gibi ES2018 öncesi polyfill edilmeyen özellikler kullanılır |
+
+**Fail-closed garantisi:** Widget hiç çalışmasa bile (eski tarayıcı, syntax hatası, bundle 404) etiketler AÇILMAZ. Bunun sebebi kod değil, mimari: gated script/iframe'ler sitenin
+kendi HTML'inde `type="text/plain"` / `data-blakfy-src` olarak "inert" (tarayıcının
+çalıştırmayacağı) halde durur (bkz. [Tag-Gating](#tag-gating)). Onları gerçek
+`<script src>`'e çeviren tek yol widget'ın `unblockScripts()`/`unblockIframes()`
+fonksiyonlarıdır — widget hiç init olmazsa bu fonksiyonlar hiç çağrılmaz, dolayısıyla
+etiketler varsayılan (bloklu) halinde kalır. "Widget çalışmadı ama etiketler sızdı" senaryosu
+bu tasarımda yapısal olarak imkansızdır, ayrı bir hata-yönetimi kodu gerektirmez.
+Bkz. `tests/gating-scripts.test.js` "#30 item 5" ve #43 (sessiz kurulum hatalarını
+yükseltme).
+
+---
+
 ## Troubleshooting
 
 ### Widget hiç görünmüyor
