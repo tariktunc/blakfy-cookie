@@ -35,7 +35,7 @@ import { startObserver, scanAll } from "./gating/observer.js";
 import { unblockScripts } from "./gating/script-unblocker.js";
 import { detectJurisdiction } from "./geo/jurisdiction.js";
 import { detectLocale, detectMainLang, RTL_LOCALES } from "./i18n/detect.js";
-import { getTranslation } from "./i18n/index.js";
+import { getTranslation, loadTranslation } from "./i18n/index.js";
 import { applyPreset, PRESETS } from "./presets/_registry.js";
 import { mountBadges, installAntiTamper } from "./ui/badge.js";
 import { createBanner } from "./ui/banner.js";
@@ -110,7 +110,12 @@ const bootstrap = async () => {
   // 2. locale + translations
   const currentLocale = detectLocale({ configLocale: config.locale });
   const mainLang = detectMainLang({ configMainLang: config.mainLang });
-  let t = getTranslation(currentLocale);
+  // #38: tr/en are bundled inline; every other locale is a separate dist/i18n/{locale}.min.js
+  // chunk fetched here as a sibling of this script's own src. Nothing has rendered yet at
+  // this point in init(), so awaiting it costs one extra network round trip on first paint
+  // for non-tr/en sites only, and never touches tr/en sites (getTranslation resolves them
+  // synchronously without going through loadTranslation's script-injection path).
+  let t = await loadTranslation(currentLocale, scriptEl && scriptEl.src);
   let isRTL = RTL_LOCALES.indexOf(currentLocale) > -1;
 
   // 2b. resolve theme via bridge: explicit (light/dark/gray) bypasses bridge;
@@ -216,6 +221,7 @@ const bootstrap = async () => {
     config: config,
     emitter: emitter,
     locale: currentLocale,
+    baseHref: scriptEl && scriptEl.src,
     mainLang: mainLang,
     jurisdiction: jurisdiction,
     deps: {

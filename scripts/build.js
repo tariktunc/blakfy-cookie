@@ -8,10 +8,13 @@ import { gzipSync } from "node:zlib";
 
 import { build, context } from "esbuild";
 
+import { REMOTE_LOCALES } from "../src/i18n/index.js";
+
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(__dirname, "..");
 const SRC = resolve(ROOT, "src");
 const DIST = resolve(ROOT, "dist");
+const I18N_DIST = resolve(DIST, "i18n");
 
 const args = new Set(process.argv.slice(2));
 const WATCH = args.has("--watch");
@@ -66,12 +69,55 @@ const TARGETS = [
 ];
 
 const BUDGETS = {
-  "cookie.min.js": 32 * 1024, // raised: service-metadata DB + 3-tab modal added
+  "cookie.min.js": 32 * 1024, // #38: tr/en bundled inline, other 21 locales split into dist/i18n/
   "cookie-defaults.min.js": 1.5 * 1024,
 };
 
+// #38: per-locale budget for the code-split dist/i18n/{locale}.min.js chunks. Generous —
+// these are fetched at most once per (site, locale) and never touch tr/en visitors at all.
+const I18N_CHUNK_BUDGET = 3 * 1024;
+
 const ensureDist = async () => {
   if (!existsSync(DIST)) await mkdir(DIST, { recursive: true });
+  if (!existsSync(I18N_DIST)) await mkdir(I18N_DIST, { recursive: true });
+};
+
+// #38: build one dist/i18n/{locale}.min.js chunk per remote locale. Each chunk imports only
+// its own translation module and registers it on window.__blakfyI18n — src/i18n/index.js's
+// loadTranslation() injects a <script src> pointing at these files as siblings of the main
+// bundle, only for a locale that isn't tr/en.
+const buildI18nChunks = async () => {
+  for (let i = 0; i < REMOTE_LOCALES.length; i++) {
+    const locale = REMOTE_LOCALES[i];
+    const translationPath = resolve(SRC, "i18n/translations", locale + ".js").replace(/\\/g, "/");
+    const stdinContents =
+      'import t from "' +
+      translationPath +
+      '";\n' +
+      "window.__blakfyI18n = window.__blakfyI18n || {};\n" +
+      'window.__blakfyI18n["' +
+      locale +
+      '"] = t;\n';
+    await build({
+      stdin: {
+        contents: stdinContents,
+        resolveDir: SRC,
+        sourcefile: locale + "-i18n-entry.js",
+        loader: "js",
+      },
+      bundle: true,
+      platform: "browser",
+      target: ["es2018"],
+      format: "iife",
+      minify: true,
+      sourcemap: false,
+      logLevel: "silent",
+      outfile: resolve(I18N_DIST, locale + ".min.js"),
+    });
+  }
+  process.stdout.write(
+    "[i18n]     " + REMOTE_LOCALES.length + " remote locale chunks -> dist/i18n/\n"
+  );
 };
 
 const copyTypes = async () => {
@@ -95,6 +141,7 @@ const buildAll = async () => {
       sourcemap: t.sourcemap,
     });
   }
+  await buildI18nChunks();
   await copyTypes();
 };
 
@@ -113,6 +160,7 @@ const watchAll = async () => {
     await c.watch();
     ctxs.push(c);
   }
+  await buildI18nChunks(); // #38: remote locale chunks aren't watched, just built once up front
   process.stdout.write("[blakfy] watching " + TARGETS.length + " targets...\n");
 };
 
@@ -157,6 +205,32 @@ const sizeCheck = async () => {
         r.status +
         "\n"
     );
+  }
+
+  // #38: also check every remote i18n chunk against a per-locale budget, so a translation
+  // file bloating out doesn't silently defeat the point of splitting it out.
+  if (existsSync(I18N_DIST)) {
+    for (let i = 0; i < REMOTE_LOCALES.length; i++) {
+      const locale = REMOTE_LOCALES[i];
+      const p = resolve(I18N_DIST, locale + ".min.js");
+      if (!existsSync(p)) continue;
+      const buf = await readFile(p);
+      const gz = gzipSync(buf);
+      const pass = gz.length <= I18N_CHUNK_BUDGET;
+      if (!pass) failed = true;
+      process.stdout.write(
+        ("i18n/" + locale + ".min.js").padEnd(26) +
+          " " +
+          fmtKB(buf.length).padEnd(11) +
+          " " +
+          fmtKB(gz.length).padEnd(11) +
+          " " +
+          fmtKB(I18N_CHUNK_BUDGET).padEnd(11) +
+          " " +
+          (pass ? "PASS" : "FAIL") +
+          "\n"
+      );
+    }
   }
 
   if (failed) {

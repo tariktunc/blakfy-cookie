@@ -1,55 +1,96 @@
-// blakfy-cookie/src/i18n/index.js — aggregates 23 translation modules and exposes lookup with fallback
+// blakfy-cookie/src/i18n/index.js — locale registry with code-split remote translations (#38)
+//
+// Only the two most common locales for Blakfy sites (tr, en) are bundled into the main
+// entry. The other 21 languages ship as separate dist/i18n/{locale}.min.js chunks, built
+// by scripts/build.js, and are fetched on demand via a <script> tag sibling to the main
+// bundle's own <script src>. This keeps every site's actual download small: most sites
+// only ever need tr/en and never pay for the other 21 languages.
+//
+// Loaded chunks are cached on window.__blakfyI18n so a page with more than one widget
+// instance, or a locale switch back and forth, only fetches each language once.
 
-import ar from "./translations/ar.js";
-import cs from "./translations/cs.js";
-import de from "./translations/de.js";
 import en from "./translations/en.js";
-import es from "./translations/es.js";
-import fa from "./translations/fa.js";
-import fr from "./translations/fr.js";
-import he from "./translations/he.js";
-import it from "./translations/it.js";
-import ru from "./translations/ru.js";
 import tr from "./translations/tr.js";
-import uk from "./translations/uk.js";
-import ur from "./translations/ur.js";
-import pt from "./translations/pt.js";
-import nl from "./translations/nl.js";
-import pl from "./translations/pl.js";
-import sv from "./translations/sv.js";
-import zhTW from "./translations/zh-TW.js";
-import zh from "./translations/zh.js";
-import ja from "./translations/ja.js";
-import ko from "./translations/ko.js";
-import id from "./translations/id.js";
-import hi from "./translations/hi.js";
 
 export const DEFAULT_LOCALE = "tr";
 
-export const TRANSLATIONS = {
-  tr,
-  en,
-  ar,
-  fa,
-  ur,
-  fr,
-  ru,
-  de,
-  he,
-  uk,
-  es,
-  it,
-  pt,
-  nl,
-  pl,
-  sv,
-  cs,
-  zh,
-  "zh-TW": zhTW,
-  ja,
-  ko,
-  id,
-  hi,
+// Bundled inline — always available synchronously, no network needed.
+export const TRANSLATIONS = { tr, en };
+
+// Shipped as separate chunks under dist/i18n/. Keep this list in sync with
+// src/i18n/translations/*.js minus the two bundled locales above.
+export const REMOTE_LOCALES = [
+  "ar",
+  "cs",
+  "de",
+  "es",
+  "fa",
+  "fr",
+  "he",
+  "hi",
+  "id",
+  "it",
+  "ja",
+  "ko",
+  "nl",
+  "pl",
+  "pt",
+  "ru",
+  "sv",
+  "uk",
+  "ur",
+  "zh",
+  "zh-TW",
+];
+
+export const isRemoteLocale = (locale) => REMOTE_LOCALES.indexOf(locale) > -1;
+
+const remoteCache = () => {
+  if (typeof window === "undefined") return null;
+  window.__blakfyI18n = window.__blakfyI18n || {};
+  return window.__blakfyI18n;
 };
 
-export const getTranslation = (locale) => TRANSLATIONS[locale] || TRANSLATIONS[DEFAULT_LOCALE];
+// Synchronous lookup only — bundled locales + whatever remote chunk already loaded.
+// Never triggers a network request. Falls back to DEFAULT_LOCALE, matching the old
+// (pre-#38) getTranslation contract so every existing caller keeps working unchanged.
+export const getTranslation = (locale) => {
+  if (TRANSLATIONS[locale]) return TRANSLATIONS[locale];
+  const cache = remoteCache();
+  if (cache && cache[locale]) return cache[locale];
+  return TRANSLATIONS[DEFAULT_LOCALE];
+};
+
+const inflight = new Map();
+
+// Async — the only path that may fetch a remote chunk. `baseHref` is the currently
+// running <script>'s src (see core/config.js getScriptEl); chunks are resolved as
+// siblings of it: ".../i18n/{locale}.min.js". Resolves to a translation object;
+// never rejects — any failure (no baseHref, network error, timeout) resolves to the
+// DEFAULT_LOCALE translation so the widget always has usable text.
+export const loadTranslation = (locale, baseHref) => {
+  if (TRANSLATIONS[locale]) return Promise.resolve(TRANSLATIONS[locale]);
+  const cache = remoteCache();
+  if (cache && cache[locale]) return Promise.resolve(cache[locale]);
+  if (!isRemoteLocale(locale) || !baseHref || typeof document === "undefined") {
+    return Promise.resolve(TRANSLATIONS[DEFAULT_LOCALE]);
+  }
+  if (inflight.has(locale)) return inflight.get(locale);
+
+  const p = new Promise((resolvePromise) => {
+    const base = baseHref.replace(/\/[^/]*$/, "/");
+    const script = document.createElement("script");
+    script.src = base + "i18n/" + locale + ".min.js";
+    script.async = true;
+    const finish = () => {
+      const loaded = remoteCache();
+      resolvePromise((loaded && loaded[locale]) || TRANSLATIONS[DEFAULT_LOCALE]);
+    };
+    script.onload = finish;
+    script.onerror = finish;
+    document.head.appendChild(script);
+  }).finally(() => inflight.delete(locale));
+
+  inflight.set(locale, p);
+  return p;
+};

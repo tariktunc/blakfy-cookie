@@ -4,13 +4,14 @@ import { postAudit } from "./core/audit.js";
 import { writeCookie, buildState } from "./core/consent-store.js";
 import { scanAll } from "./gating/observer.js";
 import { normalizeLocale, RTL_LOCALES } from "./i18n/detect.js";
-import { getTranslation, DEFAULT_LOCALE } from "./i18n/index.js";
+import { getTranslation, loadTranslation, DEFAULT_LOCALE } from "./i18n/index.js";
 
 const VERSION = "2.2.0";
 const CATEGORIES = ["analytics", "marketing", "functional", "recording"];
 
 export const createAPI = (ctx) => {
   const { config, emitter, deps } = ctx;
+  const baseHref = ctx.baseHref;
   let state = ctx.state || null;
   let currentLocale = ctx.locale;
   const mainLang = ctx.mainLang;
@@ -210,12 +211,25 @@ export const createAPI = (ctx) => {
     emitter.on("consent:" + category, fn);
   };
 
+  // #38: setLocale() stays a synchronous public contract (types.d.ts: void return) — it
+  // must not become a Promise callers are expected to await. It applies whichever
+  // translation is already available immediately (bundled tr/en, or an already-loaded
+  // remote chunk), then — for a remote locale not yet fetched — kicks off the
+  // code-split dist/i18n/{locale}.min.js load in the background and re-emits "locale"
+  // a second time once it lands, so any UI already re-rendered from the first emit
+  // (with DEFAULT_LOCALE text as an interim fallback) gets corrected in place.
   const setLocale = (loc) => {
     const resolved = normalizeLocale(loc);
     if (!resolved) return;
     currentLocale = resolved;
     t = getTranslation(resolved) || getTranslation(DEFAULT_LOCALE);
     emitter.emit("locale", { locale: resolved, t: t, isRTL: RTL_LOCALES.indexOf(resolved) > -1 });
+
+    loadTranslation(resolved, baseHref).then((loaded) => {
+      if (currentLocale !== resolved || !loaded || loaded === t) return;
+      t = loaded;
+      emitter.emit("locale", { locale: resolved, t: t, isRTL: RTL_LOCALES.indexOf(resolved) > -1 });
+    });
   };
 
   const getMainLang = () => mainLang;
