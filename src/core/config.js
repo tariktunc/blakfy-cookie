@@ -47,6 +47,14 @@ export const DEFAULTS = {
   dnt: "respect",
   statusUrl: STATUS_BASE + "/status.json",
   statusEnabled: true,
+  // #30 (scale readiness — multi-domain/subdomain scope): host-only by default
+  // (matches existing behaviour). Set data-blakfy-cookie-domain=".example.com" so a
+  // decision made on www.example.com also carries to shop.example.com — otherwise a
+  // visitor is asked again on every subdomain, which is a real defect for clients
+  // running a shop on a subdomain. Document the apex/www implication for anyone not
+  // redirecting to a canonical host: an unset value means example.com and
+  // www.example.com are treated as two different sites for consent purposes.
+  cookieDomain: null,
 };
 
 // document.currentScript is only reliable DURING the synchronous execution of this
@@ -130,5 +138,6 @@ export const readConfig = (scriptEl) => {
     dnt: attr("data-blakfy-dnt", DEFAULTS.dnt),
     statusUrl: attr("data-blakfy-status-url", DEFAULTS.statusUrl),
     statusEnabled: attr("data-blakfy-status", "true") !== "false",
+    cookieDomain: attr("data-blakfy-cookie-domain", DEFAULTS.cookieDomain),
   };
 };

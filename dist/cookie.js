@@ -36,10 +36,11 @@
       return null;
     }
   };
-  var writeCookie = (state) => {
+  var writeCookie = (state, domain) => {
     const expires = new Date(Date.now() + COOKIE_TTL_DAYS * 864e5).toUTCString();
     const secure = window.location.protocol === "https:" ? "; Secure" : "";
-    document.cookie = COOKIE_NAME + "=" + encodeURIComponent(JSON.stringify(state)) + "; expires=" + expires + "; path=/; SameSite=Strict" + secure;
+    const domainPart = domain ? "; domain=" + domain : "";
+    document.cookie = COOKIE_NAME + "=" + encodeURIComponent(JSON.stringify(state)) + "; expires=" + expires + "; path=/; SameSite=Strict" + domainPart + secure;
   };
   var newId = () => {
     if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
@@ -493,7 +494,7 @@
       });
       state = next;
       try {
-        writeCookie(state);
+        writeCookie(state, config.cookieDomain);
       } catch (e) {
       }
       if (config.auditEndpoint) {
@@ -879,7 +880,7 @@
     const subscribe = typeof o.on === "function" ? o.on : null;
     const listeners2 = /* @__PURE__ */ Object.create(null);
     let nextId = 1;
-    let cmpStatus = "loaded";
+    const cmpStatus = "loaded";
     const currentUSNat = () => buildUSNatSection(Object.assign({}, getConsent(), { gpc: getGpcFlag() }));
     const buildGPPData = (listenerId) => ({
       gppVersion: "1.1",
@@ -1256,7 +1257,15 @@
     gpc: "respect",
     dnt: "respect",
     statusUrl: STATUS_BASE + "/status.json",
-    statusEnabled: true
+    statusEnabled: true,
+    // #30 (scale readiness — multi-domain/subdomain scope): host-only by default
+    // (matches existing behaviour). Set data-blakfy-cookie-domain=".example.com" so a
+    // decision made on www.example.com also carries to shop.example.com — otherwise a
+    // visitor is asked again on every subdomain, which is a real defect for clients
+    // running a shop on a subdomain. Document the apex/www implication for anyone not
+    // redirecting to a canonical host: an unset value means example.com and
+    // www.example.com are treated as two different sites for consent purposes.
+    cookieDomain: null
   };
   var CAPTURED_SCRIPT_EL = typeof document !== "undefined" ? document.currentScript : null;
   var getScriptEl = () => {
@@ -1304,7 +1313,8 @@
       gpc: attr("data-blakfy-gpc", DEFAULTS.gpc),
       dnt: attr("data-blakfy-dnt", DEFAULTS.dnt),
       statusUrl: attr("data-blakfy-status-url", DEFAULTS.statusUrl),
-      statusEnabled: attr("data-blakfy-status", "true") !== "false"
+      statusEnabled: attr("data-blakfy-status", "true") !== "false",
+      cookieDomain: attr("data-blakfy-cookie-domain", DEFAULTS.cookieDomain)
     };
   };
 
@@ -3850,7 +3860,7 @@
           source: "gpc"
         });
         try {
-          writeCookie(state);
+          writeCookie(state, config.cookieDomain);
         } catch (e) {
         }
         optOut();

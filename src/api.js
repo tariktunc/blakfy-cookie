@@ -94,7 +94,7 @@ export const createAPI = (ctx) => {
     state = next;
 
     try {
-      writeCookie(state);
+      writeCookie(state, config.cookieDomain);
     } catch (e) {
       /* ignore */
     }

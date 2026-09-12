@@ -57,6 +57,12 @@ describe("config readConfig", () => {
     expect(cfg.presets).toBe("ga4,ads");
   });
 
+  it("#30: cookieDomain defaults to null (host-only) and reads data-blakfy-cookie-domain", () => {
+    expect(readConfig(makeScript()).cookieDomain).toBeNull();
+    const cfg = readConfig(makeScript({ "data-blakfy-cookie-domain": ".example.com" }));
+    expect(cfg.cookieDomain).toBe(".example.com");
+  });
+
   it("parses data-blakfy-status='false' as statusEnabled: false", () => {
     const cfg = readConfig(makeScript({ "data-blakfy-status": "false" }));
     expect(cfg.statusEnabled).toBe(false);

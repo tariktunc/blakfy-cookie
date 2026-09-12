@@ -222,7 +222,7 @@ const bootstrap = async () => {
         source: "gpc",
       });
       try {
-        writeCookie(state);
+        writeCookie(state, config.cookieDomain);
       } catch (e) {
         /* ignore */
       }

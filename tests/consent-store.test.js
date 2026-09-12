@@ -84,6 +84,40 @@ describe("consent-store writeCookie", () => {
     if (orig) Object.defineProperty(document, "cookie", orig);
     Object.defineProperty(window, "location", { configurable: true, value: origLoc });
   });
+
+  it("#30: is host-only (no domain attr) when no domain argument is passed", () => {
+    let captured = "";
+    const orig = Object.getOwnPropertyDescriptor(Document.prototype, "cookie");
+    Object.defineProperty(document, "cookie", {
+      configurable: true,
+      get() {
+        return "";
+      },
+      set(v) {
+        captured = v;
+      },
+    });
+    writeCookie({ version: "1.0", essential: true });
+    if (orig) Object.defineProperty(document, "cookie", orig);
+    expect(captured).not.toContain("domain=");
+  });
+
+  it("#30: adds domain=<value> when a cookie domain is configured (subdomain scope)", () => {
+    let captured = "";
+    const orig = Object.getOwnPropertyDescriptor(Document.prototype, "cookie");
+    Object.defineProperty(document, "cookie", {
+      configurable: true,
+      get() {
+        return "";
+      },
+      set(v) {
+        captured = v;
+      },
+    });
+    writeCookie({ version: "1.0", essential: true }, ".example.com");
+    if (orig) Object.defineProperty(document, "cookie", orig);
+    expect(captured).toContain("domain=.example.com");
+  });
 });
 
 describe("consent-store buildState", () => {

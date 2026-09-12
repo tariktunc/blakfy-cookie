@@ -1,6 +1,6 @@
 {
   "version": "2.3.2",
-  "generatedAt": "2026-09-12T21:03:32.740Z",
+  "generatedAt": "2026-09-12T21:10:12.010Z",
   "files": [
     {
       "file": "cookie-defaults.min.js",
@@ -9,8 +9,8 @@
     },
     {
       "file": "cookie.min.js",
-      "integrity": "sha384-TN8++LsaLk27ARpI8xzQp+UTF8IomOblfDUAyxWpDx1dMU44FUpZFEvqfAfzHIz+",
-      "bytes": 88988
+      "integrity": "sha384-jCLplK4ytccz8DWAKK5vGcakmkShAVIoaMwPL2VRhpidiSBUekOLU3I/DCQwflW4",
+      "bytes": 91401
     }
   ]
 }

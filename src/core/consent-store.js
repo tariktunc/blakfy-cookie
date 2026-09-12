@@ -15,9 +15,14 @@ export const readCookie = (policyVersion) => {
   }
 };
 
-export const writeCookie = (state) => {
+// #30 (scale readiness): `domain` is opt-in (data-blakfy-cookie-domain), host-only by
+// default — unchanged behaviour for every existing install. Passing ".example.com"
+// lets one consent decision carry across apex + subdomains instead of asking again
+// on each one.
+export const writeCookie = (state, domain) => {
   const expires = new Date(Date.now() + COOKIE_TTL_DAYS * 86400000).toUTCString();
   const secure = window.location.protocol === "https:" ? "; Secure" : "";
+  const domainPart = domain ? "; domain=" + domain : "";
   document.cookie =
     COOKIE_NAME +
     "=" +
@@ -25,6 +30,7 @@ export const writeCookie = (state) => {
     "; expires=" +
     expires +
     "; path=/; SameSite=Strict" +
+    domainPart +
     secure;
 };
 
