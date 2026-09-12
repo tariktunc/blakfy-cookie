@@ -4002,9 +4002,19 @@
     if (isNaN(n)) return 16;
     return Math.max(MIN_MARGIN_PX, n);
   };
-  var bootstrap = async () => {
-    if (typeof window === "undefined" || typeof document === "undefined") return;
-    if (window.BlakfyCookie && window.BlakfyCookie.__bootstrapped) return;
+  var bootstrapInFlight = null;
+  var bootstrap = () => {
+    if (typeof window === "undefined" || typeof document === "undefined") {
+      return Promise.resolve();
+    }
+    if (window.BlakfyCookie && window.BlakfyCookie.__bootstrapped) return Promise.resolve();
+    if (bootstrapInFlight) return bootstrapInFlight;
+    bootstrapInFlight = runBootstrap().finally(() => {
+      bootstrapInFlight = null;
+    });
+    return bootstrapInFlight;
+  };
+  var runBootstrap = async () => {
     const scriptEl = getScriptEl();
     const config = readConfig(scriptEl);
     const placementIssue = detectPlacementIssue(scriptEl);

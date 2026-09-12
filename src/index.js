@@ -84,10 +84,32 @@ const resolveMargin = (raw) => {
   return Math.max(MIN_MARGIN_PX, n);
 };
 
-const bootstrap = async () => {
-  if (typeof window === "undefined" || typeof document === "undefined") return;
-  if (window.BlakfyCookie && window.BlakfyCookie.__bootstrapped) return;
+// #30 (item 3): the OLD guard here (`if (window.BlakfyCookie && ...__bootstrapped) return`)
+// only closes the race AFTER bootstrap has fully finished — window.BlakfyCookie itself isn't
+// assigned until near the end (step 13, `api.__bootstrapped = true` a few lines later). Two
+// calls that both start before the first one reaches that point (e.g. a host script re-running
+// itself on an SPA route change, or `bootstrap()` invoked twice back-to-back before the first
+// `await detectJurisdiction()` resolves) both see `window.BlakfyCookie` as undefined and both
+// run the full init — duplicate banner, duplicate event listeners, duplicate GCM/UET/Yandex
+// installs. `runBootstrap` below holds the actual logic unchanged; `bootstrapInFlight` closes
+// the race synchronously, before any `await` point, and every re-entrant call while one run is
+// still in progress is coalesced onto the SAME in-flight promise instead of starting a second
+// run. See tests/integration/spa-rebootstrap.test.js.
+let bootstrapInFlight = null;
 
+const bootstrap = () => {
+  if (typeof window === "undefined" || typeof document === "undefined") {
+    return Promise.resolve();
+  }
+  if (window.BlakfyCookie && window.BlakfyCookie.__bootstrapped) return Promise.resolve();
+  if (bootstrapInFlight) return bootstrapInFlight;
+  bootstrapInFlight = runBootstrap().finally(() => {
+    bootstrapInFlight = null;
+  });
+  return bootstrapInFlight;
+};
+
+const runBootstrap = async () => {
   // 1. config
   const scriptEl = getScriptEl();
   const config = readConfig(scriptEl);
