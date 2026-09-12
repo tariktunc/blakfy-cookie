@@ -44,6 +44,31 @@ gtag("consent", "update", {
 - `wait_for_update: 500` ile GTM/GA4 cevap bekler
 - `gtag` global fonksiyonu yoksa stub kurulur
 
+### Basic mi Advanced mi? (#46)
+
+**Cevap: Advanced Consent Mode'un yapı taşlarını kuruyoruz, ama pratikte sonuç kurulum
+şekline bağlı.** README/CHANGELOG bunu hiç netleştirmiyordu — Ads çalıştıran müşteriler
+hangisine sahip olduğunu bilmeli, çünkü Google'ın onaydan önce ne aldığı ikisinde farklı:
+
+- **Advanced mode**: `gtag('consent','default',{...denied})` çağrılır AMA GTM/GA4
+  container'ının kendisi yüklenmeye devam eder → onay öncesi **çerezsiz ping'ler**
+  Google'a gider (modelleme için).
+- **Basic mode**: onay verilene kadar GTM/GA4 container'ı hiç yüklenmez → onay öncesi
+  hiçbir şey Google'a gitmez.
+
+Bu paket `cookie-defaults.min.js` ile HER ZAMAN Advanced mode'un sinyal katmanını kurar
+(`gtag` stub + `consent default denied`) — bu, bir gtag.js herhangi bir şekilde (gated
+olsun olmasın) çalışırsa doğru davranmasını garantiler. Ama **tag-gating** (bkz. README
+"Tag-Gating" bölümü) `<script type="text/plain">` ile GTM/GA4 script tag'inin kendisini
+onay öncesi hiç DOM'a girmesini engelliyorsa, sonuç fiilen **Basic mode**'a döner: script
+hiç yüklenmediği için çerezsiz ping de gitmez.
+
+**Pratik sonuç:** Quick Start'taki kurulum yolunu izleyen bir site (GTM script'i
+`type="text/plain"` + `data-blakfy-category` ile gated) **Basic mode** davranışı görür.
+Bir site GTM/GA4'ü kasıtlı olarak gate'lemeden (ungated) bırakırsa — örn. modelleme için
+çerezsiz sinyal isteniyorsa — **Advanced mode** davranışı görür. Hangisi olduğu widget'ın
+değil, entegratörün script'i gate'leyip gate'lememe kararının sonucudur.
+
 ---
 
 ## 3. Microsoft UET Consent Mode
@@ -105,7 +130,10 @@ Yandex'in Google gibi standart bir consent API'si yok. Yaklaşımımız:
 - Banner "Reddet" yerine **"Do Not Sell or Share My Personal Information"** olarak değiştirilir.
 - Footer'a kalıcı `<a class="blakfy-ccpa-link">` eklenir (yasal zorunluluk).
 - `Sec-GPC: 1` header otomatik opt-out say.
-- USP string `1YYY` formatında set edilir (versiyon, opt-out, sale, third-party).
+- USP string IAB US Privacy spec sırasıyla set edilir: `<version><Notice><OptOut><LSPA>`
+  (örn. `optOut()` sonrası `1YYN` — versiyon 1, notice verildi, opt-out Y, LSPA N).
+  Kaynak: `src/compliance/ccpa.js` `buildUSPString()`. (#47 — doc önceki sürümde
+  alanları "opt-out, sale, third-party" olarak yanlış tanımlıyordu.)
 
 **API:**
 
@@ -196,6 +224,37 @@ Her consent değişikliği `data-blakfy-audit-endpoint`'e POST edilir:
 - `yandex-metrica.test.js` — cookie engelleme, Webvisor ayrı kategori
 - `tcf-v2.test.js` — `__tcfapi` komut yüzeyi, TC string format
 - `ccpa.test.js` — USP string, DNT/GPC saygısı
+
+### Doğrulama durumu (#46, 2026-09-13)
+
+Yukarıdaki testler kod seviyesinde şekli doğrular (queue formatı, komut yüzeyi, string
+şeması) — dokümante edilmiş 3rd-party API sözleşmesiyle birebir eşleşiyorlar. **Canlı
+bir UET/Metrica sayacı, gerçek IAB CMP validator, veya gerçek bir ABD ziyaretçisi
+karşısında hiçbiri bu turda test edilmedi** — bu depo dışında, gerçek tag'lerle canlı
+tarayıcı testi gerektirir:
+
+- **Microsoft UET** — `window.uetq.push("consent","default"|"update",{ad_storage})`
+  şekli Microsoft'un dokümante ettiği API ile eşleşiyor (kod incelemesiyle
+  doğrulandı). Gerçek bir UET tag'inin bu sinyali kabul ettiği canlıda görülmedi.
+- **Yandex Metrica** — `window.ym` stub'ı consent öncesi çağrıları yutar (kuyruğa
+  almaz); gerçek `ym(id,"init",...)` çağrısı zaten `type="text/plain"` gate'i
+  içinde olduğu için onaydan önce hiç çalışmaz — stub bir ek güvenlik ağı, birincil
+  engelleme mekanizması değil. `_ym_*`/`yandexuid`/`yabs-frequency` preset'te
+  tanımlı ve `revokeYandex()` red halinde temizliyor (kod + test doğrulandı).
+  Webvisor canlı sayaçla test edilmedi.
+- **TCF v2.2** — `__tcfapi` yüzeyi ve TC string formatı test edilmiş; IAB CMP
+  validator'a karşı hiç çalıştırılmadı, CMP ID hâlâ `0` (preview) — bkz.
+  [tcf-certification.md](./tcf-certification.md). **Prod'a önerilmez, gerçek CMP ID
+  atanana kadar.**
+- **CCPA/GPP** — `__uspapi` yüzeyi doğrulandı, gerçek bir CA ziyaretçisiyle
+  denenmedi. `__gppapi` bilinçli olarak yok (#32 tasarım kararı); GPC'nin CCPA'da
+  fiilen deny yazdığı (`src/index.js` §11, `optOutCCPA()` çağrısı) kod
+  incelemesiyle doğrulandı — sadece algılamıyor, gerçekten kapatıyor.
+- **Accessibility widget etkileşimi** — `blakfy_a11y_prefs` cookie'si onay
+  öncesi görüldü (camsel.com.tr canlı denetimde), ama bu paket **ayrı bir repo**
+  (`@blakfy/accessibility-widget`); bu depodan düzeltilemez. Yasal temel kararı
+  (strictly-necessary mi değil mi) sahibinin vermesi gerekiyor — bkz.
+  `docs/oss-architecture-reference.md` ve GitHub #46 açık kalan madde.
 
 ---
 
