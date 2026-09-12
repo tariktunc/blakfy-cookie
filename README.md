@@ -574,6 +574,15 @@ Webvisor `marketing` değil, **`recording`** kategorisi gerektirir. Modal'da bu 
 
 **Gizlenemez.** 3 katmanlı anti-tampering korumalı (CSS `!important`, MutationObserver re-injection, kod-baked HTML). Lisans şartının parçasıdır. Marka koruması.
 
+### Badge linki hangi siteden geldiğini nasıl bildiriyor?
+
+Badge `href`'i `utm_source` (host `location.hostname`'i, `www.` atılmış hali), `utm_medium=cookie-badge` ve `utm_campaign=powered-by` ile etiketlenir; `rel="noopener"` kullanılır (`noreferrer` değil), böylece UTM parametreleri bir yönlendirme veya gizlilik uzantısı tarafından silinirse `Referer` başlığı yedek sinyal olarak kalır (`referrerPolicy="origin"` ile sadece origin gönderilir, path/query asla). Ziyaretçinin kendi verisi taşınmaz; sadece müşteri sitesinin domaini, ve sadece tıklama anında.
+
+- `<html data-blakfy-attribution="musteri-slug">` — domain yerine sabit bir hesap adı gönderir (bir müşterinin birden fazla domaini varsa faydalı).
+- `<html data-blakfy-attribution="off">` — atıf tamamen kapatılır, badge linki çıplak `https://blakfy.com/` olur.
+
+Bu davranış cookie/consent kapsamı dışındadır: hiçbir cookie yazılmaz, hiçbir kimlik oluşturulmaz, sayfa yüklenirken hiçbir istek atılmaz (sadece tıklamada). `@blakfy/accessibility-widget`'taki eşdeğer badge için de aynı şema geçerlidir, farklı `utm_medium` ile (ayrı repo, ayrı sürüm).
+
 ### Next.js'te FOUC (içerik atlaması) görüyorum
 
 `@blakfy/cookie-next@2`'ye yükselt. v1'de FOUC vardı; v2'de `next/script` `beforeInteractive` strateji kullanılıyor.

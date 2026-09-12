@@ -15,11 +15,44 @@ let observer = null;
 let intervalId = null;
 let rootRef = null;
 
+// buildBadgeHref — resolve #40: attribute the "Powered by" click to its originating site.
+// location.hostname ONLY, stripped of "www." — never path/query, which can carry
+// identifiers (order ids, usernames). A client can override the source with
+// data-blakfy-attribution="slug" on <html>, or opt out entirely with
+// data-blakfy-attribution="off" (badge then links to the bare BADGE_HREF, no UTM).
+export const buildBadgeHref = (medium = "cookie-badge") => {
+  try {
+    const url = new URL(BADGE_HREF);
+    const override =
+      typeof document !== "undefined" && document.documentElement
+        ? document.documentElement.getAttribute("data-blakfy-attribution")
+        : null;
+    if (override === "off") return url.toString();
+    const source =
+      override && override.trim()
+        ? override.trim()
+        : typeof location !== "undefined"
+          ? location.hostname.replace(/^www\./, "")
+          : "";
+    if (source) url.searchParams.set("utm_source", source);
+    url.searchParams.set("utm_medium", medium);
+    url.searchParams.set("utm_campaign", "powered-by");
+    return url.toString();
+  } catch (e) {
+    return BADGE_HREF;
+  }
+};
+
 export const buildBadge = () => {
   const a = document.createElement("a");
-  a.href = BADGE_HREF;
+  a.href = buildBadgeHref();
   a.target = "_blank";
-  a.rel = "noopener noreferrer";
+  // noopener alone: prevents window.opener reach-back (the actual security concern).
+  // noreferrer is deliberately dropped — it would strip the Referer header, which is
+  // our fallback attribution signal when UTM params get stripped by a redirect or a
+  // privacy extension. referrerPolicy caps that fallback to the origin only.
+  a.rel = "noopener";
+  a.referrerPolicy = "origin";
   a.className = BADGE_CLASS;
   a.setAttribute("aria-label", "Powered by Blakfy Studio — opens in new tab");
 

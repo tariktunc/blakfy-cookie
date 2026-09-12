@@ -1,6 +1,12 @@
 import { describe, it, expect, vi, afterEach } from "vitest";
 
-import { mountBadges, installAntiTamper, disposeAntiTamper, buildBadge } from "../src/ui/badge.js";
+import {
+  mountBadges,
+  installAntiTamper,
+  disposeAntiTamper,
+  buildBadge,
+  buildBadgeHref,
+} from "../src/ui/badge.js";
 
 const makeRoot = () => {
   const root = document.createElement("div");
@@ -24,11 +30,40 @@ describe("badge mountBadges", () => {
     expect(root.querySelector(".blakfy-badge")).not.toBeNull();
   });
 
-  it("badge has correct href, target, rel attributes", () => {
+  it("badge has UTM-tagged href, target, noopener-only rel, origin referrer policy (#40)", () => {
     const a = buildBadge();
-    expect(a.getAttribute("href")).toBe("https://blakfy.com");
+    const href = a.getAttribute("href");
+    expect(href.startsWith("https://blakfy.com/?")).toBe(true);
+    expect(href).toContain("utm_medium=cookie-badge");
+    expect(href).toContain("utm_campaign=powered-by");
     expect(a.getAttribute("target")).toBe("_blank");
-    expect(a.getAttribute("rel")).toBe("noopener noreferrer");
+    expect(a.getAttribute("rel")).toBe("noopener");
+    expect(a.getAttribute("referrerPolicy") || a.referrerPolicy).toBe("origin");
+  });
+
+  it("buildBadgeHref resolves utm_source from location.hostname, stripped of www (#40)", () => {
+    const href = buildBadgeHref();
+    const url = new URL(href);
+    expect(url.searchParams.get("utm_source")).toBe(location.hostname.replace(/^www\./, ""));
+  });
+
+  it("buildBadgeHref honors data-blakfy-attribution override slug (#40)", () => {
+    document.documentElement.setAttribute("data-blakfy-attribution", "acme-client");
+    try {
+      const url = new URL(buildBadgeHref());
+      expect(url.searchParams.get("utm_source")).toBe("acme-client");
+    } finally {
+      document.documentElement.removeAttribute("data-blakfy-attribution");
+    }
+  });
+
+  it("buildBadgeHref honors data-blakfy-attribution='off' opt-out (#40)", () => {
+    document.documentElement.setAttribute("data-blakfy-attribution", "off");
+    try {
+      expect(buildBadgeHref()).toBe("https://blakfy.com/");
+    } finally {
+      document.documentElement.removeAttribute("data-blakfy-attribution");
+    }
   });
 
   it("badge text contains 'Powered by' and 'Blakfy Studio'", () => {
