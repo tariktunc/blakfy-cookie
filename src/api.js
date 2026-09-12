@@ -18,6 +18,7 @@ export const createAPI = (ctx) => {
   let t = getTranslation(currentLocale);
 
   let modalRoot = null;
+  let warnedNoAuditEndpoint = false;
   let bannerRoot = null;
 
   const setUI = (which, root) => {
@@ -89,6 +90,19 @@ export const createAPI = (ctx) => {
           recording: state.recording,
         },
       });
+    } else if (!warnedNoAuditEndpoint && typeof console !== "undefined" && console.warn) {
+      // #28: with no data-blakfy-audit-endpoint, consent changes are recorded only in
+      // this browser's own cookie — there is no server-side record to show as proof
+      // of consent under GDPR Art. 7(1)/KVKK Md.12. That may be a deliberate choice
+      // (small site, no DPO requirement) but it must not be an unnoticed default.
+      warnedNoAuditEndpoint = true;
+      console.warn(
+        "[Blakfy Cookie] No data-blakfy-audit-endpoint configured — consent changes are not " +
+          "being recorded server-side. This means there is no proof-of-consent record " +
+          "(GDPR Art. 7(1) / KVKK Md.12) if ever challenged. See docs/compliance.md §10 " +
+          "for the payload shape and a reference endpoint, or set " +
+          "data-blakfy-audit-endpoint if you have already built one."
+      );
     }
 
     if (deps && typeof deps.pushGCM === "function") deps.pushGCM(state);

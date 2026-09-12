@@ -162,3 +162,34 @@ describe("API behavior", () => {
     expect(ctx.deps.applyPreset).toHaveBeenCalled();
   });
 });
+
+describe("audit endpoint warning (#28)", () => {
+  it("warns once when a consent change commits with no auditEndpoint configured", () => {
+    const ctx = makeCtx({ config: { auditEndpoint: null } });
+    const api = createAPI(ctx);
+    const spy = vi.spyOn(console, "warn").mockImplementation(() => {});
+
+    api.acceptAll();
+    api.rejectAll();
+
+    const auditWarnings = spy.mock.calls.filter(
+      (c) => typeof c[0] === "string" && c[0].indexOf("audit-endpoint") > -1
+    );
+    expect(auditWarnings.length).toBe(1);
+    spy.mockRestore();
+  });
+
+  it("does not warn when auditEndpoint is configured", () => {
+    const ctx = makeCtx({ config: { auditEndpoint: "https://example.com/audit" } });
+    const api = createAPI(ctx);
+    const spy = vi.spyOn(console, "warn").mockImplementation(() => {});
+
+    api.acceptAll();
+
+    const auditWarnings = spy.mock.calls.filter(
+      (c) => typeof c[0] === "string" && c[0].indexOf("audit-endpoint") > -1
+    );
+    expect(auditWarnings.length).toBe(0);
+    spy.mockRestore();
+  });
+});
