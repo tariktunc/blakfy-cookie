@@ -25,6 +25,10 @@ export default {
       desc: "Utilisés pour la publicité personnalisée et le reciblage.",
     },
     functional: { title: "Cookies Fonctionnels", desc: "Utilisés pour mémoriser vos préférences." },
+    recording: {
+      title: "Enregistrement de session",
+      desc: "Enregistre ou rejoue votre session (cartes de chaleur, capture d'écran) à des fins d'analyse UX.",
+    },
   },
   placeholder: {
     title: "Contenu bloqué",

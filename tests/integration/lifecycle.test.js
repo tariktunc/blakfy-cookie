@@ -152,6 +152,68 @@ describe("full DOM lifecycle (#31)", () => {
     // withdrawal keeps the same consent record id (it is an update, not a new visitor)
   });
 
+  it("#26: reopen FAB -> withdraw a category -> consent-change hooks fire and cookie updates", async () => {
+    // fabSide defaults to "left" (not "off") — the reopen control this test drives
+    // must be reachable without any extra config, matching a stock install.
+    await boot();
+    clickAct("accept");
+    await FLUSH();
+    expect(readConsentCookie().analytics).toBe(true);
+
+    const changeSpy = vi.fn();
+    const analyticsSpy = vi.fn();
+    window.BlakfyCookie.onChange(changeSpy);
+    window.BlakfyCookie.onConsent("analytics", analyticsSpy);
+    analyticsSpy.mockClear(); // onConsent fires immediately with the current (true) state
+
+    const fab = document.querySelector(".blakfy-fab");
+    expect(fab, "reopen FAB should be mounted once a decision exists (#34)").toBeTruthy();
+    fab.click();
+    await FLUSH();
+
+    const modalCard = document.querySelector(".blakfy-card[aria-modal='true']");
+    expect(modalCard, "FAB click should reopen the preferences modal").toBeTruthy();
+
+    const analyticsToggle = modalCard.querySelector('[data-cat="analytics"]');
+    expect(analyticsToggle.getAttribute("aria-checked")).toBe("true");
+    analyticsToggle.click();
+    expect(analyticsToggle.getAttribute("aria-checked")).toBe("false");
+
+    clickAct("save");
+    await FLUSH();
+
+    // withdrawal actually cleared the stored consent
+    const state = readConsentCookie();
+    expect(state.analytics).toBe(false);
+
+    // and re-fired the consent-change hooks/events (GDPR Art. 7(3): withdrawal is
+    // as effective and as observable to integrators as granting was)
+    expect(changeSpy).toHaveBeenCalled();
+    expect(analyticsSpy).toHaveBeenCalledWith(false);
+  });
+
+  it("#26: recording is its own explicit consent category, not bundled into analytics", async () => {
+    await boot();
+    clickAct("prefs");
+    await FLUSH();
+
+    const modalCard = document.querySelector(".blakfy-card[aria-modal='true']");
+    const recordingToggle = modalCard.querySelector('[data-cat="recording"]');
+    expect(
+      recordingToggle,
+      "modal should expose a dedicated recording category switch, separate from analytics"
+    ).toBeTruthy();
+    expect(recordingToggle.getAttribute("aria-checked")).toBe("false");
+
+    recordingToggle.click();
+    clickAct("save");
+    await FLUSH();
+
+    const state = readConsentCookie();
+    expect(state.recording).toBe(true);
+    expect(state.analytics).toBe(false); // toggling recording must not leak into analytics
+  });
+
   it("a returning visitor with a stored decision does not see the banner again", async () => {
     await boot();
     clickAct("accept");

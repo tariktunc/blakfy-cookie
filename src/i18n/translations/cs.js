@@ -28,6 +28,10 @@ export default {
       title: "Funkční soubory cookie",
       desc: "Slouží k zapamatování předvoleb jako jazyk a téma.",
     },
+    recording: {
+      title: "Nahrávání relace",
+      desc: "Nahrává nebo přehrává vaši relaci (mapy zájmu, záznam obrazovky) pro analýzu UX.",
+    },
   },
   placeholder: {
     title: "Obsah blokován",

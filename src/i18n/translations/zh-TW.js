@@ -14,6 +14,10 @@ export default {
     analytics: { title: "分析 Cookie", desc: "用於收集匿名訪問統計資料。" },
     marketing: { title: "行銷 Cookie", desc: "用於個人化廣告和再行銷。" },
     functional: { title: "功能 Cookie", desc: "用於記住語言、主題等偏好設定。" },
+    recording: {
+      title: "工作階段錄製",
+      desc: "為進行使用者體驗分析而錄製或重播您的工作階段（熱圖、螢幕錄製）。",
+    },
   },
   placeholder: {
     title: "內容已被封鎖",

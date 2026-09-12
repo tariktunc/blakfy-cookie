@@ -28,6 +28,10 @@ export default {
       title: "Cookie Fungsional",
       desc: "Digunakan untuk mengingat preferensi seperti bahasa dan tema.",
     },
+    recording: {
+      title: "Perekaman Sesi",
+      desc: "Merekam atau memutar ulang sesi Anda (peta panas, rekaman layar) untuk analisis UX.",
+    },
   },
   placeholder: {
     title: "Konten diblokir",

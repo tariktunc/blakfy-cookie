@@ -3,7 +3,10 @@
 import { buildPolicyText, isAutoPolicy } from "../compliance/policy-text.js";
 import { SERVICE_METADATA } from "../data/service-metadata.js";
 
-const CATEGORIES = ["essential", "analytics", "marketing", "functional"];
+// #26: "recording" (session-recording/heatmap tracking) is its own explicit category —
+// it must never be silently folded into "analytics". Real state field since
+// core/consent-store.js buildState(); this UI list was the gap.
+const CATEGORIES = ["essential", "analytics", "marketing", "functional", "recording"];
 
 // ── helpers ──────────────────────────────────────────────────────────────────
 
@@ -75,6 +78,7 @@ const buildCategoriesPanel = (t, current, card, onSave, onAccept) => {
   panel.appendChild(buildCatRow("analytics", t, false, !!current.analytics));
   panel.appendChild(buildCatRow("marketing", t, false, !!current.marketing));
   panel.appendChild(buildCatRow("functional", t, false, !!current.functional));
+  panel.appendChild(buildCatRow("recording", t, false, !!current.recording));
 
   const actions = el("div", { class: "blakfy-actions" });
   actions.style.marginTop = "16px";
@@ -487,7 +491,12 @@ export const createModal = ({
   observedCookies,
   onDeleteCookie,
 }) => {
-  const current = currentState || { analytics: false, marketing: false, functional: false };
+  const current = currentState || {
+    analytics: false,
+    marketing: false,
+    functional: false,
+    recording: false,
+  };
 
   const card = el("div", {
     class: "blakfy-card",

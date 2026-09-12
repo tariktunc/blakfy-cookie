@@ -49,7 +49,8 @@ describe("createModal", () => {
   it("every category switch is named via aria-labelledby pointing at its title", () => {
     const card = createModal(baseProps);
     const switches = card.querySelectorAll(".blakfy-switch");
-    expect(switches.length).toBe(4);
+    // #26: essential, analytics, marketing, functional, recording
+    expect(switches.length).toBe(5);
     switches.forEach((sw) => {
       const labelledby = sw.getAttribute("aria-labelledby");
       expect(labelledby).toBeTruthy();

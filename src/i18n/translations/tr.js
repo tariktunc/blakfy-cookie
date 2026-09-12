@@ -28,6 +28,10 @@ export default {
       title: "Fonksiyonel Çerezler",
       desc: "Dil, tema, bölge gibi tercihlerinizi hatırlamak için kullanılır.",
     },
+    recording: {
+      title: "Oturum Kaydı",
+      desc: "Isı haritası, ekran kaydı gibi yöntemlerle oturumunuzu kaydeder veya tekrar oynatır.",
+    },
   },
   placeholder: {
     title: "İçerik engellendi",

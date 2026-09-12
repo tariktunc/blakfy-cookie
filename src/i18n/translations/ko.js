@@ -22,6 +22,10 @@ export default {
       title: "기능성 쿠키",
       desc: "언어, 테마 등의 환경설정을 기억하는 데 사용됩니다.",
     },
+    recording: {
+      title: "세션 녹화",
+      desc: "UX 분석을 위해 세션을 녹화하거나 재생합니다 (히트맵, 화면 녹화).",
+    },
   },
   placeholder: {
     title: "콘텐츠가 차단되었습니다",

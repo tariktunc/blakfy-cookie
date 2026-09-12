@@ -28,6 +28,10 @@ export default {
       title: "Cookies funcionales",
       desc: "Usadas para recordar preferencias como idioma o tema.",
     },
+    recording: {
+      title: "Grabación de sesión",
+      desc: "Graba o reproduce su sesión (mapas de calor, captura de pantalla) para análisis de UX.",
+    },
   },
   placeholder: {
     title: "Contenido bloqueado",

@@ -28,6 +28,10 @@ export default {
       title: "Funktionella cookies",
       desc: "Används för att komma ihåg inställningar som språk och tema.",
     },
+    recording: {
+      title: "Sessionsinspelning",
+      desc: "Spelar in eller spelar upp din session (värmekartor, skärminspelning) för UX-analys.",
+    },
   },
   placeholder: {
     title: "Innehåll blockerat",

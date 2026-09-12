@@ -25,6 +25,10 @@ export default {
       title: "機能Cookie",
       desc: "言語やテーマなどの設定を記憶するために使用されます。",
     },
+    recording: {
+      title: "セッション録画",
+      desc: "UX分析のためにセッションを記録・再生します（ヒートマップ、画面録画）。",
+    },
   },
   placeholder: {
     title: "コンテンツがブロックされました",

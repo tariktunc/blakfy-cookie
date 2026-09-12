@@ -28,6 +28,10 @@ export default {
       title: "Functionele cookies",
       desc: "Gebruikt om voorkeuren zoals taal en thema te onthouden.",
     },
+    recording: {
+      title: "Sessieopname",
+      desc: "Neemt uw sessie op of speelt deze af (heatmaps, schermopname) voor UX-analyse.",
+    },
   },
   placeholder: {
     title: "Inhoud geblokkeerd",

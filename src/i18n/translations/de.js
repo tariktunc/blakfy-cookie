@@ -28,6 +28,10 @@ export default {
       title: "Funktionale Cookies",
       desc: "Werden verwendet, um Einstellungen wie Sprache und Theme zu speichern.",
     },
+    recording: {
+      title: "Sitzungsaufzeichnung",
+      desc: "Zeichnet Ihre Sitzung auf oder spielt sie ab (Heatmaps, Bildschirmaufnahme) zur UX-Analyse.",
+    },
   },
   placeholder: {
     title: "Inhalt blockiert",

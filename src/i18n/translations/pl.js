@@ -28,6 +28,10 @@ export default {
       title: "Funkcjonalne pliki cookie",
       desc: "Używane do zapamiętywania preferencji takich jak język i motyw.",
     },
+    recording: {
+      title: "Nagrywanie sesji",
+      desc: "Nagrywa lub odtwarza sesję (mapy cieplne, nagranie ekranu) do analizy UX.",
+    },
   },
   placeholder: {
     title: "Treść zablokowana",

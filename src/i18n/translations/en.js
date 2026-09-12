@@ -24,6 +24,10 @@ export default {
       title: "Functional Cookies",
       desc: "Used to remember preferences like language, theme, region.",
     },
+    recording: {
+      title: "Session Recording",
+      desc: "Records or replays your session (heatmaps, screen capture) for UX analysis.",
+    },
   },
   placeholder: {
     title: "Content blocked",
