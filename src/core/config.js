@@ -29,6 +29,10 @@ export const DEFAULTS = {
   policyUrl: "auto",
   policyVersion: "1.0",
   auditEndpoint: null,
+  // #30 (item 6): optional operator error-reporting hook. Read directly off the <script>
+  // element by index.js's bootstrap-error handler (not through readConfig()'s output) so a
+  // throw inside readConfig() itself still has a chance to be reported.
+  errorEndpoint: null,
   // #49: required for the generated in-widget notice (GDPR Art. 13(1)(a) / KVKK
   // Md.10 controller identity). Left unset, the notice renders but is marked
   // incomplete and says so loudly — see src/compliance/policy-text.js.
@@ -134,6 +138,7 @@ export const readConfig = (scriptEl) => {
     policyUrl: attr("data-blakfy-policy-url", DEFAULTS.policyUrl),
     policyVersion: attr("data-blakfy-version", DEFAULTS.policyVersion),
     auditEndpoint: attr("data-blakfy-audit-endpoint", DEFAULTS.auditEndpoint),
+    errorEndpoint: attr("data-blakfy-error-endpoint", DEFAULTS.errorEndpoint),
     operator: attr("data-blakfy-operator", DEFAULTS.operator),
     operatorContact: attr("data-blakfy-operator-contact", DEFAULTS.operatorContact),
     operatorAddress: attr("data-blakfy-operator-address", DEFAULTS.operatorAddress),

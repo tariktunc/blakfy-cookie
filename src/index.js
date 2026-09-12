@@ -26,6 +26,7 @@ import {
   installDefaults as installYandexDefaults,
   applyYandex,
 } from "./compliance/yandex-metrica.js";
+import { postAudit } from "./core/audit.js";
 import { getScriptEl, readConfig, detectPlacementIssue } from "./core/config.js";
 import { readCookie, writeCookie, buildState } from "./core/consent-store.js";
 import { createEmitter } from "./core/events.js";
@@ -97,15 +98,53 @@ const resolveMargin = (raw) => {
 // run. See tests/integration/spa-rebootstrap.test.js.
 let bootstrapInFlight = null;
 
+// #30 (item 6): an uncaught error inside runBootstrap() must never become a silent
+// unhandled-promise-rejection — that leaves the page with no banner AND no signal that
+// anything went wrong. Gated tags themselves are already safe regardless (#30 item 5 —
+// they stay type="text/plain" unless explicitly unblocked, so a half-finished init can
+// only ever be MORE conservative, never leak a tag); this handler is about making the
+// failure visible and, optionally, reportable to the operator.
+const reportBootstrapError = (err) => {
+  const message = (err && err.message) || String(err);
+  if (typeof console !== "undefined" && console.error) {
+    console.error(
+      "[Blakfy Cookie] bootstrap failed and did not complete: " +
+        message +
+        ". No consent banner will show until this is fixed. Any data-blakfy-category-gated " +
+        "tags stay blocked (fail-closed by design) — see README 'Browser Desteği' (#30).",
+      err
+    );
+  }
+  // Optional error-reporting hook (#30 item 6): reuses the #28 sendBeacon-first transport.
+  // Fully opt-in — no endpoint configured means no network call at all.
+  try {
+    const scriptEl = getScriptEl();
+    const endpoint = scriptEl && scriptEl.getAttribute("data-blakfy-error-endpoint");
+    if (endpoint) {
+      postAudit(endpoint, {
+        type: "bootstrap_error",
+        message: message,
+        timestamp: new Date().toISOString(),
+      });
+    }
+  } catch (e2) {
+    /* error reporting must never itself throw */
+  }
+};
+
 const bootstrap = () => {
   if (typeof window === "undefined" || typeof document === "undefined") {
     return Promise.resolve();
   }
   if (window.BlakfyCookie && window.BlakfyCookie.__bootstrapped) return Promise.resolve();
   if (bootstrapInFlight) return bootstrapInFlight;
-  bootstrapInFlight = runBootstrap().finally(() => {
-    bootstrapInFlight = null;
-  });
+  bootstrapInFlight = runBootstrap()
+    .catch((err) => {
+      reportBootstrapError(err);
+    })
+    .finally(() => {
+      bootstrapInFlight = null;
+    });
   return bootstrapInFlight;
 };
 
