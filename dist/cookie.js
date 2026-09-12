@@ -1272,7 +1272,11 @@
     fabSide: "left",
     fabOffset: null,
     fabSize: null,
-    fabColor: null
+    fabColor: null,
+    // #39: cookie transparency panel — off by default (issue proposal: "Off by default;
+    // a site opts in"). Lists cookies actually present in document.cookie, with
+    // per-cookie delete. data-blakfy-cookie-panel="true" to enable.
+    cookiePanel: "false"
   };
   var CAPTURED_SCRIPT_EL = typeof document !== "undefined" ? document.currentScript : null;
   var getScriptEl = () => {
@@ -1325,7 +1329,8 @@
       fabSide: attr("data-blakfy-fab", DEFAULTS.fabSide),
       fabOffset: attr("data-blakfy-fab-offset", DEFAULTS.fabOffset),
       fabSize: attr("data-blakfy-fab-size", DEFAULTS.fabSize),
-      fabColor: attr("data-blakfy-fab-color", DEFAULTS.fabColor)
+      fabColor: attr("data-blakfy-fab-color", DEFAULTS.fabColor),
+      cookiePanel: attr("data-blakfy-cookie-panel", DEFAULTS.cookiePanel) === "true"
     };
   };
 
@@ -2121,521 +2126,6 @@
     return preset;
   };
 
-  // src/ui/badge.js
-  var BADGE_HREF = "https://blakfy.com";
-  var BADGE_TEXT_PREFIX = "Powered by ";
-  var BADGE_BRAND = "Blakfy Studio";
-  var BADGE_CLASS = "blakfy-badge";
-  var PROTECT_STYLE_ID = "blakfy-badge-protect";
-  var PROTECT_CSS = ".blakfy-badge{display:flex !important;visibility:visible !important;opacity:0.6 !important;pointer-events:auto !important;}.blakfy-badge:hover{opacity:1 !important;}.blakfy-badge[hidden]{display:flex !important;}";
-  var mountedBadges = /* @__PURE__ */ new Set();
-  var slotMap = /* @__PURE__ */ new WeakMap();
-  var observer = null;
-  var intervalId = null;
-  var rootRef = null;
-  var buildBadge = () => {
-    const a = document.createElement("a");
-    a.href = BADGE_HREF;
-    a.target = "_blank";
-    a.rel = "noopener noreferrer";
-    a.className = BADGE_CLASS;
-    a.setAttribute("aria-label", "Powered by Blakfy Studio \u2014 opens in new tab");
-    const prefix = document.createTextNode(BADGE_TEXT_PREFIX);
-    a.appendChild(prefix);
-    const strong = document.createElement("strong");
-    strong.textContent = BADGE_BRAND;
-    a.appendChild(strong);
-    const cssText = "display: flex !important; align-items: center; gap: 4px;position: absolute; bottom: 8px; right: 12px;font-size: 11px; font-family: system-ui, -apple-system, sans-serif;color: inherit; text-decoration: none;opacity: 0.6 !important; transition: opacity 0.2s;pointer-events: auto !important;z-index: 1;";
-    a.style.cssText = cssText;
-    return a;
-  };
-  var applyRTL = (badge) => {
-    const rtlAncestor = badge.closest && badge.closest("[dir=rtl]");
-    if (rtlAncestor) {
-      badge.style.right = "auto";
-      badge.style.left = "12px";
-    }
-  };
-  var injectProtectStyle = () => {
-    if (typeof document === "undefined") return;
-    if (document.getElementById(PROTECT_STYLE_ID)) return;
-    const style = document.createElement("style");
-    style.id = PROTECT_STYLE_ID;
-    style.textContent = PROTECT_CSS;
-    (document.head || document.documentElement).appendChild(style);
-  };
-  var replaceBadge = (oldBadge) => {
-    const slot = slotMap.get(oldBadge);
-    const fresh = buildBadge();
-    if (oldBadge.parentNode) {
-      oldBadge.parentNode.replaceChild(fresh, oldBadge);
-    } else if (slot && slot.isConnected) {
-      slot.appendChild(fresh);
-    } else if (rootRef) {
-      rootRef.appendChild(fresh);
-    }
-    mountedBadges.delete(oldBadge);
-    mountedBadges.add(fresh);
-    if (slot) slotMap.set(fresh, slot);
-    applyRTL(fresh);
-    return fresh;
-  };
-  var reAttachBadge = (badge) => {
-    const slot = slotMap.get(badge);
-    if (badge.isConnected) return badge;
-    const fresh = buildBadge();
-    if (slot && slot.isConnected) {
-      slot.appendChild(fresh);
-    } else if (rootRef) {
-      rootRef.appendChild(fresh);
-    } else {
-      return badge;
-    }
-    mountedBadges.delete(badge);
-    mountedBadges.add(fresh);
-    if (slot) slotMap.set(fresh, slot);
-    applyRTL(fresh);
-    return fresh;
-  };
-  var mountBadges = (rootEl) => {
-    if (!rootEl) return [];
-    rootRef = rootEl;
-    const slots = rootEl.querySelectorAll(".blakfy-badge-slot");
-    const result = [];
-    for (let i = 0; i < slots.length; i++) {
-      const slot = slots[i];
-      const existing = slot.querySelector("." + BADGE_CLASS);
-      if (existing) {
-        mountedBadges.add(existing);
-        slotMap.set(existing, slot);
-        applyRTL(existing);
-        result.push(existing);
-        continue;
-      }
-      const badge = buildBadge();
-      while (slot.firstChild) slot.removeChild(slot.firstChild);
-      slot.appendChild(badge);
-      mountedBadges.add(badge);
-      slotMap.set(badge, slot);
-      applyRTL(badge);
-      result.push(badge);
-    }
-    return result;
-  };
-  var verifyBadges = () => {
-    if (typeof window === "undefined" || !window.getComputedStyle) return;
-    const snapshot = Array.from(mountedBadges);
-    for (let i = 0; i < snapshot.length; i++) {
-      const badge = snapshot[i];
-      if (!badge.isConnected) {
-        reAttachBadge(badge);
-        continue;
-      }
-      const cs = window.getComputedStyle(badge);
-      const opacity = parseFloat(cs.opacity);
-      if (isFinite(opacity) && opacity < 0.5 || cs.display === "none" || cs.visibility === "hidden") {
-        replaceBadge(badge);
-      }
-    }
-    if (!document.getElementById(PROTECT_STYLE_ID)) {
-      injectProtectStyle();
-    }
-  };
-  var handleMutations = (records) => {
-    let needsStyleReinject = false;
-    const removedBadges = [];
-    const mutatedBadges = [];
-    for (let i = 0; i < records.length; i++) {
-      const rec = records[i];
-      if (rec.type === "childList") {
-        for (let j = 0; j < rec.removedNodes.length; j++) {
-          const node = rec.removedNodes[j];
-          if (!node || node.nodeType !== 1) continue;
-          if (node.id === PROTECT_STYLE_ID) {
-            needsStyleReinject = true;
-          }
-          if (mountedBadges.has(node)) {
-            removedBadges.push(node);
-          } else if (node.querySelector) {
-            const inner = node.querySelector("." + BADGE_CLASS);
-            if (inner && mountedBadges.has(inner)) {
-              removedBadges.push(inner);
-            }
-          }
-        }
-      } else if (rec.type === "attributes") {
-        const target = rec.target;
-        if (target && mountedBadges.has(target)) {
-          mutatedBadges.push(target);
-        }
-      }
-    }
-    if (needsStyleReinject) {
-      setTimeout(injectProtectStyle, 0);
-    }
-    if (removedBadges.length) {
-      setTimeout(() => {
-        for (let i = 0; i < removedBadges.length; i++) {
-          reAttachBadge(removedBadges[i]);
-        }
-      }, 50);
-    }
-    for (let i = 0; i < mutatedBadges.length; i++) {
-      replaceBadge(mutatedBadges[i]);
-    }
-  };
-  var installAntiTamper = (rootEl) => {
-    if (!rootEl || typeof MutationObserver === "undefined") return;
-    rootRef = rootEl;
-    injectProtectStyle();
-    if (observer) observer.disconnect();
-    observer = new MutationObserver(handleMutations);
-    observer.observe(rootEl, {
-      childList: true,
-      attributes: true,
-      subtree: true,
-      attributeFilter: ["style", "class", "hidden"]
-    });
-    if (document.head) {
-      observer.observe(document.head, { childList: true, subtree: false });
-    }
-    if (intervalId) clearInterval(intervalId);
-    intervalId = setInterval(verifyBadges, 2e3);
-  };
-
-  // src/i18n/policy-strings.js
-  var POLICY_STRINGS = {
-    tr: {
-      tabLabel: "Politika",
-      heading: "\xC7erez ve Gizlilik Bildirimi",
-      incomplete: "Bildirim eksik: site sahibi bilgileri (data-blakfy-operator / -operator-contact) tan\u0131mlanmam\u0131\u015F. Yay\u0131n \xF6ncesi tamamlanmal\u0131.",
-      controllerTitle: "Veri Sorumlusu",
-      controllerName: "Unvan",
-      controllerContact: "\u0130leti\u015Fim",
-      controllerAddress: "Adres",
-      cookiesTitle: "Kullan\u0131lan Hizmetler",
-      noCookies: "\xDC\xE7\xFCnc\xFC taraf hizmet yap\u0131land\u0131r\u0131lmam\u0131\u015F.",
-      purposeLabel: "Ama\xE7",
-      legalBasisLabel: "Hukuki Sebep",
-      retentionLabel: "Saklama S\xFCresi",
-      rightsTitle: "Haklar\u0131n\u0131z",
-      rightsGDPR: "GDPR: eri\u015Fim, d\xFCzeltme, silme, k\u0131s\u0131tlama, ta\u015F\u0131nabilirlik ve itiraz hakk\u0131.",
-      rightsKVKK: "KVKK Md.11: bilgi talep etme, d\xFCzeltme, silme ve itiraz hakk\u0131.",
-      rightsCCPA: "CCPA: bilgi edinme, silme talebi ve sat\u0131\u015Ftan vazge\xE7me (opt-out) hakk\u0131.",
-      rightsDefault: "Haklar\u0131n\u0131z i\xE7in yukar\u0131daki ileti\u015Fim bilgilerini kullan\u0131n.",
-      versionLabel: "S\xFCr\xFCm",
-      lastDecisionLabel: "Son karar",
-      footnote: "Bu bildirim yap\u0131land\u0131r\u0131lm\u0131\u015F hizmetlerden otomatik \xFCretilmi\u015Ftir."
-    },
-    en: {
-      tabLabel: "Policy",
-      heading: "Cookie & Privacy Notice",
-      incomplete: "Notice incomplete: operator identity (data-blakfy-operator / -operator-contact) not configured. Complete before going live.",
-      controllerTitle: "Data Controller",
-      controllerName: "Name",
-      controllerContact: "Contact",
-      controllerAddress: "Address",
-      cookiesTitle: "Services Used",
-      noCookies: "No third-party service is configured on this site.",
-      purposeLabel: "Purpose",
-      legalBasisLabel: "Legal Basis",
-      retentionLabel: "Retention",
-      rightsTitle: "Your Rights",
-      rightsGDPR: "GDPR: right to access, rectify, erase, restrict, port and object.",
-      rightsKVKK: "KVKK Art. 11: right to information, rectification, erasure and objection.",
-      rightsCCPA: "CCPA: right to know, delete, and opt out of sale/sharing.",
-      rightsDefault: "Use the contact details above to exercise your data rights.",
-      versionLabel: "Version",
-      lastDecisionLabel: "Last decision",
-      footnote: "This notice was generated automatically from configured services."
-    }
-  };
-  var getPolicyStrings = (locale) => POLICY_STRINGS[locale] || POLICY_STRINGS.en;
-
-  // src/compliance/policy-text.js
-  var RIGHTS_KEY_BY_JURISDICTION = {
-    GDPR: "rightsGDPR",
-    KVKK: "rightsKVKK",
-    CCPA: "rightsCCPA"
-  };
-  var isAutoPolicy = (policyUrl) => !policyUrl || policyUrl === "auto";
-  var buildPolicyText = ({
-    locale,
-    operator,
-    operatorContact,
-    operatorAddress,
-    jurisdiction,
-    policyVersion,
-    consentTimestamp,
-    enrichedPresets
-  }) => {
-    const s = getPolicyStrings(locale);
-    const hasOperator = !!(operator && operatorContact);
-    const services = (enrichedPresets || []).filter((p) => p && p.meta).map((p) => ({
-      key: p.key,
-      displayName: p.meta.displayName || p.key,
-      category: p.meta.category || "",
-      purposes: p.meta.purposes || [],
-      legalBasis: p.meta.legalBasis || "",
-      retention: p.meta.retention || "",
-      processorName: p.meta.processor && p.meta.processor.name || "",
-      transferCountries: p.meta.transferCountries || []
-    }));
-    const rightsKey = RIGHTS_KEY_BY_JURISDICTION[jurisdiction] || "rightsDefault";
-    return {
-      incomplete: !hasOperator,
-      strings: s,
-      controller: {
-        name: operator || null,
-        contact: operatorContact || null,
-        address: operatorAddress || null
-      },
-      services,
-      rightsText: s[rightsKey] || s.rightsDefault,
-      policyVersion: policyVersion || null,
-      consentTimestamp: consentTimestamp || null
-    };
-  };
-
-  // src/ui/banner.js
-  var createBanner = ({
-    t,
-    isRTL,
-    accent,
-    theme,
-    locale,
-    policyUrl,
-    onAccept,
-    onReject,
-    onPrefs,
-    onOpenPolicy
-  }) => {
-    const card = document.createElement("div");
-    card.className = "blakfy-card";
-    card.setAttribute("dir", isRTL ? "rtl" : "ltr");
-    card.setAttribute("role", "dialog");
-    card.setAttribute("aria-labelledby", "blakfy-title");
-    card.setAttribute("aria-describedby", "blakfy-desc");
-    if (locale) card.setAttribute("lang", locale);
-    card.style.cssText = "--blakfy-accent:" + accent;
-    if (theme && theme !== "light") card.setAttribute("data-blakfy-theme", theme);
-    const h2 = document.createElement("h2");
-    h2.id = "blakfy-title";
-    h2.textContent = t.title;
-    card.appendChild(h2);
-    const p = document.createElement("p");
-    p.id = "blakfy-desc";
-    p.textContent = t.intro + " ";
-    const a = document.createElement("a");
-    if (isAutoPolicy(policyUrl)) {
-      a.href = "#";
-      a.addEventListener("click", (ev) => {
-        ev.preventDefault();
-        if (onOpenPolicy) onOpenPolicy();
-      });
-    } else {
-      a.href = policyUrl;
-    }
-    a.textContent = t.policyLink;
-    p.appendChild(a);
-    card.appendChild(p);
-    const actions = document.createElement("div");
-    actions.className = "blakfy-actions";
-    const btnReject = document.createElement("button");
-    btnReject.className = "blakfy-btn";
-    btnReject.setAttribute("data-act", "reject");
-    btnReject.textContent = t.rejectAll;
-    btnReject.addEventListener("click", () => {
-      if (onReject) onReject();
-    });
-    actions.appendChild(btnReject);
-    const btnPrefs = document.createElement("button");
-    btnPrefs.className = "blakfy-btn";
-    btnPrefs.setAttribute("data-act", "prefs");
-    btnPrefs.textContent = t.preferences;
-    btnPrefs.addEventListener("click", () => {
-      if (onPrefs) onPrefs();
-    });
-    actions.appendChild(btnPrefs);
-    const btnAccept = document.createElement("button");
-    btnAccept.className = "blakfy-btn blakfy-btn-primary";
-    btnAccept.setAttribute("data-act", "accept");
-    btnAccept.textContent = t.acceptAll;
-    btnAccept.addEventListener("click", () => {
-      if (onAccept) onAccept();
-    });
-    actions.appendChild(btnAccept);
-    card.appendChild(actions);
-    const badgeSlot = document.createElement("div");
-    badgeSlot.className = "blakfy-badge-slot";
-    card.appendChild(badgeSlot);
-    return card;
-  };
-
-  // src/ui/focus-trap.js
-  var FOCUSABLE = 'button:not([disabled]),a[href],input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])';
-  var activeRoot = null;
-  var activeHandler = null;
-  var activeEscape = null;
-  var restoreFocusTarget = null;
-  var inertedNodes = [];
-  var scrollLockApplied = false;
-  var prevBodyOverflow = "";
-  var prevScrollY = 0;
-  var supportsInert = () => typeof document !== "undefined" && "inert" in document.createElement("div");
-  var applyBackgroundInert = (skipEl) => {
-    if (typeof document === "undefined" || !document.body) return;
-    const useInert = supportsInert();
-    const children = document.body.children;
-    for (let i = 0; i < children.length; i++) {
-      const node = children[i];
-      if (node === skipEl || skipEl && node.contains(skipEl)) continue;
-      if (useInert) {
-        inertedNodes.push({ node, hadInert: node.hasAttribute("inert") });
-        node.setAttribute("inert", "");
-      } else {
-        inertedNodes.push({
-          node,
-          hadTabindex: node.hasAttribute("tabindex"),
-          prevTabindex: node.getAttribute("tabindex"),
-          hadAriaHidden: node.hasAttribute("aria-hidden")
-        });
-        node.setAttribute("tabindex", "-1");
-        node.setAttribute("aria-hidden", "true");
-      }
-    }
-  };
-  var removeBackgroundInert = () => {
-    const useInert = supportsInert();
-    for (let i = 0; i < inertedNodes.length; i++) {
-      const entry = inertedNodes[i];
-      if (useInert) {
-        if (!entry.hadInert) entry.node.removeAttribute("inert");
-      } else {
-        if (entry.hadTabindex) entry.node.setAttribute("tabindex", entry.prevTabindex);
-        else entry.node.removeAttribute("tabindex");
-        if (!entry.hadAriaHidden) entry.node.removeAttribute("aria-hidden");
-      }
-    }
-    inertedNodes = [];
-  };
-  var lockBodyScroll = () => {
-    if (typeof document === "undefined" || !document.body) return;
-    scrollLockApplied = true;
-    prevScrollY = typeof window !== "undefined" && (window.scrollY || window.pageYOffset) || 0;
-    prevBodyOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-  };
-  var unlockBodyScroll = () => {
-    if (!scrollLockApplied || typeof document === "undefined" || !document.body) return;
-    document.body.style.overflow = prevBodyOverflow;
-    scrollLockApplied = false;
-    if (typeof window !== "undefined" && typeof window.scrollTo === "function") {
-      try {
-        window.scrollTo(0, prevScrollY);
-      } catch (e) {
-      }
-    }
-  };
-  var installFocusTrap = (rootEl, options) => {
-    const opts = options || {};
-    const opener = opts.returnFocus === false || typeof document === "undefined" ? null : document.activeElement;
-    removeFocusTrap();
-    if (!rootEl) return;
-    activeRoot = rootEl;
-    activeEscape = opts.onEscape;
-    restoreFocusTarget = opener;
-    if (opts.trapBackground) {
-      const overlayRoot = rootEl.parentNode || rootEl;
-      applyBackgroundInert(overlayRoot);
-    }
-    if (opts.lockScroll) lockBodyScroll();
-    activeHandler = (e) => {
-      if (!activeRoot) return;
-      if (e.key === "Escape") {
-        if (typeof activeEscape === "function") {
-          e.preventDefault();
-          activeEscape();
-        }
-        return;
-      }
-      if (e.key !== "Tab") return;
-      const nodes = activeRoot.querySelectorAll(FOCUSABLE);
-      if (!nodes.length) return;
-      const first = nodes[0];
-      const last = nodes[nodes.length - 1];
-      if (e.shiftKey && document.activeElement === first) {
-        e.preventDefault();
-        last.focus();
-      } else if (!e.shiftKey && document.activeElement === last) {
-        e.preventDefault();
-        first.focus();
-      }
-    };
-    document.addEventListener("keydown", activeHandler);
-    const firstFocusable = rootEl.querySelector(FOCUSABLE);
-    if (firstFocusable) firstFocusable.focus();
-  };
-  var removeFocusTrap = () => {
-    if (activeHandler) {
-      document.removeEventListener("keydown", activeHandler);
-    }
-    removeBackgroundInert();
-    unlockBodyScroll();
-    if (restoreFocusTarget && typeof restoreFocusTarget.focus === "function" && typeof document !== "undefined" && document.body && document.body.contains(restoreFocusTarget)) {
-      restoreFocusTarget.focus();
-    }
-    restoreFocusTarget = null;
-    activeRoot = null;
-    activeHandler = null;
-    activeEscape = null;
-  };
-
-  // src/ui/fab.js
-  var FAB_CLASS = "blakfy-fab";
-  var FINGERPRINT_SVG = '<svg viewBox="0 0 24 24" width="var(--blakfy-fab-icon-size,20px)" height="var(--blakfy-fab-icon-size,20px)" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 3a6 6 0 0 0-6 6v2c0 3.5-1 6-2 7.5"/><path d="M12 3a6 6 0 0 1 6 6v2c0 1.2.15 2.6.5 4"/><path d="M8 21c1-1.5 2-4 2-8v-1a2 2 0 1 1 4 0v3"/><path d="M4 15.5c.7-1.2 1-3 1-4.5V9a7 7 0 0 1 3.5-6.06"/><path d="M16 5.5A7 7 0 0 1 19 11v1.5c0 2.5.3 4.5 1 6"/><path d="M12 8a3 3 0 0 1 3 3v1c0 3 .5 5 1.5 7"/></svg>';
-  var createFab = (opts) => {
-    const o = opts || {};
-    if (typeof document === "undefined") return null;
-    const btn = document.createElement("button");
-    btn.type = "button";
-    btn.className = FAB_CLASS;
-    btn.setAttribute("aria-label", o.ariaLabel || "Privacy settings");
-    btn.setAttribute("aria-haspopup", "dialog");
-    btn.setAttribute("data-blakfy-open", "");
-    btn.innerHTML = FINGERPRINT_SVG;
-    if (o.isRTL) btn.dir = "rtl";
-    btn.addEventListener("click", () => {
-      if (typeof o.onOpen === "function") o.onOpen();
-    });
-    return btn;
-  };
-  var resolveFabConfig = (config) => {
-    const side = config && config.fabSide ? String(config.fabSide) : "left";
-    if (side === "off") return null;
-    return {
-      side: side === "right" ? "right" : "left",
-      offset: config && config.fabOffset != null ? config.fabOffset : null,
-      size: config && config.fabSize != null ? config.fabSize : null,
-      color: config && config.fabColor != null ? config.fabColor : null
-    };
-  };
-  var applyFabTokens = (btn, resolved) => {
-    if (!btn || !resolved) return;
-    btn.classList.toggle("blakfy-fab--right", resolved.side === "right");
-    btn.classList.toggle("blakfy-fab--left", resolved.side !== "right");
-    if (resolved.offset != null) {
-      btn.style.setProperty("--blakfy-fab-offset-x", resolved.offset + "px");
-      btn.style.setProperty("--blakfy-fab-offset-y", resolved.offset + "px");
-    }
-    if (resolved.size != null) {
-      btn.style.setProperty("--blakfy-fab-size", resolved.size + "px");
-    }
-    if (resolved.color != null) {
-      btn.style.setProperty("--blakfy-fab-bg", resolved.color);
-    }
-  };
-
   // src/data/service-metadata.js
   var SERVICE_METADATA = {
     ga4: {
@@ -3058,6 +2548,599 @@
     }
   };
 
+  // src/data/cookie-inspector.js
+  var matchesPreset = (matcher, name) => matcher instanceof RegExp ? matcher.test(name) : matcher === name;
+  var findOwningPreset = (name, presets) => {
+    if (!presets) return null;
+    const keys = Object.keys(presets);
+    for (let i = 0; i < keys.length; i++) {
+      const key = keys[i];
+      const preset = presets[key];
+      if (!preset || !preset.cookies) continue;
+      for (let m = 0; m < preset.cookies.length; m++) {
+        if (matchesPreset(preset.cookies[m], name)) {
+          return { key, preset };
+        }
+      }
+    }
+    return null;
+  };
+  var listObservedCookies = (presets) => {
+    const names = readCookieNames();
+    const out = [];
+    for (let i = 0; i < names.length; i++) {
+      const name = names[i];
+      if (name === COOKIE_NAME) {
+        out.push({
+          name,
+          service: "Blakfy Cookie",
+          category: "essential",
+          purposes: ["Stores your consent decision"],
+          essential: true,
+          unrecognised: false
+        });
+        continue;
+      }
+      const owner = findOwningPreset(name, presets);
+      if (owner) {
+        const meta = SERVICE_METADATA[owner.key];
+        out.push({
+          name,
+          service: meta && meta.displayName || owner.preset.name || owner.key,
+          category: owner.preset.category || meta && meta.category || null,
+          purposes: meta && meta.purposes || [],
+          essential: false,
+          unrecognised: false
+        });
+        continue;
+      }
+      out.push({
+        name,
+        service: null,
+        category: null,
+        purposes: [],
+        essential: false,
+        unrecognised: true
+      });
+    }
+    return out;
+  };
+  var deleteObservedCookie = (name) => {
+    if (!name || name === COOKIE_NAME) return false;
+    expireCookie(name);
+    return true;
+  };
+
+  // src/ui/badge.js
+  var BADGE_HREF = "https://blakfy.com";
+  var BADGE_TEXT_PREFIX = "Powered by ";
+  var BADGE_BRAND = "Blakfy Studio";
+  var BADGE_CLASS = "blakfy-badge";
+  var PROTECT_STYLE_ID = "blakfy-badge-protect";
+  var PROTECT_CSS = ".blakfy-badge{display:flex !important;visibility:visible !important;opacity:0.6 !important;pointer-events:auto !important;}.blakfy-badge:hover{opacity:1 !important;}.blakfy-badge[hidden]{display:flex !important;}";
+  var mountedBadges = /* @__PURE__ */ new Set();
+  var slotMap = /* @__PURE__ */ new WeakMap();
+  var observer = null;
+  var intervalId = null;
+  var rootRef = null;
+  var buildBadgeHref = (medium = "cookie-badge") => {
+    try {
+      const url = new URL(BADGE_HREF);
+      const override = typeof document !== "undefined" && document.documentElement ? document.documentElement.getAttribute("data-blakfy-attribution") : null;
+      if (override === "off") return url.toString();
+      const source = override && override.trim() ? override.trim() : typeof location !== "undefined" ? location.hostname.replace(/^www\./, "") : "";
+      if (source) url.searchParams.set("utm_source", source);
+      url.searchParams.set("utm_medium", medium);
+      url.searchParams.set("utm_campaign", "powered-by");
+      return url.toString();
+    } catch (e) {
+      return BADGE_HREF;
+    }
+  };
+  var buildBadge = () => {
+    const a = document.createElement("a");
+    a.href = buildBadgeHref();
+    a.target = "_blank";
+    a.rel = "noopener";
+    a.referrerPolicy = "origin";
+    a.className = BADGE_CLASS;
+    a.setAttribute("aria-label", "Powered by Blakfy Studio \u2014 opens in new tab");
+    const prefix = document.createTextNode(BADGE_TEXT_PREFIX);
+    a.appendChild(prefix);
+    const strong = document.createElement("strong");
+    strong.textContent = BADGE_BRAND;
+    a.appendChild(strong);
+    const cssText = "display: flex !important; align-items: center; gap: 4px;position: absolute; bottom: 8px; right: 12px;font-size: 11px; font-family: system-ui, -apple-system, sans-serif;color: inherit; text-decoration: none;opacity: 0.6 !important; transition: opacity 0.2s;pointer-events: auto !important;z-index: 1;";
+    a.style.cssText = cssText;
+    return a;
+  };
+  var applyRTL = (badge) => {
+    const rtlAncestor = badge.closest && badge.closest("[dir=rtl]");
+    if (rtlAncestor) {
+      badge.style.right = "auto";
+      badge.style.left = "12px";
+    }
+  };
+  var injectProtectStyle = () => {
+    if (typeof document === "undefined") return;
+    if (document.getElementById(PROTECT_STYLE_ID)) return;
+    const style = document.createElement("style");
+    style.id = PROTECT_STYLE_ID;
+    style.textContent = PROTECT_CSS;
+    (document.head || document.documentElement).appendChild(style);
+  };
+  var replaceBadge = (oldBadge) => {
+    const slot = slotMap.get(oldBadge);
+    const fresh = buildBadge();
+    if (oldBadge.parentNode) {
+      oldBadge.parentNode.replaceChild(fresh, oldBadge);
+    } else if (slot && slot.isConnected) {
+      slot.appendChild(fresh);
+    } else if (rootRef) {
+      rootRef.appendChild(fresh);
+    }
+    mountedBadges.delete(oldBadge);
+    mountedBadges.add(fresh);
+    if (slot) slotMap.set(fresh, slot);
+    applyRTL(fresh);
+    return fresh;
+  };
+  var reAttachBadge = (badge) => {
+    const slot = slotMap.get(badge);
+    if (badge.isConnected) return badge;
+    const fresh = buildBadge();
+    if (slot && slot.isConnected) {
+      slot.appendChild(fresh);
+    } else if (rootRef) {
+      rootRef.appendChild(fresh);
+    } else {
+      return badge;
+    }
+    mountedBadges.delete(badge);
+    mountedBadges.add(fresh);
+    if (slot) slotMap.set(fresh, slot);
+    applyRTL(fresh);
+    return fresh;
+  };
+  var mountBadges = (rootEl) => {
+    if (!rootEl) return [];
+    rootRef = rootEl;
+    const slots = rootEl.querySelectorAll(".blakfy-badge-slot");
+    const result = [];
+    for (let i = 0; i < slots.length; i++) {
+      const slot = slots[i];
+      const existing = slot.querySelector("." + BADGE_CLASS);
+      if (existing) {
+        mountedBadges.add(existing);
+        slotMap.set(existing, slot);
+        applyRTL(existing);
+        result.push(existing);
+        continue;
+      }
+      const badge = buildBadge();
+      while (slot.firstChild) slot.removeChild(slot.firstChild);
+      slot.appendChild(badge);
+      mountedBadges.add(badge);
+      slotMap.set(badge, slot);
+      applyRTL(badge);
+      result.push(badge);
+    }
+    return result;
+  };
+  var verifyBadges = () => {
+    if (typeof window === "undefined" || !window.getComputedStyle) return;
+    const snapshot = Array.from(mountedBadges);
+    for (let i = 0; i < snapshot.length; i++) {
+      const badge = snapshot[i];
+      if (!badge.isConnected) {
+        reAttachBadge(badge);
+        continue;
+      }
+      const cs = window.getComputedStyle(badge);
+      const opacity = parseFloat(cs.opacity);
+      if (isFinite(opacity) && opacity < 0.5 || cs.display === "none" || cs.visibility === "hidden") {
+        replaceBadge(badge);
+      }
+    }
+    if (!document.getElementById(PROTECT_STYLE_ID)) {
+      injectProtectStyle();
+    }
+  };
+  var handleMutations = (records) => {
+    let needsStyleReinject = false;
+    const removedBadges = [];
+    const mutatedBadges = [];
+    for (let i = 0; i < records.length; i++) {
+      const rec = records[i];
+      if (rec.type === "childList") {
+        for (let j = 0; j < rec.removedNodes.length; j++) {
+          const node = rec.removedNodes[j];
+          if (!node || node.nodeType !== 1) continue;
+          if (node.id === PROTECT_STYLE_ID) {
+            needsStyleReinject = true;
+          }
+          if (mountedBadges.has(node)) {
+            removedBadges.push(node);
+          } else if (node.querySelector) {
+            const inner = node.querySelector("." + BADGE_CLASS);
+            if (inner && mountedBadges.has(inner)) {
+              removedBadges.push(inner);
+            }
+          }
+        }
+      } else if (rec.type === "attributes") {
+        const target = rec.target;
+        if (target && mountedBadges.has(target)) {
+          mutatedBadges.push(target);
+        }
+      }
+    }
+    if (needsStyleReinject) {
+      setTimeout(injectProtectStyle, 0);
+    }
+    if (removedBadges.length) {
+      setTimeout(() => {
+        for (let i = 0; i < removedBadges.length; i++) {
+          reAttachBadge(removedBadges[i]);
+        }
+      }, 50);
+    }
+    for (let i = 0; i < mutatedBadges.length; i++) {
+      replaceBadge(mutatedBadges[i]);
+    }
+  };
+  var installAntiTamper = (rootEl) => {
+    if (!rootEl || typeof MutationObserver === "undefined") return;
+    rootRef = rootEl;
+    injectProtectStyle();
+    if (observer) observer.disconnect();
+    observer = new MutationObserver(handleMutations);
+    observer.observe(rootEl, {
+      childList: true,
+      attributes: true,
+      subtree: true,
+      attributeFilter: ["style", "class", "hidden"]
+    });
+    if (document.head) {
+      observer.observe(document.head, { childList: true, subtree: false });
+    }
+    if (intervalId) clearInterval(intervalId);
+    intervalId = setInterval(verifyBadges, 2e3);
+  };
+
+  // src/i18n/policy-strings.js
+  var POLICY_STRINGS = {
+    tr: {
+      tabLabel: "Politika",
+      heading: "\xC7erez ve Gizlilik Bildirimi",
+      incomplete: "Bildirim eksik: site sahibi bilgileri (data-blakfy-operator / -operator-contact) tan\u0131mlanmam\u0131\u015F. Yay\u0131n \xF6ncesi tamamlanmal\u0131.",
+      controllerTitle: "Veri Sorumlusu",
+      controllerName: "Unvan",
+      controllerContact: "\u0130leti\u015Fim",
+      controllerAddress: "Adres",
+      cookiesTitle: "Kullan\u0131lan Hizmetler",
+      noCookies: "\xDC\xE7\xFCnc\xFC taraf hizmet yap\u0131land\u0131r\u0131lmam\u0131\u015F.",
+      purposeLabel: "Ama\xE7",
+      legalBasisLabel: "Hukuki Sebep",
+      retentionLabel: "Saklama S\xFCresi",
+      rightsTitle: "Haklar\u0131n\u0131z",
+      rightsGDPR: "GDPR: eri\u015Fim, d\xFCzeltme, silme, k\u0131s\u0131tlama, ta\u015F\u0131nabilirlik ve itiraz hakk\u0131.",
+      rightsKVKK: "KVKK Md.11: bilgi talep etme, d\xFCzeltme, silme ve itiraz hakk\u0131.",
+      rightsCCPA: "CCPA: bilgi edinme, silme talebi ve sat\u0131\u015Ftan vazge\xE7me (opt-out) hakk\u0131.",
+      rightsDefault: "Haklar\u0131n\u0131z i\xE7in yukar\u0131daki ileti\u015Fim bilgilerini kullan\u0131n.",
+      versionLabel: "S\xFCr\xFCm",
+      lastDecisionLabel: "Son karar",
+      footnote: "Bu bildirim yap\u0131land\u0131r\u0131lm\u0131\u015F hizmetlerden otomatik \xFCretilmi\u015Ftir."
+    },
+    en: {
+      tabLabel: "Policy",
+      heading: "Cookie & Privacy Notice",
+      incomplete: "Notice incomplete: operator identity (data-blakfy-operator / -operator-contact) not configured. Complete before going live.",
+      controllerTitle: "Data Controller",
+      controllerName: "Name",
+      controllerContact: "Contact",
+      controllerAddress: "Address",
+      cookiesTitle: "Services Used",
+      noCookies: "No third-party service is configured on this site.",
+      purposeLabel: "Purpose",
+      legalBasisLabel: "Legal Basis",
+      retentionLabel: "Retention",
+      rightsTitle: "Your Rights",
+      rightsGDPR: "GDPR: right to access, rectify, erase, restrict, port and object.",
+      rightsKVKK: "KVKK Art. 11: right to information, rectification, erasure and objection.",
+      rightsCCPA: "CCPA: right to know, delete, and opt out of sale/sharing.",
+      rightsDefault: "Use the contact details above to exercise your data rights.",
+      versionLabel: "Version",
+      lastDecisionLabel: "Last decision",
+      footnote: "This notice was generated automatically from configured services."
+    }
+  };
+  var getPolicyStrings = (locale) => POLICY_STRINGS[locale] || POLICY_STRINGS.en;
+
+  // src/compliance/policy-text.js
+  var RIGHTS_KEY_BY_JURISDICTION = {
+    GDPR: "rightsGDPR",
+    KVKK: "rightsKVKK",
+    CCPA: "rightsCCPA"
+  };
+  var isAutoPolicy = (policyUrl) => !policyUrl || policyUrl === "auto";
+  var buildPolicyText = ({
+    locale,
+    operator,
+    operatorContact,
+    operatorAddress,
+    jurisdiction,
+    policyVersion,
+    consentTimestamp,
+    enrichedPresets
+  }) => {
+    const s = getPolicyStrings(locale);
+    const hasOperator = !!(operator && operatorContact);
+    const services = (enrichedPresets || []).filter((p) => p && p.meta).map((p) => ({
+      key: p.key,
+      displayName: p.meta.displayName || p.key,
+      category: p.meta.category || "",
+      purposes: p.meta.purposes || [],
+      legalBasis: p.meta.legalBasis || "",
+      retention: p.meta.retention || "",
+      processorName: p.meta.processor && p.meta.processor.name || "",
+      transferCountries: p.meta.transferCountries || []
+    }));
+    const rightsKey = RIGHTS_KEY_BY_JURISDICTION[jurisdiction] || "rightsDefault";
+    return {
+      incomplete: !hasOperator,
+      strings: s,
+      controller: {
+        name: operator || null,
+        contact: operatorContact || null,
+        address: operatorAddress || null
+      },
+      services,
+      rightsText: s[rightsKey] || s.rightsDefault,
+      policyVersion: policyVersion || null,
+      consentTimestamp: consentTimestamp || null
+    };
+  };
+
+  // src/ui/banner.js
+  var createBanner = ({
+    t,
+    isRTL,
+    accent,
+    theme,
+    locale,
+    policyUrl,
+    onAccept,
+    onReject,
+    onPrefs,
+    onOpenPolicy
+  }) => {
+    const card = document.createElement("div");
+    card.className = "blakfy-card";
+    card.setAttribute("dir", isRTL ? "rtl" : "ltr");
+    card.setAttribute("role", "dialog");
+    card.setAttribute("aria-labelledby", "blakfy-title");
+    card.setAttribute("aria-describedby", "blakfy-desc");
+    if (locale) card.setAttribute("lang", locale);
+    card.style.cssText = "--blakfy-accent:" + accent;
+    if (theme && theme !== "light") card.setAttribute("data-blakfy-theme", theme);
+    const h2 = document.createElement("h2");
+    h2.id = "blakfy-title";
+    h2.textContent = t.title;
+    card.appendChild(h2);
+    const p = document.createElement("p");
+    p.id = "blakfy-desc";
+    p.textContent = t.intro + " ";
+    const a = document.createElement("a");
+    if (isAutoPolicy(policyUrl)) {
+      a.href = "#";
+      a.addEventListener("click", (ev) => {
+        ev.preventDefault();
+        if (onOpenPolicy) onOpenPolicy();
+      });
+    } else {
+      a.href = policyUrl;
+    }
+    a.textContent = t.policyLink;
+    p.appendChild(a);
+    card.appendChild(p);
+    const actions = document.createElement("div");
+    actions.className = "blakfy-actions";
+    const btnReject = document.createElement("button");
+    btnReject.className = "blakfy-btn";
+    btnReject.setAttribute("data-act", "reject");
+    btnReject.textContent = t.rejectAll;
+    btnReject.addEventListener("click", () => {
+      if (onReject) onReject();
+    });
+    actions.appendChild(btnReject);
+    const btnPrefs = document.createElement("button");
+    btnPrefs.className = "blakfy-btn";
+    btnPrefs.setAttribute("data-act", "prefs");
+    btnPrefs.textContent = t.preferences;
+    btnPrefs.addEventListener("click", () => {
+      if (onPrefs) onPrefs();
+    });
+    actions.appendChild(btnPrefs);
+    const btnAccept = document.createElement("button");
+    btnAccept.className = "blakfy-btn blakfy-btn-primary";
+    btnAccept.setAttribute("data-act", "accept");
+    btnAccept.textContent = t.acceptAll;
+    btnAccept.addEventListener("click", () => {
+      if (onAccept) onAccept();
+    });
+    actions.appendChild(btnAccept);
+    card.appendChild(actions);
+    const badgeSlot = document.createElement("div");
+    badgeSlot.className = "blakfy-badge-slot";
+    card.appendChild(badgeSlot);
+    return card;
+  };
+
+  // src/ui/fab.js
+  var FAB_CLASS = "blakfy-fab";
+  var FINGERPRINT_SVG = '<svg viewBox="0 0 24 24" width="var(--blakfy-fab-icon-size,20px)" height="var(--blakfy-fab-icon-size,20px)" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M12 3a6 6 0 0 0-6 6v2c0 3.5-1 6-2 7.5"/><path d="M12 3a6 6 0 0 1 6 6v2c0 1.2.15 2.6.5 4"/><path d="M8 21c1-1.5 2-4 2-8v-1a2 2 0 1 1 4 0v3"/><path d="M4 15.5c.7-1.2 1-3 1-4.5V9a7 7 0 0 1 3.5-6.06"/><path d="M16 5.5A7 7 0 0 1 19 11v1.5c0 2.5.3 4.5 1 6"/><path d="M12 8a3 3 0 0 1 3 3v1c0 3 .5 5 1.5 7"/></svg>';
+  var createFab = (opts) => {
+    const o = opts || {};
+    if (typeof document === "undefined") return null;
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = FAB_CLASS;
+    btn.setAttribute("aria-label", o.ariaLabel || "Privacy settings");
+    btn.setAttribute("aria-haspopup", "dialog");
+    btn.setAttribute("data-blakfy-open", "");
+    btn.innerHTML = FINGERPRINT_SVG;
+    if (o.isRTL) btn.dir = "rtl";
+    btn.addEventListener("click", () => {
+      if (typeof o.onOpen === "function") o.onOpen();
+    });
+    return btn;
+  };
+  var resolveFabConfig = (config) => {
+    const side = config && config.fabSide ? String(config.fabSide) : "left";
+    if (side === "off") return null;
+    return {
+      side: side === "right" ? "right" : "left",
+      offset: config && config.fabOffset != null ? config.fabOffset : null,
+      size: config && config.fabSize != null ? config.fabSize : null,
+      color: config && config.fabColor != null ? config.fabColor : null
+    };
+  };
+  var applyFabTokens = (btn, resolved) => {
+    if (!btn || !resolved) return;
+    btn.classList.toggle("blakfy-fab--right", resolved.side === "right");
+    btn.classList.toggle("blakfy-fab--left", resolved.side !== "right");
+    if (resolved.offset != null) {
+      btn.style.setProperty("--blakfy-fab-offset-x", resolved.offset + "px");
+      btn.style.setProperty("--blakfy-fab-offset-y", resolved.offset + "px");
+    }
+    if (resolved.size != null) {
+      btn.style.setProperty("--blakfy-fab-size", resolved.size + "px");
+    }
+    if (resolved.color != null) {
+      btn.style.setProperty("--blakfy-fab-bg", resolved.color);
+    }
+  };
+
+  // src/ui/focus-trap.js
+  var FOCUSABLE = 'button:not([disabled]),a[href],input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])';
+  var activeRoot = null;
+  var activeHandler = null;
+  var activeEscape = null;
+  var restoreFocusTarget = null;
+  var inertedNodes = [];
+  var scrollLockApplied = false;
+  var prevBodyOverflow = "";
+  var prevScrollY = 0;
+  var supportsInert = () => typeof document !== "undefined" && "inert" in document.createElement("div");
+  var applyBackgroundInert = (skipEl) => {
+    if (typeof document === "undefined" || !document.body) return;
+    const useInert = supportsInert();
+    const children = document.body.children;
+    for (let i = 0; i < children.length; i++) {
+      const node = children[i];
+      if (node === skipEl || skipEl && node.contains(skipEl)) continue;
+      if (useInert) {
+        inertedNodes.push({ node, hadInert: node.hasAttribute("inert") });
+        node.setAttribute("inert", "");
+      } else {
+        inertedNodes.push({
+          node,
+          hadTabindex: node.hasAttribute("tabindex"),
+          prevTabindex: node.getAttribute("tabindex"),
+          hadAriaHidden: node.hasAttribute("aria-hidden")
+        });
+        node.setAttribute("tabindex", "-1");
+        node.setAttribute("aria-hidden", "true");
+      }
+    }
+  };
+  var removeBackgroundInert = () => {
+    const useInert = supportsInert();
+    for (let i = 0; i < inertedNodes.length; i++) {
+      const entry = inertedNodes[i];
+      if (useInert) {
+        if (!entry.hadInert) entry.node.removeAttribute("inert");
+      } else {
+        if (entry.hadTabindex) entry.node.setAttribute("tabindex", entry.prevTabindex);
+        else entry.node.removeAttribute("tabindex");
+        if (!entry.hadAriaHidden) entry.node.removeAttribute("aria-hidden");
+      }
+    }
+    inertedNodes = [];
+  };
+  var lockBodyScroll = () => {
+    if (typeof document === "undefined" || !document.body) return;
+    scrollLockApplied = true;
+    prevScrollY = typeof window !== "undefined" && (window.scrollY || window.pageYOffset) || 0;
+    prevBodyOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+  };
+  var unlockBodyScroll = () => {
+    if (!scrollLockApplied || typeof document === "undefined" || !document.body) return;
+    document.body.style.overflow = prevBodyOverflow;
+    scrollLockApplied = false;
+    if (typeof window !== "undefined" && typeof window.scrollTo === "function") {
+      try {
+        window.scrollTo(0, prevScrollY);
+      } catch (e) {
+      }
+    }
+  };
+  var installFocusTrap = (rootEl, options) => {
+    const opts = options || {};
+    const opener = opts.returnFocus === false || typeof document === "undefined" ? null : document.activeElement;
+    removeFocusTrap();
+    if (!rootEl) return;
+    activeRoot = rootEl;
+    activeEscape = opts.onEscape;
+    restoreFocusTarget = opener;
+    if (opts.trapBackground) {
+      const overlayRoot = rootEl.parentNode || rootEl;
+      applyBackgroundInert(overlayRoot);
+    }
+    if (opts.lockScroll) lockBodyScroll();
+    activeHandler = (e) => {
+      if (!activeRoot) return;
+      if (e.key === "Escape") {
+        if (typeof activeEscape === "function") {
+          e.preventDefault();
+          activeEscape();
+        }
+        return;
+      }
+      if (e.key !== "Tab") return;
+      const nodes = activeRoot.querySelectorAll(FOCUSABLE);
+      if (!nodes.length) return;
+      const first = nodes[0];
+      const last = nodes[nodes.length - 1];
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    };
+    document.addEventListener("keydown", activeHandler);
+    const firstFocusable = rootEl.querySelector(FOCUSABLE);
+    if (firstFocusable) firstFocusable.focus();
+  };
+  var removeFocusTrap = () => {
+    if (activeHandler) {
+      document.removeEventListener("keydown", activeHandler);
+    }
+    removeBackgroundInert();
+    unlockBodyScroll();
+    if (restoreFocusTarget && typeof restoreFocusTarget.focus === "function" && typeof document !== "undefined" && document.body && document.body.contains(restoreFocusTarget)) {
+      restoreFocusTarget.focus();
+    }
+    restoreFocusTarget = null;
+    activeRoot = null;
+    activeHandler = null;
+    activeEscape = null;
+  };
+
   // src/ui/modal.js
   var CATEGORIES2 = ["essential", "analytics", "marketing", "functional"];
   var el = (tag, props) => {
@@ -3329,6 +3412,70 @@
     panel.appendChild(content);
     return panel;
   };
+  var buildCookieRow = (entry, t, onDelete) => {
+    const s = safeGet(t, "cookiePanel", {});
+    const row = el("div", { class: "blakfy-cookie-row" });
+    const info = el("div", { class: "blakfy-cookie-info" });
+    info.appendChild(el("strong", { class: "blakfy-cookie-name", text: entry.name }));
+    const meta = el("span", { class: "blakfy-cookie-meta" });
+    if (entry.unrecognised) {
+      meta.textContent = s.unrecognised || "Unrecognised \u2014 not matched to any known service";
+      meta.classList.add("blakfy-cookie-unrecognised");
+    } else {
+      const bits = [entry.service];
+      if (entry.category) bits.push(entry.category);
+      if (entry.purposes && entry.purposes.length) bits.push(entry.purposes.join(", "));
+      meta.textContent = bits.filter(Boolean).join(" \xB7 ");
+    }
+    info.appendChild(meta);
+    row.appendChild(info);
+    if (entry.essential) {
+      row.appendChild(
+        el("span", {
+          class: "blakfy-cookie-essential",
+          text: s.essential || "Essential \u2014 cannot be deleted"
+        })
+      );
+    } else {
+      const del = el("button", {
+        class: "blakfy-btn blakfy-cookie-delete",
+        "data-cookie": entry.name,
+        text: s.delete || "Delete"
+      });
+      del.addEventListener("click", () => {
+        if (onDelete) onDelete(entry.name);
+        row.remove();
+      });
+      row.appendChild(del);
+    }
+    return row;
+  };
+  var buildCookiesPanel = (observedCookies, t, onDelete) => {
+    const s = safeGet(t, "cookiePanel", {});
+    const panel = el("div", {
+      class: "blakfy-tab-panel",
+      "data-panel": "cookies",
+      "aria-hidden": "true"
+    });
+    panel.appendChild(
+      el("p", {
+        class: "blakfy-cookie-caveat",
+        text: s.caveat || "This list shows cookies readable by this page (document.cookie). It cannot see HttpOnly cookies and says nothing about localStorage, IndexedDB, or fingerprinting \u2014 it is a partial view, not a complete inventory."
+      })
+    );
+    const list = el("div", { class: "blakfy-cookie-list" });
+    if (!observedCookies || !observedCookies.length) {
+      list.appendChild(
+        el("p", { class: "blakfy-svc-empty", text: s.empty || "No cookies detected on this page." })
+      );
+    } else {
+      for (let i = 0; i < observedCookies.length; i++) {
+        list.appendChild(buildCookieRow(observedCookies[i], t, onDelete));
+      }
+    }
+    panel.appendChild(list);
+    return panel;
+  };
   var initTabs = (card, initialTab) => {
     const btns = card.querySelectorAll(".blakfy-tab-btn");
     const panels = card.querySelectorAll(".blakfy-tab-panel");
@@ -3374,7 +3521,10 @@
     operatorAddress,
     jurisdiction,
     policyVersion,
-    initialTab
+    initialTab,
+    cookiePanel,
+    observedCookies,
+    onDeleteCookie
   }) => {
     const current = currentState || { analytics: false, marketing: false, functional: false };
     const card = el("div", {
@@ -3448,6 +3598,11 @@
       }
       tabBar.appendChild(makeTabBtn("policy", policy.strings.tabLabel, false));
       card.appendChild(buildPolicyPanel(policy));
+    }
+    if (cookiePanel) {
+      const cookieTabLabel = safeGet(t, "tabs.cookies", "Cookies");
+      tabBar.appendChild(makeTabBtn("cookies", cookieTabLabel, false));
+      card.appendChild(buildCookiesPanel(observedCookies, t, onDeleteCookie));
     }
     card.appendChild(el("div", { class: "blakfy-badge-slot" }));
     initTabs(card, initialTab);
@@ -3633,6 +3788,16 @@
     ".blakfy-service-links{display:flex;gap:12px;margin-top:8px;flex-wrap:wrap}",
     ".blakfy-service-links a{font-size:12px;color:var(--blakfy-accent,#3E5C3A);text-decoration:underline}",
     ".blakfy-svc-empty{font-size:13px;color:#888;padding:16px 0}",
+    // Cookie transparency panel (#39)
+    ".blakfy-cookie-caveat{font-size:11px;color:#888;line-height:1.5;margin:0 0 12px;padding:8px 10px;background:#f7f7f7;border-radius:6px}",
+    ".blakfy-cookie-list{display:flex;flex-direction:column;gap:6px;max-height:360px;overflow-y:auto;padding-right:2px}",
+    ".blakfy-cookie-row{display:flex;align-items:center;gap:8px;padding:8px 10px;border:1px solid #eee;border-radius:6px}",
+    ".blakfy-cookie-info{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}",
+    ".blakfy-cookie-name{font-size:12px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;color:#222;word-break:break-all}",
+    ".blakfy-cookie-meta{font-size:11px;color:#888}",
+    ".blakfy-cookie-unrecognised{color:#b45309}",
+    ".blakfy-cookie-essential{font-size:11px;color:#888;white-space:nowrap}",
+    ".blakfy-cookie-delete{font-size:11px;padding:4px 10px;white-space:nowrap}",
     // About panel
     ".blakfy-about-panel{padding:4px 0}",
     ".blakfy-about-brand{display:flex;align-items:center;gap:8px;margin-bottom:14px}",
@@ -3673,6 +3838,11 @@
     ".blakfy-card[data-blakfy-theme=dark] .blakfy-about-panel p{color:#aaa}",
     ".blakfy-card[data-blakfy-theme=dark] .blakfy-about-meta{color:#666}",
     ".blakfy-card[data-blakfy-theme=dark] .blakfy-svc-empty{color:#666}",
+    ".blakfy-card[data-blakfy-theme=dark] .blakfy-cookie-caveat{background:#252525;color:#999}",
+    ".blakfy-card[data-blakfy-theme=dark] .blakfy-cookie-row{border-color:#333}",
+    ".blakfy-card[data-blakfy-theme=dark] .blakfy-cookie-name{color:#f0f0f0}",
+    ".blakfy-card[data-blakfy-theme=dark] .blakfy-cookie-meta{color:#999}",
+    ".blakfy-card[data-blakfy-theme=dark] .blakfy-cookie-essential{color:#999}",
     // ── Reopen FAB (#34) — token API, see docs in src/ui/fab.js ────────────────
     ":root{--blakfy-fab-side:left;--blakfy-fab-offset-x:20px;--blakfy-fab-offset-y:20px;--blakfy-fab-z:2147483640;--blakfy-fab-size:40px;--blakfy-fab-target:44px;--blakfy-fab-icon-size:20px;--blakfy-fab-bg:var(--blakfy-accent,#3E5C3A);--blakfy-fab-color:#fff;--blakfy-fab-radius:50%;--blakfy-fab-shadow:0 2px 8px rgb(0 0 0 / 0.18);--blakfy-fab-opacity:0.55;--blakfy-fab-opacity-hover:1}",
     ".blakfy-fab{position:fixed;z-index:var(--blakfy-fab-z);width:var(--blakfy-fab-target);height:var(--blakfy-fab-target);display:flex;align-items:center;justify-content:center;padding:0;border:none;cursor:pointer;background:transparent;bottom:calc(var(--blakfy-fab-offset-y) + env(safe-area-inset-bottom,0px))}",
@@ -4085,7 +4255,14 @@
         operatorAddress: config.operatorAddress,
         jurisdiction,
         policyVersion: config.policyVersion,
-        initialTab: opts && opts.tab
+        initialTab: opts && opts.tab,
+        // #39: transparency panel reads against the FULL preset registry (not just the
+        // active list above) so a platform-injected tracker with no matching
+        // data-blakfy-presets entry still shows up correctly attributed instead of
+        // falling into "unrecognised".
+        cookiePanel: config.cookiePanel,
+        observedCookies: config.cookiePanel ? listObservedCookies(PRESETS) : null,
+        onDeleteCookie: (name) => deleteObservedCookie(name)
       });
       overlay.appendChild(card);
       document.body.appendChild(overlay);

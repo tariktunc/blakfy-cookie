@@ -344,6 +344,89 @@ const buildPolicyPanel = (policy) => {
   return panel;
 };
 
+// ── Cookies tab (#39 transparency panel) ──────────────────────────────────────
+//
+// Lists the cookies actually present in document.cookie right now, not the categories
+// we predict — that gap is exactly where gating bugs live (see issue #39). Off by
+// default; a site opts in with data-blakfy-cookie-panel="true".
+
+const buildCookieRow = (entry, t, onDelete) => {
+  const s = safeGet(t, "cookiePanel", {});
+  const row = el("div", { class: "blakfy-cookie-row" });
+
+  const info = el("div", { class: "blakfy-cookie-info" });
+  info.appendChild(el("strong", { class: "blakfy-cookie-name", text: entry.name }));
+
+  const meta = el("span", { class: "blakfy-cookie-meta" });
+  if (entry.unrecognised) {
+    meta.textContent = s.unrecognised || "Unrecognised — not matched to any known service";
+    meta.classList.add("blakfy-cookie-unrecognised");
+  } else {
+    const bits = [entry.service];
+    if (entry.category) bits.push(entry.category);
+    if (entry.purposes && entry.purposes.length) bits.push(entry.purposes.join(", "));
+    meta.textContent = bits.filter(Boolean).join(" · ");
+  }
+  info.appendChild(meta);
+  row.appendChild(info);
+
+  if (entry.essential) {
+    row.appendChild(
+      el("span", {
+        class: "blakfy-cookie-essential",
+        text: s.essential || "Essential — cannot be deleted",
+      })
+    );
+  } else {
+    const del = el("button", {
+      class: "blakfy-btn blakfy-cookie-delete",
+      "data-cookie": entry.name,
+      text: s.delete || "Delete",
+    });
+    del.addEventListener("click", () => {
+      if (onDelete) onDelete(entry.name);
+      row.remove();
+    });
+    row.appendChild(del);
+  }
+
+  return row;
+};
+
+const buildCookiesPanel = (observedCookies, t, onDelete) => {
+  const s = safeGet(t, "cookiePanel", {});
+  const panel = el("div", {
+    class: "blakfy-tab-panel",
+    "data-panel": "cookies",
+    "aria-hidden": "true",
+  });
+
+  panel.appendChild(
+    el("p", {
+      class: "blakfy-cookie-caveat",
+      text:
+        s.caveat ||
+        "This list shows cookies readable by this page (document.cookie). It cannot see " +
+          "HttpOnly cookies and says nothing about localStorage, IndexedDB, or fingerprinting " +
+          "— it is a partial view, not a complete inventory.",
+    })
+  );
+
+  const list = el("div", { class: "blakfy-cookie-list" });
+  if (!observedCookies || !observedCookies.length) {
+    list.appendChild(
+      el("p", { class: "blakfy-svc-empty", text: s.empty || "No cookies detected on this page." })
+    );
+  } else {
+    for (let i = 0; i < observedCookies.length; i++) {
+      list.appendChild(buildCookieRow(observedCookies[i], t, onDelete));
+    }
+  }
+  panel.appendChild(list);
+
+  return panel;
+};
+
 // ── Tab switching ─────────────────────────────────────────────────────────────
 
 const initTabs = (card, initialTab) => {
@@ -400,6 +483,9 @@ export const createModal = ({
   jurisdiction,
   policyVersion,
   initialTab,
+  cookiePanel,
+  observedCookies,
+  onDeleteCookie,
 }) => {
   const current = currentState || { analytics: false, marketing: false, functional: false };
 
@@ -495,6 +581,13 @@ export const createModal = ({
     }
     tabBar.appendChild(makeTabBtn("policy", policy.strings.tabLabel, false));
     card.appendChild(buildPolicyPanel(policy));
+  }
+
+  // #39: Cookies tab — off by default, opt-in via data-blakfy-cookie-panel="true".
+  if (cookiePanel) {
+    const cookieTabLabel = safeGet(t, "tabs.cookies", "Cookies");
+    tabBar.appendChild(makeTabBtn("cookies", cookieTabLabel, false));
+    card.appendChild(buildCookiesPanel(observedCookies, t, onDeleteCookie));
   }
 
   // Badge slot

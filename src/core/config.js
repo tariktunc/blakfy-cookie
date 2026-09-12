@@ -62,6 +62,10 @@ export const DEFAULTS = {
   fabOffset: null,
   fabSize: null,
   fabColor: null,
+  // #39: cookie transparency panel — off by default (issue proposal: "Off by default;
+  // a site opts in"). Lists cookies actually present in document.cookie, with
+  // per-cookie delete. data-blakfy-cookie-panel="true" to enable.
+  cookiePanel: "false",
 };
 
 // document.currentScript is only reliable DURING the synchronous execution of this
@@ -150,5 +154,6 @@ export const readConfig = (scriptEl) => {
     fabOffset: attr("data-blakfy-fab-offset", DEFAULTS.fabOffset),
     fabSize: attr("data-blakfy-fab-size", DEFAULTS.fabSize),
     fabColor: attr("data-blakfy-fab-color", DEFAULTS.fabColor),
+    cookiePanel: attr("data-blakfy-cookie-panel", DEFAULTS.cookiePanel) === "true",
   };
 };

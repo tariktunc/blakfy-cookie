@@ -83,6 +83,16 @@ const RULES = [
   ".blakfy-service-links{display:flex;gap:12px;margin-top:8px;flex-wrap:wrap}",
   ".blakfy-service-links a{font-size:12px;color:var(--blakfy-accent,#3E5C3A);text-decoration:underline}",
   ".blakfy-svc-empty{font-size:13px;color:#888;padding:16px 0}",
+  // Cookie transparency panel (#39)
+  ".blakfy-cookie-caveat{font-size:11px;color:#888;line-height:1.5;margin:0 0 12px;padding:8px 10px;background:#f7f7f7;border-radius:6px}",
+  ".blakfy-cookie-list{display:flex;flex-direction:column;gap:6px;max-height:360px;overflow-y:auto;padding-right:2px}",
+  ".blakfy-cookie-row{display:flex;align-items:center;gap:8px;padding:8px 10px;border:1px solid #eee;border-radius:6px}",
+  ".blakfy-cookie-info{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}",
+  ".blakfy-cookie-name{font-size:12px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;color:#222;word-break:break-all}",
+  ".blakfy-cookie-meta{font-size:11px;color:#888}",
+  ".blakfy-cookie-unrecognised{color:#b45309}",
+  ".blakfy-cookie-essential{font-size:11px;color:#888;white-space:nowrap}",
+  ".blakfy-cookie-delete{font-size:11px;padding:4px 10px;white-space:nowrap}",
   // About panel
   ".blakfy-about-panel{padding:4px 0}",
   ".blakfy-about-brand{display:flex;align-items:center;gap:8px;margin-bottom:14px}",
@@ -123,6 +133,11 @@ const RULES = [
   ".blakfy-card[data-blakfy-theme=dark] .blakfy-about-panel p{color:#aaa}",
   ".blakfy-card[data-blakfy-theme=dark] .blakfy-about-meta{color:#666}",
   ".blakfy-card[data-blakfy-theme=dark] .blakfy-svc-empty{color:#666}",
+  ".blakfy-card[data-blakfy-theme=dark] .blakfy-cookie-caveat{background:#252525;color:#999}",
+  ".blakfy-card[data-blakfy-theme=dark] .blakfy-cookie-row{border-color:#333}",
+  ".blakfy-card[data-blakfy-theme=dark] .blakfy-cookie-name{color:#f0f0f0}",
+  ".blakfy-card[data-blakfy-theme=dark] .blakfy-cookie-meta{color:#999}",
+  ".blakfy-card[data-blakfy-theme=dark] .blakfy-cookie-essential{color:#999}",
   // ── Reopen FAB (#34) — token API, see docs in src/ui/fab.js ────────────────
   ":root{--blakfy-fab-side:left;--blakfy-fab-offset-x:20px;--blakfy-fab-offset-y:20px;--blakfy-fab-z:2147483640;--blakfy-fab-size:40px;--blakfy-fab-target:44px;--blakfy-fab-icon-size:20px;--blakfy-fab-bg:var(--blakfy-accent,#3E5C3A);--blakfy-fab-color:#fff;--blakfy-fab-radius:50%;--blakfy-fab-shadow:0 2px 8px rgb(0 0 0 / 0.18);--blakfy-fab-opacity:0.55;--blakfy-fab-opacity-hover:1}",
   ".blakfy-fab{position:fixed;z-index:var(--blakfy-fab-z);width:var(--blakfy-fab-target);height:var(--blakfy-fab-target);display:flex;align-items:center;justify-content:center;padding:0;border:none;cursor:pointer;background:transparent;bottom:calc(var(--blakfy-fab-offset-y) + env(safe-area-inset-bottom,0px))}",

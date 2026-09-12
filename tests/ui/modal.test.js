@@ -126,3 +126,106 @@ describe("createModal — in-widget policy tab (#49)", () => {
     ).toBe("false");
   });
 });
+
+describe("createModal — cookie transparency panel (#39)", () => {
+  it("does not render a Cookies tab when cookiePanel is falsy (off by default)", () => {
+    const card = createModal(baseProps);
+    expect(card.querySelector('.blakfy-tab-btn[data-tab="cookies"]')).toBeNull();
+    expect(card.querySelector('.blakfy-tab-panel[data-panel="cookies"]')).toBeNull();
+  });
+
+  it("renders a Cookies tab + panel when cookiePanel is true", () => {
+    const card = createModal({ ...baseProps, cookiePanel: true, observedCookies: [] });
+    expect(card.querySelector('.blakfy-tab-btn[data-tab="cookies"]')).not.toBeNull();
+    expect(card.querySelector('.blakfy-tab-panel[data-panel="cookies"]')).not.toBeNull();
+  });
+
+  it("lists each observed cookie with its resolved service name", () => {
+    const card = createModal({
+      ...baseProps,
+      cookiePanel: true,
+      observedCookies: [
+        {
+          name: "_ga_ABC",
+          service: "Google Analytics 4",
+          category: "analytics",
+          purposes: ["Analytics"],
+          essential: false,
+          unrecognised: false,
+        },
+      ],
+    });
+    const panel = card.querySelector('.blakfy-tab-panel[data-panel="cookies"]');
+    expect(panel.textContent).toContain("_ga_ABC");
+    expect(panel.textContent).toContain("Google Analytics 4");
+  });
+
+  it("marks an unrecognised cookie and gives it a delete button", () => {
+    const card = createModal({
+      ...baseProps,
+      cookiePanel: true,
+      observedCookies: [
+        {
+          name: "mystery_cookie",
+          service: null,
+          category: null,
+          purposes: [],
+          essential: false,
+          unrecognised: true,
+        },
+      ],
+    });
+    const panel = card.querySelector('.blakfy-tab-panel[data-panel="cookies"]');
+    expect(panel.querySelector(".blakfy-cookie-unrecognised")).not.toBeNull();
+    expect(panel.querySelector('button[data-cookie="mystery_cookie"]')).not.toBeNull();
+  });
+
+  it("essential cookies get no delete button", () => {
+    const card = createModal({
+      ...baseProps,
+      cookiePanel: true,
+      observedCookies: [
+        {
+          name: "blakfy_consent",
+          service: "Blakfy Cookie",
+          category: "essential",
+          purposes: [],
+          essential: true,
+          unrecognised: false,
+        },
+      ],
+    });
+    const panel = card.querySelector('.blakfy-tab-panel[data-panel="cookies"]');
+    expect(panel.querySelector('button[data-cookie="blakfy_consent"]')).toBeNull();
+    expect(panel.querySelector(".blakfy-cookie-essential")).not.toBeNull();
+  });
+
+  it("clicking delete calls onDeleteCookie with the cookie name and removes the row", () => {
+    const onDeleteCookie = vi.fn();
+    const card = createModal({
+      ...baseProps,
+      cookiePanel: true,
+      observedCookies: [
+        {
+          name: "_fbp",
+          service: "Facebook Pixel",
+          category: "marketing",
+          purposes: [],
+          essential: false,
+          unrecognised: false,
+        },
+      ],
+      onDeleteCookie,
+    });
+    const btn = card.querySelector('button[data-cookie="_fbp"]');
+    btn.click();
+    expect(onDeleteCookie).toHaveBeenCalledWith("_fbp");
+    expect(card.querySelector('button[data-cookie="_fbp"]')).toBeNull();
+  });
+
+  it("shows the empty state when no cookies are observed", () => {
+    const card = createModal({ ...baseProps, cookiePanel: true, observedCookies: [] });
+    const panel = card.querySelector('.blakfy-tab-panel[data-panel="cookies"]');
+    expect(panel.querySelector(".blakfy-svc-empty")).not.toBeNull();
+  });
+});

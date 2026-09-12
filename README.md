@@ -285,6 +285,27 @@ Yandex'in standart consent API'si yoktur, tag-gating kullanılır. Metrica embed
 
 > **Yasal dayanak:** Hizmetler sekmesindeki bilgiler GDPR Madde 13/14 (bilgi yükümlülüğü) ve KVKK Madde 10 (aydınlatma yükümlülüğü) gerekliliklerini karşılar. Presets kullanmadan da her site kendi hizmet bilgilerini `SERVICE_METADATA` yapısına ekleyebilir.
 
+### Opsiyonel 4. Sekme: Cookie Transparency Panel (#39)
+
+`data-blakfy-cookie-panel="true"` ile açılan **"Cookies"** sekmesi, kategorilerin
+öngördüğü değil, `document.cookie`'de **gerçekten o an var olan** çerezleri listeler —
+her satırda çerez adı, eşleşen hizmet (varsa), kategori ve amaç; eşleşmeyen çerezler
+"unrecognised" olarak işaretlenir (operatör için asıl aksiyon alınacak liste budur).
+Zorunlu (essential) kategorideki çerezler ve widget'ın kendi onay kaydı çerezi
+silinemez; diğerleri tek tıkla, kategori reddi ile aynı çok-kapsamlı silme mantığıyla
+(`src/gating/cleaner.js`) kaldırılır.
+
+**Varsayılan: kapalı.** Bir site açıkça opt-in olmalı.
+
+```html
+<script src="..." data-blakfy-cookie-panel="true" ...></script>
+```
+
+**Sınırlamalar (UI'da da belirtilir):**
+
+- `document.cookie` `HttpOnly` çerezleri göremez — liste kaçınılmaz olarak eksiktir.
+- `localStorage`, `IndexedDB` veya fingerprinting hakkında hiçbir şey söylemez.
+
 ---
 
 ## Renk Temaları
@@ -336,6 +357,8 @@ Tüm `<script>` tag'i üzerine konabilen `data-blakfy-*` attribute'ları:
 | `data-blakfy-dnt`            | `respect`                                           | enum               | `respect` (UI'da uyar) \| `auto-deny` (auto-reject)                                                                                                                           |
 | `data-blakfy-status-url`     | `cdn.jsdelivr.net/npm/@blakfy/cookie@2/status.json` | URL                | Status bar mesajları için kaynak. Kendi domain'inde host'lamak için override et.                                                                                              |
 | `data-blakfy-status`         | `true`                                              | bool               | `false` ise status bar render edilmez.                                                                                                                                        |
+| `data-blakfy-cookie-panel`   | `false`                                             | bool               | `true` ise modal'a "Cookies" sekmesi eklenir (#39) — o an gerçekten var olan çerezlerin listesi + tek tek silme. Bkz. "Opsiyonel 4. Sekme" bölümü.                            |
+| `data-blakfy-attribution`    | `null` (host-name)                                  | string/`off`       | "Powered by" badge linkinin `utm_source`'unu domain yerine bir slug'a sabitler; `off` atıfı tamamen kapatır (#40).                                                            |
 
 **Desteklenen 23 dil:** `tr`, `en`, `ar`, `fa`, `ur`, `fr`, `ru`, `de`, `he`, `uk`, `es`, `it`, `pt`, `nl`, `pl`, `sv`, `cs`, `zh`, `zh-TW`, `ja`, `ko`, `id`, `hi` (RTL: `ar`, `fa`, `ur`, `he`).
 

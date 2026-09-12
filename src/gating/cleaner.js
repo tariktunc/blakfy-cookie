@@ -72,7 +72,11 @@ const getRootDomain = (host) => {
   return lastTwo;
 };
 
-const expireCookie = (name) => {
+// Exported for src/data/cookie-inspector.js (#39): the transparency panel needs the
+// exact same multi-scope deletion (host + root-domain, bare + leading-dot variants)
+// used by category cleanup, so a per-cookie delete from the panel behaves identically
+// to a category rejection instead of drifting into a second, weaker implementation.
+export const expireCookie = (name) => {
   if (typeof document === "undefined") return;
   const host = (typeof location !== "undefined" && location.hostname) || "";
   const root = getRootDomain(host);
@@ -99,7 +103,8 @@ const expireCookie = (name) => {
   }
 };
 
-const readCookieNames = () => {
+// Exported for src/data/cookie-inspector.js (#39) — same reasoning as expireCookie above.
+export const readCookieNames = () => {
   if (typeof document === "undefined" || !document.cookie) return [];
   const out = [];
   const parts = document.cookie.split(";");

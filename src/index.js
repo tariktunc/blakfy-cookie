@@ -24,6 +24,7 @@ import {
 import { getScriptEl, readConfig, detectPlacementIssue } from "./core/config.js";
 import { readCookie, writeCookie, buildState } from "./core/consent-store.js";
 import { createEmitter } from "./core/events.js";
+import { listObservedCookies, deleteObservedCookie } from "./data/cookie-inspector.js";
 import {
   runCleanup,
   registerCleanup,
@@ -427,6 +428,13 @@ const bootstrap = async () => {
       jurisdiction: jurisdiction,
       policyVersion: config.policyVersion,
       initialTab: opts && opts.tab,
+      // #39: transparency panel reads against the FULL preset registry (not just the
+      // active list above) so a platform-injected tracker with no matching
+      // data-blakfy-presets entry still shows up correctly attributed instead of
+      // falling into "unrecognised".
+      cookiePanel: config.cookiePanel,
+      observedCookies: config.cookiePanel ? listObservedCookies(PRESETS) : null,
+      onDeleteCookie: (name) => deleteObservedCookie(name),
     });
     overlay.appendChild(card);
     document.body.appendChild(overlay);
