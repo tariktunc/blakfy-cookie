@@ -176,8 +176,13 @@ export const createAPI = (ctx) => {
       deps.openModal({ commit: commit, t: t, currentLocale: currentLocale, state: state });
   };
 
+  // #45: return an unsubscribe function. Without it, a caller that subscribes on every
+  // mount (e.g. the Next wrapper's useBlakfyConsent() hook, remounted on every App
+  // Router route that renders it) has no way to detach the old listener — listeners
+  // accumulate for the life of the page.
   const onChange = (fn) => {
     emitter.on("change", fn);
+    return () => emitter.off("change", fn);
   };
 
   const onConsent = (category, fn) => {

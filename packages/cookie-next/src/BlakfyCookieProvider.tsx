@@ -67,8 +67,11 @@ export function BlakfyCookieProvider({
   if (gpc) dataAttrs["data-blakfy-gpc"] = gpc;
   if (dnt) dataAttrs["data-blakfy-dnt"] = dnt;
   if (statusUrl) dataAttrs["data-blakfy-status-url"] = statusUrl;
+  // #45: the vanilla bundle reads `data-blakfy-status` (src/core/config.js), NOT
+  // `data-blakfy-status-enabled` — this wrapper was writing an attribute name the
+  // vanilla reader never looks at, so `statusEnabled={false}` silently had no effect.
   if (typeof statusEnabled === "boolean")
-    dataAttrs["data-blakfy-status-enabled"] = statusEnabled ? "true" : "false";
+    dataAttrs["data-blakfy-status"] = statusEnabled ? "true" : "false";
 
   return (
     <>

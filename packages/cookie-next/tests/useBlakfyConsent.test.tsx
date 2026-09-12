@@ -11,6 +11,10 @@ const mockApi = (initialState: BlakfyConsentState | null = null) => {
     getState: vi.fn(() => initialState),
     onChange: vi.fn((fn: (s: BlakfyConsentState) => void) => {
       listeners.push(fn);
+      return () => {
+        const i = listeners.indexOf(fn);
+        if (i > -1) listeners.splice(i, 1);
+      };
     }),
     open: vi.fn(),
     acceptAll: vi.fn(),
@@ -118,5 +122,18 @@ describe("useBlakfyConsent", () => {
     expect(result.current.getConsent("marketing")).toBe(false);
     expect(result.current.getConsent("functional")).toBe(true);
     expect(result.current.getConsent("essential")).toBe(true);
+  });
+
+  it("#45: unsubscribes the onChange listener on unmount (no leak across remounts)", () => {
+    const { api, fireChange } = mockApi(sampleState());
+    const { result, unmount } = renderHook(() => useBlakfyConsent());
+    expect(result.current.state?.analytics).toBe(false);
+
+    unmount();
+
+    // A state change fired after unmount must not throw and must not still be
+    // observed by the (already detached) hook instance's setState.
+    expect(() => fireChange(sampleState({ analytics: true }))).not.toThrow();
+    expect(api.onChange).toHaveBeenCalledTimes(1);
   });
 });

@@ -1857,6 +1857,7 @@
     };
     const onChange = (fn) => {
       emitter.on("change", fn);
+      return () => emitter.off("change", fn);
     };
     const onConsent = (category, fn) => {
       if (typeof fn !== "function") return;

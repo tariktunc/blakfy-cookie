@@ -69,6 +69,13 @@ describe("BlakfyCookieProvider", () => {
     expect(widgetScript?.getAttribute("data-blakfy-theme")).toBe("dark");
   });
 
+  it("#45: statusEnabled maps to data-blakfy-status (the vanilla attribute name), not data-blakfy-status-enabled", () => {
+    render(<BlakfyCookieProvider statusEnabled={false} />);
+    const widgetScript = document.querySelector("script[data-blakfy-locale]");
+    expect(widgetScript?.getAttribute("data-blakfy-status")).toBe("false");
+    expect(widgetScript?.hasAttribute("data-blakfy-status-enabled")).toBe(false);
+  });
+
   it("uses beforeInteractive strategy (FOUC koruması)", () => {
     render(<BlakfyCookieProvider />);
     const scripts = document.querySelectorAll("script");

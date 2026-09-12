@@ -113,10 +113,14 @@ export interface BlakfyCookieAPI {
   rejectAll(): void;
   /** Kategori onaylı mı? `essential` her zaman true */
   getConsent(category: ConsentCategory): boolean;
+  /** Ziyaretçi herhangi bir karar verdi mi (#43) */
+  hasDecided(): boolean;
   /** Tam consent state objesi (henüz karar verilmediyse null) */
   getState(): BlakfyConsentState | null;
-  /** State değişince çağrılır */
-  onChange(fn: (state: BlakfyConsentState) => void): void;
+  /** State değişince çağrılır; unsubscribe fonksiyonu döner (#45) */
+  onChange(fn: (state: BlakfyConsentState) => void): () => void;
+  /** Kurulum kendi kendini kontrol (#43) */
+  diagnose(): Record<string, unknown>;
   /** Kategori-bazlı listener; mevcut state ile anında çağrılır */
   onConsent(category: ConsentCategory, fn: (granted: boolean) => void): void;
   /** Dili değiştir (UI re-render) */

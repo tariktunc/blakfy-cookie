@@ -80,8 +80,10 @@ declare global {
       acceptAll(): void;
       rejectAll(): void;
       getConsent(c: ConsentCategory): boolean;
+      hasDecided(): boolean;
       getState(): BlakfyConsentState | null;
-      onChange(fn: (s: BlakfyConsentState) => void): void;
+      onChange(fn: (s: BlakfyConsentState) => void): () => void;
+      diagnose(): Record<string, unknown>;
       onConsent(c: ConsentCategory, fn: (granted: boolean) => void): void;
       setLocale(l: BlakfyLocale): void;
       getMainLang(): BlakfyLocale;

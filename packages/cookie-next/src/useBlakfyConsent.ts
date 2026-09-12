@@ -11,19 +11,28 @@ export function useBlakfyConsent() {
   useEffect(() => {
     if (typeof window === "undefined") return;
     let unsubscribed = false;
+    // #45: without detaching this on unmount, every remount (e.g. an App Router soft
+    // navigation that re-renders whatever calls this hook) leaves the previous
+    // onChange listener attached forever — a growing leak for the life of the page.
+    let unsubscribeChange: (() => void) | null = null;
 
     const subscribe = () => {
       if (unsubscribed) return false;
       const api = window.BlakfyCookie;
       if (!api) return false;
       setState(api.getState());
-      api.onChange((s: BlakfyConsentState) => {
+      unsubscribeChange = api.onChange((s: BlakfyConsentState) => {
         if (!unsubscribed) setState(s);
       });
       return true;
     };
 
-    if (subscribe()) return;
+    if (subscribe()) {
+      return () => {
+        unsubscribed = true;
+        if (unsubscribeChange) unsubscribeChange();
+      };
+    }
 
     const onReady = () => {
       subscribe();
@@ -32,6 +41,7 @@ export function useBlakfyConsent() {
     return () => {
       unsubscribed = true;
       window.removeEventListener("blakfy:ready", onReady);
+      if (unsubscribeChange) unsubscribeChange();
     };
   }, []);
 
