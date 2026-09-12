@@ -4,6 +4,12 @@ All notable changes follow [Keep a Changelog](https://keepachangelog.com/) and S
 
 ---
 
+## [Unreleased]
+
+### Fixed
+
+- Give category switches accessible names using their visible translated titles.
+
 ## [cookie-next 2.3.1] — 2026-08-25
 
 ### Changed

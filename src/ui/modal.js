@@ -36,7 +36,8 @@ const buildCatRow = (key, t, alwaysOn, checked) => {
   const row = el("div", { class: "blakfy-cat" });
 
   const text = el("div", { class: "blakfy-cat-text" });
-  const strong = el("strong", { text: c.title || key });
+  const titleId = "blakfy-cat-title-" + key;
+  const strong = el("strong", { id: titleId, text: c.title || key });
   text.appendChild(strong);
   const span = el("span", {
     text: (c.desc || "") + (alwaysOn ? " (" + (c.always || "") + ")" : ""),
@@ -47,6 +48,7 @@ const buildCatRow = (key, t, alwaysOn, checked) => {
   const sw = el("button", {
     class: "blakfy-switch",
     role: "switch",
+    "aria-labelledby": titleId,
     "aria-checked": checked ? "true" : "false",
     "data-cat": key,
   });
