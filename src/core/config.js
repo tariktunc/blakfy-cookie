@@ -2,6 +2,22 @@
 
 export const CDN_BASE = "https://cdn.jsdelivr.net/npm/@blakfy/cookie@2";
 
+// #41: __BLAKFY_PKG_VERSION__ is a build-time constant — injected by esbuild's `define`
+// in scripts/build.js (and by vitest.config.js's `define` for tests), both reading the
+// exact version straight from package.json. Falling back to CDN_BASE's floating "@2" only
+// happens if a bundle was somehow built without going through scripts/build.js at all.
+const RUNTIME_VERSION =
+  typeof __BLAKFY_PKG_VERSION__ !== "undefined" && __BLAKFY_PKG_VERSION__
+    ? __BLAKFY_PKG_VERSION__
+    : "2";
+
+// #41: the status endpoint is pinned to the EXACT version this bundle was built as, not
+// the floating "@2" major tag CDN_BASE uses for the script itself. A site pinned to
+// 2.3.0 must never be shown a status message written against a later 2.4.x release —
+// that was Problem 1 in #41. (CDN_BASE's own major-tag policy for the *script* URL is a
+// separate, deliberate distribution decision — see docs/architecture.md — untouched here.)
+const STATUS_BASE = "https://cdn.jsdelivr.net/npm/@blakfy/cookie@" + RUNTIME_VERSION;
+
 export const DEFAULTS = {
   locale: "auto",
   mainLang: null,
@@ -29,7 +45,7 @@ export const DEFAULTS = {
   ccpa: "auto",
   gpc: "respect",
   dnt: "respect",
-  statusUrl: CDN_BASE + "/status.json",
+  statusUrl: STATUS_BASE + "/status.json",
   statusEnabled: true,
 };
 

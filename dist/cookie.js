@@ -1103,7 +1103,8 @@
   };
 
   // src/core/config.js
-  var CDN_BASE = "https://cdn.jsdelivr.net/npm/@blakfy/cookie@2";
+  var RUNTIME_VERSION = "2.3.2" ? "2.3.2" : "2";
+  var STATUS_BASE = "https://cdn.jsdelivr.net/npm/@blakfy/cookie@" + RUNTIME_VERSION;
   var DEFAULTS = {
     locale: "auto",
     mainLang: null,
@@ -1131,7 +1132,7 @@
     ccpa: "auto",
     gpc: "respect",
     dnt: "respect",
-    statusUrl: CDN_BASE + "/status.json",
+    statusUrl: STATUS_BASE + "/status.json",
     statusEnabled: true
   };
   var CAPTURED_SCRIPT_EL = typeof document !== "undefined" ? document.currentScript : null;
@@ -3321,14 +3322,44 @@
     statusRoot = root;
     statusData = data;
   };
+  var STATUS_CACHE_TTL_MS = 5 * 60 * 1e3;
+  var statusCacheKey = (url) => "blakfy_status_cache_" + url;
+  var readStatusCache = (url) => {
+    try {
+      const raw = sessionStorage.getItem(statusCacheKey(url));
+      if (!raw) return void 0;
+      const parsed = JSON.parse(raw);
+      if (!parsed || typeof parsed.ts !== "number") return void 0;
+      if (Date.now() - parsed.ts > STATUS_CACHE_TTL_MS) return void 0;
+      return parsed.data === void 0 ? null : parsed.data;
+    } catch (e) {
+      return void 0;
+    }
+  };
+  var writeStatusCache = (url, data) => {
+    try {
+      sessionStorage.setItem(statusCacheKey(url), JSON.stringify({ ts: Date.now(), data }));
+    } catch (e) {
+    }
+  };
+  var normalizeStatus = (data) => {
+    if (!data || !data.active) return null;
+    if (data.expires && new Date(data.expires) < /* @__PURE__ */ new Date()) return null;
+    data._id = (data.expires || "") + (data.type || "");
+    return data;
+  };
   var fetchStatus = (url) => {
     if (!url) return Promise.resolve(null);
-    return fetch(url + (url.indexOf("?") > -1 ? "&" : "?") + "_=" + Date.now(), { cache: "no-store" }).then((r) => r.json()).then((data) => {
-      if (!data || !data.active) return null;
-      if (data.expires && new Date(data.expires) < /* @__PURE__ */ new Date()) return null;
-      data._id = (data.expires || "") + (data.type || "");
-      return data;
-    }).catch(() => null);
+    const cached = readStatusCache(url);
+    if (cached !== void 0) return Promise.resolve(cached);
+    return fetch(url).then((r) => r.json()).then((data) => {
+      const result = normalizeStatus(data);
+      writeStatusCache(url, result);
+      return result;
+    }).catch(() => {
+      writeStatusCache(url, null);
+      return null;
+    });
   };
 
   // src/ui/styles.js

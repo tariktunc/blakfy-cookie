@@ -39,6 +39,9 @@ const baseOpts = {
   legalComments: "linked",
   banner: { js: BANNER },
   logLevel: "info",
+  // #41: src/core/config.js pins the status.json request to the exact version this
+  // bundle was built as, instead of CDN_BASE's floating "@2" major tag.
+  define: { __BLAKFY_PKG_VERSION__: JSON.stringify(PKG_VERSION) },
 };
 
 const TARGETS = [

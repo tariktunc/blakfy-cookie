@@ -71,8 +71,15 @@ describe("config readConfig", () => {
     expect(CDN_BASE).toContain("@blakfy/cookie@2");
     expect(CDN_BASE).not.toContain("@latest");
     expect(CDN_BASE).not.toContain("/gh/");
-    expect(DEFAULTS.statusUrl).toContain("@blakfy/cookie@2");
     expect(DEFAULTS.statusUrl).toMatch(/\/status\.json$/);
+  });
+
+  // #41 Problem 1: statusUrl must be pinned to the exact running version, not the
+  // floating "@2" major tag CDN_BASE uses for the script itself — a site pinned to
+  // 2.3.0 must never be shown a status message written against a later 2.4.x release.
+  it("#41: statusUrl is pinned to an exact x.y.z version, not the floating @2 major", () => {
+    expect(DEFAULTS.statusUrl).toMatch(/@blakfy\/cookie@\d+\.\d+\.\d+\/status\.json$/);
+    expect(DEFAULTS.statusUrl).not.toBe(CDN_BASE + "/status.json");
   });
 });
 

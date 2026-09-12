@@ -1,6 +1,16 @@
+import { readFileSync } from "node:fs";
+import { dirname, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
+
 import { defineConfig } from "vitest/config";
 
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const PKG_VERSION = JSON.parse(readFileSync(resolve(__dirname, "package.json"), "utf8")).version;
+
 export default defineConfig({
+  // #41: mirrors scripts/build.js's esbuild `define` so src/core/config.js's
+  // exact-version status.json URL is testable the same way it's built.
+  define: { __BLAKFY_PKG_VERSION__: JSON.stringify(PKG_VERSION) },
   test: {
     environment: "jsdom",
     globals: true,

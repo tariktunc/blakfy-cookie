@@ -65,6 +65,9 @@ export default [
         ...globals.browser,
         ...globals.node,
         ...globals.es2022,
+        // #41: build-time constant injected by esbuild's `define` in scripts/build.js
+        // (and mirrored in vitest.config.js for tests) — not a real runtime global.
+        __BLAKFY_PKG_VERSION__: "readonly",
       },
     },
     plugins: {

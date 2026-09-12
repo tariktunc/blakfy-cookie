@@ -73,15 +73,70 @@ export const renderStatus = ({ data, currentLocale, mainLang }) => {
   statusData = data;
 };
 
+// #41: once-per-tab-session TTL cache, keyed by URL, so a custom data-blakfy-status-url
+// per site never collides with another site's cache in the same browser. Caches BOTH a
+// real "active" status and a "nothing to report"/failed result (as null) — the point is
+// capping network requests, not just successful ones.
+const STATUS_CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes — #41 checklist: 60-300s TTL
+
+const statusCacheKey = (url) => "blakfy_status_cache_" + url;
+
+const readStatusCache = (url) => {
+  try {
+    const raw = sessionStorage.getItem(statusCacheKey(url));
+    if (!raw) return undefined;
+    const parsed = JSON.parse(raw);
+    if (!parsed || typeof parsed.ts !== "number") return undefined;
+    if (Date.now() - parsed.ts > STATUS_CACHE_TTL_MS) return undefined;
+    return parsed.data === undefined ? null : parsed.data;
+  } catch (e) {
+    return undefined;
+  }
+};
+
+const writeStatusCache = (url, data) => {
+  try {
+    sessionStorage.setItem(statusCacheKey(url), JSON.stringify({ ts: Date.now(), data: data }));
+  } catch (e) {
+    /* ignore — private mode / storage disabled / quota */
+  }
+};
+
+const normalizeStatus = (data) => {
+  if (!data || !data.active) return null;
+  if (data.expires && new Date(data.expires) < new Date()) return null;
+  data._id = (data.expires || "") + (data.type || "");
+  return data;
+};
+
+// #41: fixes two problems with the previous implementation —
+// 1. `cache: "no-store"` + a `_=Date.now()` cache-buster meant no browser or CDN cache
+//    could ever serve this, forever, on every page view of every client site. Plain
+//    `fetch(url)` now lets normal HTTP caching (jsDelivr's own Cache-Control) apply.
+// 2. Even with HTTP caching, a page load still spent a network round trip. The
+//    sessionStorage layer above caps this to at most one request per tab per
+//    STATUS_CACHE_TTL_MS, independent of whatever cache headers the endpoint sends —
+//    a status banner does not need sub-minute freshness.
+// A failed or slow fetch never delays or blocks anything else: this function is only
+// ever called fire-and-forget from bootstrap() (see src/index.js step 17), never awaited
+// on the consent path.
 export const fetchStatus = (url) => {
   if (!url) return Promise.resolve(null);
-  return fetch(url + (url.indexOf("?") > -1 ? "&" : "?") + "_=" + Date.now(), { cache: "no-store" })
+
+  const cached = readStatusCache(url);
+  if (cached !== undefined) return Promise.resolve(cached);
+
+  return fetch(url)
     .then((r) => r.json())
     .then((data) => {
-      if (!data || !data.active) return null;
-      if (data.expires && new Date(data.expires) < new Date()) return null;
-      data._id = (data.expires || "") + (data.type || "");
-      return data;
+      const result = normalizeStatus(data);
+      writeStatusCache(url, result);
+      return result;
     })
-    .catch(() => null);
+    .catch(() => {
+      // Cache the miss too — a slow/unreachable endpoint shouldn't be retried on every
+      // single page view for the rest of the TTL window either.
+      writeStatusCache(url, null);
+      return null;
+    });
 };
