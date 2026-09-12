@@ -52,6 +52,10 @@ describe("API v1 ↔ v2 backwards-compat surface", () => {
     expect(typeof api.getMainLang).toBe("function");
   });
 
+  it("#49: exposes openPolicy()", () => {
+    expect(typeof api.openPolicy).toBe("function");
+  });
+
   it("exposes v2 additions", () => {
     expect(typeof api.onConsent).toBe("function");
     expect(typeof api.registerCleanup).toBe("function");
@@ -125,6 +129,13 @@ describe("API behavior", () => {
     const result = api.diagnose();
     expect(result).toHaveProperty("note");
     expect(result.placementOk).toBeNull();
+  });
+
+  it("#49: openPolicy() calls deps.openModal with tab:'policy'", () => {
+    const ctx = makeCtx();
+    const api = createAPI(ctx);
+    api.openPolicy();
+    expect(ctx.deps.openModal).toHaveBeenCalledWith(expect.objectContaining({ tab: "policy" }));
   });
 
   it("#43: diagnose() delegates to deps.getDiagnostics when provided", () => {

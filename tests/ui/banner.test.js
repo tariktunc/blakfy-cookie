@@ -78,6 +78,30 @@ describe("createBanner", () => {
     expect(link.textContent).toBe("Çerez Politikası");
   });
 
+  it("#49: policy link opens in-widget policy view instead of navigating when policyUrl is 'auto'", () => {
+    const onOpenPolicy = vi.fn();
+    const card = createBanner({
+      t,
+      isRTL: false,
+      accent: "#000",
+      theme: "auto",
+      policyUrl: "auto",
+      onOpenPolicy,
+    });
+    const link = card.querySelector("a");
+    expect(link.getAttribute("href")).toBe("#");
+    link.dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true }));
+    expect(onOpenPolicy).toHaveBeenCalledTimes(1);
+  });
+
+  it("#49: policy link opens in-widget policy view when policyUrl is unset", () => {
+    const onOpenPolicy = vi.fn();
+    const card = createBanner({ t, isRTL: false, accent: "#000", theme: "auto", onOpenPolicy });
+    const link = card.querySelector("a");
+    link.dispatchEvent(new MouseEvent("click", { bubbles: true, cancelable: true }));
+    expect(onOpenPolicy).toHaveBeenCalledTimes(1);
+  });
+
   it("3 buttons: reject, prefs, accept (in that order)", () => {
     const card = createBanner({ t, isRTL: false, accent: "#000", theme: "auto", policyUrl: "/p" });
     const buttons = card.querySelectorAll("button");

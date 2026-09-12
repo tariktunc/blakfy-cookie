@@ -1,5 +1,6 @@
 // blakfy-cookie/src/ui/modal.js — preferences modal: Categories | Services | About
 
+import { buildPolicyText, isAutoPolicy } from "../compliance/policy-text.js";
 import { SERVICE_METADATA } from "../data/service-metadata.js";
 
 const CATEGORIES = ["essential", "analytics", "marketing", "functional"];
@@ -275,9 +276,77 @@ const buildAboutPanel = (t, version) => {
   return panel;
 };
 
+// ── Policy tab (#49) ──────────────────────────────────────────────────────────
+
+const buildPolicyPanel = (policy) => {
+  const panel = el("div", {
+    class: "blakfy-tab-panel",
+    "data-panel": "policy",
+    "aria-hidden": "true",
+  });
+  const s = policy.strings;
+  const content = el("div", { class: "blakfy-policy-panel" });
+
+  content.appendChild(el("h3", { text: s.heading }));
+
+  if (policy.incomplete) {
+    content.appendChild(el("p", { class: "blakfy-policy-warning", text: s.incomplete }));
+  }
+
+  content.appendChild(el("h4", { text: s.controllerTitle }));
+  const dlController = el("dl", { class: "blakfy-service-dl" });
+  const addRow = (label, value) => {
+    if (!value) return;
+    dlController.appendChild(el("dt", { class: "blakfy-service-dt", text: label }));
+    dlController.appendChild(el("dd", { class: "blakfy-service-dd", text: value }));
+  };
+  addRow(s.controllerName, policy.controller.name);
+  addRow(s.controllerContact, policy.controller.contact);
+  addRow(s.controllerAddress, policy.controller.address);
+  content.appendChild(dlController);
+
+  content.appendChild(el("h4", { text: s.cookiesTitle }));
+  if (!policy.services.length) {
+    content.appendChild(el("p", { text: s.noCookies }));
+  } else {
+    for (let i = 0; i < policy.services.length; i++) {
+      const svc = policy.services[i];
+      const card = el("div", { class: "blakfy-service-card" });
+      card.appendChild(el("strong", { text: svc.displayName }));
+      const dl = el("dl", { class: "blakfy-service-dl" });
+      const row = (label, value) => {
+        if (!value) return;
+        dl.appendChild(el("dt", { class: "blakfy-service-dt", text: label }));
+        dl.appendChild(el("dd", { class: "blakfy-service-dd", text: value }));
+      };
+      row(s.purposeLabel, svc.purposes.join(", "));
+      row(s.legalBasisLabel, svc.legalBasis);
+      row(s.retentionLabel, svc.retention);
+      card.appendChild(dl);
+      content.appendChild(card);
+    }
+  }
+
+  content.appendChild(el("h4", { text: s.rightsTitle }));
+  content.appendChild(el("p", { text: policy.rightsText }));
+
+  const meta = el("p", { class: "blakfy-about-meta" });
+  meta.textContent =
+    s.versionLabel +
+    ": " +
+    (policy.policyVersion || "-") +
+    (policy.consentTimestamp ? " · " + s.lastDecisionLabel + ": " + policy.consentTimestamp : "");
+  content.appendChild(meta);
+
+  content.appendChild(el("p", { class: "blakfy-policy-footnote", text: s.footnote }));
+
+  panel.appendChild(content);
+  return panel;
+};
+
 // ── Tab switching ─────────────────────────────────────────────────────────────
 
-const initTabs = (card) => {
+const initTabs = (card, initialTab) => {
   const btns = card.querySelectorAll(".blakfy-tab-btn");
   const panels = card.querySelectorAll(".blakfy-tab-panel");
 
@@ -301,6 +370,13 @@ const initTabs = (card) => {
       switchTab(this.getAttribute("data-tab"));
     });
   }
+
+  // #49: openPolicy()/banner link land directly on a specific tab instead of always
+  // defaulting to Categories.
+  if (initialTab) {
+    const exists = card.querySelector('.blakfy-tab-btn[data-tab="' + initialTab + '"]');
+    if (exists) switchTab(initialTab);
+  }
 };
 
 // ── Public factory ────────────────────────────────────────────────────────────
@@ -317,6 +393,13 @@ export const createModal = ({
   onSave,
   onAccept,
   onClose,
+  policyUrl,
+  operator,
+  operatorContact,
+  operatorAddress,
+  jurisdiction,
+  policyVersion,
+  initialTab,
 }) => {
   const current = currentState || { analytics: false, marketing: false, functional: false };
 
@@ -385,11 +468,40 @@ export const createModal = ({
   card.appendChild(buildServicesPanel(enriched, t));
   card.appendChild(buildAboutPanel(t, version));
 
+  // #49: Policy tab — only when no real off-site policy page is configured. The
+  // generated notice needs somewhere to live that is "reachable before consent,
+  // linked from the banner itself" per the issue; this tab is that place, and
+  // banner.js's policyUrl link opens the modal straight onto it (initialTab).
+  if (isAutoPolicy(policyUrl)) {
+    const policy = buildPolicyText({
+      locale: locale,
+      operator: operator,
+      operatorContact: operatorContact,
+      operatorAddress: operatorAddress,
+      jurisdiction: jurisdiction,
+      policyVersion: policyVersion,
+      consentTimestamp: currentState && currentState.timestamp,
+      enrichedPresets: enriched,
+    });
+    if (policy.incomplete && typeof console !== "undefined" && console.error) {
+      // Fail loud (#43 philosophy): an incomplete controller-identity notice is a
+      // real compliance gap, not a cosmetic one — surface it every time it renders.
+      console.error(
+        "[Blakfy Cookie] In-widget policy notice is INCOMPLETE — data-blakfy-operator " +
+          "and/or data-blakfy-operator-contact are not configured. GDPR Art. 13(1)(a) / " +
+          "KVKK Md.10 require the controller's identity in this notice. Set both attributes " +
+          "(or configure a real data-blakfy-policy-url instead) before this site goes live."
+      );
+    }
+    tabBar.appendChild(makeTabBtn("policy", policy.strings.tabLabel, false));
+    card.appendChild(buildPolicyPanel(policy));
+  }
+
   // Badge slot
   card.appendChild(el("div", { class: "blakfy-badge-slot" }));
 
   // Wire up tab switching after DOM is built
-  initTabs(card);
+  initTabs(card, initialTab);
 
   return card;
 };

@@ -67,9 +67,16 @@ export interface BlakfyConsentState {
 export interface BlakfyCookieConfig {
   locale?: BlakfyLocale | "auto";
   mainLang?: BlakfyLocale;
+  /** "auto" veya boş -> widget içi üretilmiş bildirim (#49). Gerçek sayfa varsa link. */
   policyUrl?: string;
   policyVersion?: string;
   auditEndpoint?: string;
+  /** Veri sorumlusu unvanı — widget içi bildirim için zorunlu (#49) */
+  operator?: string;
+  /** Veri sorumlusu iletişim bilgisi (e-posta/URL) — widget içi bildirim için zorunlu (#49) */
+  operatorContact?: string;
+  /** Veri sorumlusu adresi — opsiyonel (#49) */
+  operatorAddress?: string;
   position?: BlakfyPosition;
   theme?: BlakfyTheme;
   accent?: string;
@@ -107,6 +114,8 @@ export interface BlakfyCookieAPI {
   version: string;
   /** Tercihler modalını aç */
   open(): void;
+  /** Widget içi politika bildirimini aç (#49) */
+  openPolicy(): void;
   /** Tüm kategorileri kabul et */
   acceptAll(): void;
   /** Tüm kategorileri reddet (essential dışında) */

@@ -333,6 +333,7 @@ const bootstrap = async () => {
           currentLocale: currentLocale,
           state: state,
         }),
+      onOpenPolicy: () => mountModal({ t: t, tab: "policy" }),
     });
     overlay.appendChild(card);
     document.body.appendChild(overlay);
@@ -376,6 +377,15 @@ const bootstrap = async () => {
       onSave: (prefs) => api.__internal.commit(prefs, "save"),
       onAccept: () => api.acceptAll(),
       onClose: () => api.__internal.closeUI(),
+      // #49: in-widget policy notice — passed through regardless of tab so the
+      // Policy tab is available every time the modal opens, not only via openPolicy().
+      policyUrl: config.policyUrl,
+      operator: config.operator,
+      operatorContact: config.operatorContact,
+      operatorAddress: config.operatorAddress,
+      jurisdiction: jurisdiction,
+      policyVersion: config.policyVersion,
+      initialTab: opts && opts.tab,
     });
     overlay.appendChild(card);
     document.body.appendChild(overlay);

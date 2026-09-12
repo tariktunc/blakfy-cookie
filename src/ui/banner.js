@@ -1,5 +1,7 @@
 // blakfy-cookie/src/ui/banner.js — first-visit consent banner DOM factory
 
+import { isAutoPolicy } from "../compliance/policy-text.js";
+
 export const createBanner = ({
   t,
   isRTL,
@@ -10,6 +12,7 @@ export const createBanner = ({
   onAccept,
   onReject,
   onPrefs,
+  onOpenPolicy,
 }) => {
   const card = document.createElement("div");
   card.className = "blakfy-card";
@@ -33,7 +36,18 @@ export const createBanner = ({
   p.id = "blakfy-desc";
   p.textContent = t.intro + " ";
   const a = document.createElement("a");
-  a.href = policyUrl;
+  // #49: "auto" (or unset) means no real policy page exists on this site — link
+  // off-site to nothing (that is exactly the 404 this issue was opened over).
+  // Open the widget's own generated notice instead.
+  if (isAutoPolicy(policyUrl)) {
+    a.href = "#";
+    a.addEventListener("click", (ev) => {
+      ev.preventDefault();
+      if (onOpenPolicy) onOpenPolicy();
+    });
+  } else {
+    a.href = policyUrl;
+  }
   a.textContent = t.policyLink;
   p.appendChild(a);
   card.appendChild(p);

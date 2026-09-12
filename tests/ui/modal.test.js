@@ -1,6 +1,6 @@
 // tests/ui/modal.test.js — preferences modal a11y attributes (#27)
 
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 
 import { createModal } from "../../src/ui/modal.js";
 
@@ -65,5 +65,64 @@ describe("createModal", () => {
     const sw = card.querySelector('[data-cat="essential"]');
     const labelledby = sw.getAttribute("aria-labelledby");
     expect(card.querySelector("#" + labelledby).textContent).toBe("essential");
+  });
+});
+
+describe("createModal — in-widget policy tab (#49)", () => {
+  it("adds a Policy tab when policyUrl is 'auto' (default)", () => {
+    const card = createModal({ ...baseProps, policyUrl: "auto", locale: "en" });
+    expect(card.querySelector('.blakfy-tab-btn[data-tab="policy"]')).not.toBeNull();
+    expect(card.querySelector('.blakfy-tab-panel[data-panel="policy"]')).not.toBeNull();
+  });
+
+  it("adds a Policy tab when policyUrl is unset", () => {
+    const card = createModal({ ...baseProps, locale: "en" });
+    expect(card.querySelector('.blakfy-tab-btn[data-tab="policy"]')).not.toBeNull();
+  });
+
+  it("does NOT add a Policy tab when a real policyUrl is configured", () => {
+    const card = createModal({ ...baseProps, policyUrl: "/cerez-politikasi", locale: "en" });
+    expect(card.querySelector('.blakfy-tab-btn[data-tab="policy"]')).toBeNull();
+    expect(card.querySelector('.blakfy-tab-panel[data-panel="policy"]')).toBeNull();
+  });
+
+  it("shows the incomplete warning when operator/operatorContact are not configured", () => {
+    const card = createModal({ ...baseProps, locale: "en" });
+    const panel = card.querySelector('.blakfy-tab-panel[data-panel="policy"]');
+    expect(panel.querySelector(".blakfy-policy-warning")).not.toBeNull();
+  });
+
+  it("logs a console.error when the notice is incomplete", () => {
+    const spy = vi.spyOn(console, "error").mockImplementation(() => {});
+    createModal({ ...baseProps, locale: "en" });
+    expect(spy).toHaveBeenCalled();
+    expect(spy.mock.calls[0][0]).toContain("INCOMPLETE");
+    spy.mockRestore();
+  });
+
+  it("does not warn and renders controller identity when operator fields are set", () => {
+    const spy = vi.spyOn(console, "error").mockImplementation(() => {});
+    const card = createModal({
+      ...baseProps,
+      locale: "en",
+      operator: "Acme A.S.",
+      operatorContact: "privacy@acme.test",
+    });
+    const panel = card.querySelector('.blakfy-tab-panel[data-panel="policy"]');
+    expect(panel.querySelector(".blakfy-policy-warning")).toBeNull();
+    expect(panel.textContent).toContain("Acme A.S.");
+    expect(spy).not.toHaveBeenCalled();
+    spy.mockRestore();
+  });
+
+  it("initialTab='policy' opens directly on the Policy tab", () => {
+    const card = createModal({ ...baseProps, locale: "en", initialTab: "policy" });
+    const policyBtn = card.querySelector('.blakfy-tab-btn[data-tab="policy"]');
+    const catBtn = card.querySelector('.blakfy-tab-btn[data-tab="categories"]');
+    expect(policyBtn.getAttribute("aria-selected")).toBe("true");
+    expect(catBtn.getAttribute("aria-selected")).toBe("false");
+    expect(
+      card.querySelector('.blakfy-tab-panel[data-panel="policy"]').getAttribute("aria-hidden")
+    ).toBe("false");
   });
 });

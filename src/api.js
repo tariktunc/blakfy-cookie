@@ -176,6 +176,19 @@ export const createAPI = (ctx) => {
       deps.openModal({ commit: commit, t: t, currentLocale: currentLocale, state: state });
   };
 
+  // #49: BlakfyCookie.openPolicy() — the issue asks for a footer link to reach the
+  // in-widget notice too, not only the banner's own link.
+  const openPolicy = () => {
+    if (deps && typeof deps.openModal === "function")
+      deps.openModal({
+        commit: commit,
+        t: t,
+        currentLocale: currentLocale,
+        state: state,
+        tab: "policy",
+      });
+  };
+
   // #45: return an unsubscribe function. Without it, a caller that subscribes on every
   // mount (e.g. the Next wrapper's useBlakfyConsent() hook, remounted on every App
   // Router route that renders it) has no way to detach the old listener — listeners
@@ -263,6 +276,7 @@ export const createAPI = (ctx) => {
   return {
     version: VERSION,
     open: open,
+    openPolicy: openPolicy,
     acceptAll: acceptAll,
     rejectAll: rejectAll,
     getConsent: getConsent,

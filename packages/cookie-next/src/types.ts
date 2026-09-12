@@ -48,9 +48,16 @@ export interface BlakfyConsentState {
 export interface BlakfyCookieConfig {
   locale?: BlakfyLocale | "auto";
   mainLang?: BlakfyLocale;
+  /** "auto" or unset -> in-widget generated notice (#49). A real page gets a link. */
   policyUrl?: string;
   policyVersion?: string;
   auditEndpoint?: string;
+  /** Data controller name — required for the in-widget notice to be complete (#49) */
+  operator?: string;
+  /** Data controller contact (email or URL) — required for the in-widget notice (#49) */
+  operatorContact?: string;
+  /** Data controller address — optional (#49) */
+  operatorAddress?: string;
   position?:
     | "bottom-center"
     | "bottom-right"
@@ -77,6 +84,7 @@ declare global {
     BlakfyCookie?: {
       version: string;
       open(): void;
+      openPolicy(): void;
       acceptAll(): void;
       rejectAll(): void;
       getConsent(c: ConsentCategory): boolean;

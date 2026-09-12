@@ -5,9 +5,20 @@ export const CDN_BASE = "https://cdn.jsdelivr.net/npm/@blakfy/cookie@2";
 export const DEFAULTS = {
   locale: "auto",
   mainLang: null,
-  policyUrl: "/cerez-politikasi",
+  // #49 (owner decision 2026-09-12): default to "auto" (in-widget generated notice)
+  // instead of a hardcoded path most sites never created — that hardcoded default is
+  // exactly what produced live 404s on suestebeauty.com and senelli.com. A site with
+  // a real policy page still sets data-blakfy-policy-url explicitly and gets the old
+  // off-site link behaviour.
+  policyUrl: "auto",
   policyVersion: "1.0",
   auditEndpoint: null,
+  // #49: required for the generated in-widget notice (GDPR Art. 13(1)(a) / KVKK
+  // Md.10 controller identity). Left unset, the notice renders but is marked
+  // incomplete and says so loudly — see src/compliance/policy-text.js.
+  operator: null,
+  operatorContact: null,
+  operatorAddress: null,
   position: "bottom-center",
   margin: "16",
   theme: "auto",
@@ -88,6 +99,9 @@ export const readConfig = (scriptEl) => {
     policyUrl: attr("data-blakfy-policy-url", DEFAULTS.policyUrl),
     policyVersion: attr("data-blakfy-version", DEFAULTS.policyVersion),
     auditEndpoint: attr("data-blakfy-audit-endpoint", DEFAULTS.auditEndpoint),
+    operator: attr("data-blakfy-operator", DEFAULTS.operator),
+    operatorContact: attr("data-blakfy-operator-contact", DEFAULTS.operatorContact),
+    operatorAddress: attr("data-blakfy-operator-address", DEFAULTS.operatorAddress),
     position: attr("data-blakfy-position", DEFAULTS.position),
     margin: attr("data-blakfy-margin", DEFAULTS.margin),
     theme: attr("data-blakfy-theme", DEFAULTS.theme),

@@ -18,6 +18,9 @@ export function BlakfyCookieProvider({
   policyUrl,
   policyVersion,
   auditEndpoint,
+  operator,
+  operatorContact,
+  operatorAddress,
   position = "bottom-center",
   theme = "auto",
   accent,
@@ -57,6 +60,12 @@ export function BlakfyCookieProvider({
   if (policyUrl) dataAttrs["data-blakfy-policy-url"] = policyUrl;
   if (policyVersion) dataAttrs["data-blakfy-version"] = policyVersion;
   if (auditEndpoint) dataAttrs["data-blakfy-audit-endpoint"] = auditEndpoint;
+  // #49: required for a complete in-widget notice when policyUrl is unset/"auto" —
+  // see src/compliance/policy-text.js in the vanilla package for what happens
+  // without these (the notice renders but is marked incomplete, loudly, in console).
+  if (operator) dataAttrs["data-blakfy-operator"] = operator;
+  if (operatorContact) dataAttrs["data-blakfy-operator-contact"] = operatorContact;
+  if (operatorAddress) dataAttrs["data-blakfy-operator-address"] = operatorAddress;
   if (position) dataAttrs["data-blakfy-position"] = position;
   if (theme) dataAttrs["data-blakfy-theme"] = theme;
   if (accent) dataAttrs["data-blakfy-accent"] = accent;

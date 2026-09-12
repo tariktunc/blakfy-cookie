@@ -1855,6 +1855,16 @@
       if (deps && typeof deps.openModal === "function")
         deps.openModal({ commit, t, currentLocale, state });
     };
+    const openPolicy = () => {
+      if (deps && typeof deps.openModal === "function")
+        deps.openModal({
+          commit,
+          t,
+          currentLocale,
+          state,
+          tab: "policy"
+        });
+    };
     const onChange = (fn) => {
       emitter.on("change", fn);
       return () => emitter.off("change", fn);
@@ -1921,6 +1931,7 @@
     return {
       version: VERSION,
       open,
+      openPolicy,
       acceptAll,
       rejectAll,
       getConsent,
@@ -2394,9 +2405,20 @@
   var DEFAULTS = {
     locale: "auto",
     mainLang: null,
-    policyUrl: "/cerez-politikasi",
+    // #49 (owner decision 2026-09-12): default to "auto" (in-widget generated notice)
+    // instead of a hardcoded path most sites never created — that hardcoded default is
+    // exactly what produced live 404s on suestebeauty.com and senelli.com. A site with
+    // a real policy page still sets data-blakfy-policy-url explicitly and gets the old
+    // off-site link behaviour.
+    policyUrl: "auto",
     policyVersion: "1.0",
     auditEndpoint: null,
+    // #49: required for the generated in-widget notice (GDPR Art. 13(1)(a) / KVKK
+    // Md.10 controller identity). Left unset, the notice renders but is marked
+    // incomplete and says so loudly — see src/compliance/policy-text.js.
+    operator: null,
+    operatorContact: null,
+    operatorAddress: null,
     position: "bottom-center",
     margin: "16",
     theme: "auto",
@@ -2442,6 +2464,9 @@
       policyUrl: attr("data-blakfy-policy-url", DEFAULTS.policyUrl),
       policyVersion: attr("data-blakfy-version", DEFAULTS.policyVersion),
       auditEndpoint: attr("data-blakfy-audit-endpoint", DEFAULTS.auditEndpoint),
+      operator: attr("data-blakfy-operator", DEFAULTS.operator),
+      operatorContact: attr("data-blakfy-operator-contact", DEFAULTS.operatorContact),
+      operatorAddress: attr("data-blakfy-operator-address", DEFAULTS.operatorAddress),
       position: attr("data-blakfy-position", DEFAULTS.position),
       margin: attr("data-blakfy-margin", DEFAULTS.margin),
       theme: attr("data-blakfy-theme", DEFAULTS.theme),
@@ -3431,6 +3456,100 @@
     intervalId = setInterval(verifyBadges, 2e3);
   };
 
+  // src/i18n/policy-strings.js
+  var POLICY_STRINGS = {
+    tr: {
+      tabLabel: "Politika",
+      heading: "\xC7erez ve Gizlilik Bildirimi",
+      incomplete: "Bildirim eksik: site sahibi bilgileri (data-blakfy-operator / -operator-contact) tan\u0131mlanmam\u0131\u015F. Yay\u0131n \xF6ncesi tamamlanmal\u0131.",
+      controllerTitle: "Veri Sorumlusu",
+      controllerName: "Unvan",
+      controllerContact: "\u0130leti\u015Fim",
+      controllerAddress: "Adres",
+      cookiesTitle: "Kullan\u0131lan Hizmetler",
+      noCookies: "\xDC\xE7\xFCnc\xFC taraf hizmet yap\u0131land\u0131r\u0131lmam\u0131\u015F.",
+      purposeLabel: "Ama\xE7",
+      legalBasisLabel: "Hukuki Sebep",
+      retentionLabel: "Saklama S\xFCresi",
+      rightsTitle: "Haklar\u0131n\u0131z",
+      rightsGDPR: "GDPR: eri\u015Fim, d\xFCzeltme, silme, k\u0131s\u0131tlama, ta\u015F\u0131nabilirlik ve itiraz hakk\u0131.",
+      rightsKVKK: "KVKK Md.11: bilgi talep etme, d\xFCzeltme, silme ve itiraz hakk\u0131.",
+      rightsCCPA: "CCPA: bilgi edinme, silme talebi ve sat\u0131\u015Ftan vazge\xE7me (opt-out) hakk\u0131.",
+      rightsDefault: "Haklar\u0131n\u0131z i\xE7in yukar\u0131daki ileti\u015Fim bilgilerini kullan\u0131n.",
+      versionLabel: "S\xFCr\xFCm",
+      lastDecisionLabel: "Son karar",
+      footnote: "Bu bildirim yap\u0131land\u0131r\u0131lm\u0131\u015F hizmetlerden otomatik \xFCretilmi\u015Ftir."
+    },
+    en: {
+      tabLabel: "Policy",
+      heading: "Cookie & Privacy Notice",
+      incomplete: "Notice incomplete: operator identity (data-blakfy-operator / -operator-contact) not configured. Complete before going live.",
+      controllerTitle: "Data Controller",
+      controllerName: "Name",
+      controllerContact: "Contact",
+      controllerAddress: "Address",
+      cookiesTitle: "Services Used",
+      noCookies: "No third-party service is configured on this site.",
+      purposeLabel: "Purpose",
+      legalBasisLabel: "Legal Basis",
+      retentionLabel: "Retention",
+      rightsTitle: "Your Rights",
+      rightsGDPR: "GDPR: right to access, rectify, erase, restrict, port and object.",
+      rightsKVKK: "KVKK Art. 11: right to information, rectification, erasure and objection.",
+      rightsCCPA: "CCPA: right to know, delete, and opt out of sale/sharing.",
+      rightsDefault: "Use the contact details above to exercise your data rights.",
+      versionLabel: "Version",
+      lastDecisionLabel: "Last decision",
+      footnote: "This notice was generated automatically from configured services."
+    }
+  };
+  var getPolicyStrings = (locale) => POLICY_STRINGS[locale] || POLICY_STRINGS.en;
+
+  // src/compliance/policy-text.js
+  var RIGHTS_KEY_BY_JURISDICTION = {
+    GDPR: "rightsGDPR",
+    KVKK: "rightsKVKK",
+    CCPA: "rightsCCPA"
+  };
+  var isAutoPolicy = (policyUrl) => !policyUrl || policyUrl === "auto";
+  var buildPolicyText = ({
+    locale,
+    operator,
+    operatorContact,
+    operatorAddress,
+    jurisdiction,
+    policyVersion,
+    consentTimestamp,
+    enrichedPresets
+  }) => {
+    const s = getPolicyStrings(locale);
+    const hasOperator = !!(operator && operatorContact);
+    const services = (enrichedPresets || []).filter((p) => p && p.meta).map((p) => ({
+      key: p.key,
+      displayName: p.meta.displayName || p.key,
+      category: p.meta.category || "",
+      purposes: p.meta.purposes || [],
+      legalBasis: p.meta.legalBasis || "",
+      retention: p.meta.retention || "",
+      processorName: p.meta.processor && p.meta.processor.name || "",
+      transferCountries: p.meta.transferCountries || []
+    }));
+    const rightsKey = RIGHTS_KEY_BY_JURISDICTION[jurisdiction] || "rightsDefault";
+    return {
+      incomplete: !hasOperator,
+      strings: s,
+      controller: {
+        name: operator || null,
+        contact: operatorContact || null,
+        address: operatorAddress || null
+      },
+      services,
+      rightsText: s[rightsKey] || s.rightsDefault,
+      policyVersion: policyVersion || null,
+      consentTimestamp: consentTimestamp || null
+    };
+  };
+
   // src/ui/banner.js
   var createBanner = ({
     t,
@@ -3441,7 +3560,8 @@
     policyUrl,
     onAccept,
     onReject,
-    onPrefs
+    onPrefs,
+    onOpenPolicy
   }) => {
     const card = document.createElement("div");
     card.className = "blakfy-card";
@@ -3460,7 +3580,15 @@
     p.id = "blakfy-desc";
     p.textContent = t.intro + " ";
     const a = document.createElement("a");
-    a.href = policyUrl;
+    if (isAutoPolicy(policyUrl)) {
+      a.href = "#";
+      a.addEventListener("click", (ev) => {
+        ev.preventDefault();
+        if (onOpenPolicy) onOpenPolicy();
+      });
+    } else {
+      a.href = policyUrl;
+    }
     a.textContent = t.policyLink;
     p.appendChild(a);
     card.appendChild(p);
@@ -4256,7 +4384,56 @@
     panel.appendChild(content);
     return panel;
   };
-  var initTabs = (card) => {
+  var buildPolicyPanel = (policy) => {
+    const panel = el("div", { class: "blakfy-tab-panel", "data-panel": "policy", "aria-hidden": "true" });
+    const s = policy.strings;
+    const content = el("div", { class: "blakfy-policy-panel" });
+    content.appendChild(el("h3", { text: s.heading }));
+    if (policy.incomplete) {
+      content.appendChild(el("p", { class: "blakfy-policy-warning", text: s.incomplete }));
+    }
+    content.appendChild(el("h4", { text: s.controllerTitle }));
+    const dlController = el("dl", { class: "blakfy-service-dl" });
+    const addRow = (label, value) => {
+      if (!value) return;
+      dlController.appendChild(el("dt", { class: "blakfy-service-dt", text: label }));
+      dlController.appendChild(el("dd", { class: "blakfy-service-dd", text: value }));
+    };
+    addRow(s.controllerName, policy.controller.name);
+    addRow(s.controllerContact, policy.controller.contact);
+    addRow(s.controllerAddress, policy.controller.address);
+    content.appendChild(dlController);
+    content.appendChild(el("h4", { text: s.cookiesTitle }));
+    if (!policy.services.length) {
+      content.appendChild(el("p", { text: s.noCookies }));
+    } else {
+      for (let i = 0; i < policy.services.length; i++) {
+        const svc = policy.services[i];
+        const card = el("div", { class: "blakfy-service-card" });
+        card.appendChild(el("strong", { text: svc.displayName }));
+        const dl = el("dl", { class: "blakfy-service-dl" });
+        const row = (label, value) => {
+          if (!value) return;
+          dl.appendChild(el("dt", { class: "blakfy-service-dt", text: label }));
+          dl.appendChild(el("dd", { class: "blakfy-service-dd", text: value }));
+        };
+        row(s.purposeLabel, svc.purposes.join(", "));
+        row(s.legalBasisLabel, svc.legalBasis);
+        row(s.retentionLabel, svc.retention);
+        card.appendChild(dl);
+        content.appendChild(card);
+      }
+    }
+    content.appendChild(el("h4", { text: s.rightsTitle }));
+    content.appendChild(el("p", { text: policy.rightsText }));
+    const meta = el("p", { class: "blakfy-about-meta" });
+    meta.textContent = s.versionLabel + ": " + (policy.policyVersion || "-") + (policy.consentTimestamp ? " \xB7 " + s.lastDecisionLabel + ": " + policy.consentTimestamp : "");
+    content.appendChild(meta);
+    content.appendChild(el("p", { class: "blakfy-policy-footnote", text: s.footnote }));
+    panel.appendChild(content);
+    return panel;
+  };
+  var initTabs = (card, initialTab) => {
     const btns = card.querySelectorAll(".blakfy-tab-btn");
     const panels = card.querySelectorAll(".blakfy-tab-panel");
     const switchTab = (target) => {
@@ -4278,6 +4455,10 @@
         switchTab(this.getAttribute("data-tab"));
       });
     }
+    if (initialTab) {
+      const exists = card.querySelector('.blakfy-tab-btn[data-tab="' + initialTab + '"]');
+      if (exists) switchTab(initialTab);
+    }
   };
   var createModal = ({
     t,
@@ -4290,7 +4471,14 @@
     version,
     onSave,
     onAccept,
-    onClose
+    onClose,
+    policyUrl,
+    operator,
+    operatorContact,
+    operatorAddress,
+    jurisdiction,
+    policyVersion,
+    initialTab
   }) => {
     const current = currentState || { analytics: false, marketing: false, functional: false };
     const card = el("div", {
@@ -4346,8 +4534,27 @@
     card.appendChild(buildCategoriesPanel(t, current, card, onSave, onAccept));
     card.appendChild(buildServicesPanel(enriched, t));
     card.appendChild(buildAboutPanel(t, version));
+    if (isAutoPolicy(policyUrl)) {
+      const policy = buildPolicyText({
+        locale,
+        operator,
+        operatorContact,
+        operatorAddress,
+        jurisdiction,
+        policyVersion,
+        consentTimestamp: currentState && currentState.timestamp,
+        enrichedPresets: enriched
+      });
+      if (policy.incomplete && typeof console !== "undefined" && console.error) {
+        console.error(
+          "[Blakfy Cookie] In-widget policy notice is INCOMPLETE \u2014 data-blakfy-operator and/or data-blakfy-operator-contact are not configured. GDPR Art. 13(1)(a) / KVKK Md.10 require the controller's identity in this notice. Set both attributes (or configure a real data-blakfy-policy-url instead) before this site goes live."
+        );
+      }
+      tabBar.appendChild(makeTabBtn("policy", policy.strings.tabLabel, false));
+      card.appendChild(buildPolicyPanel(policy));
+    }
     card.appendChild(el("div", { class: "blakfy-badge-slot" }));
-    initTabs(card);
+    initTabs(card, initialTab);
     return card;
   };
 
@@ -4871,7 +5078,8 @@
           t,
           currentLocale,
           state
-        })
+        }),
+        onOpenPolicy: () => mountModal({ t, tab: "policy" })
       });
       overlay.appendChild(card);
       document.body.appendChild(overlay);
@@ -4906,7 +5114,16 @@
         version: api.version,
         onSave: (prefs) => api.__internal.commit(prefs, "save"),
         onAccept: () => api.acceptAll(),
-        onClose: () => api.__internal.closeUI()
+        onClose: () => api.__internal.closeUI(),
+        // #49: in-widget policy notice — passed through regardless of tab so the
+        // Policy tab is available every time the modal opens, not only via openPolicy().
+        policyUrl: config.policyUrl,
+        operator: config.operator,
+        operatorContact: config.operatorContact,
+        operatorAddress: config.operatorAddress,
+        jurisdiction,
+        policyVersion: config.policyVersion,
+        initialTab: opts && opts.tab
       });
       overlay.appendChild(card);
       document.body.appendChild(overlay);
