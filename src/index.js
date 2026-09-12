@@ -1,5 +1,6 @@
 // blakfy-cookie/src/index.js — bootstrap entry; wires modules and assigns window.BlakfyCookie
 
+import { installHostAdapter } from "./adapters/host-adapters.js";
 import { createAPI } from "./api.js";
 import {
   installUSP,
@@ -44,6 +45,7 @@ import { createBanner } from "./ui/banner.js";
 import { createFab, resolveFabConfig, applyFabTokens } from "./ui/fab.js";
 import { installFocusTrap, removeFocusTrap } from "./ui/focus-trap.js";
 import { createModal } from "./ui/modal.js";
+import { getShadowRoot, getShadowHost } from "./ui/shadow-root.js";
 import { fetchStatus, renderStatus } from "./ui/status-bar.js";
 import { injectStyles } from "./ui/styles.js";
 import {
@@ -266,6 +268,10 @@ const bootstrap = async () => {
       pushGCM: pushGCM,
       pushUET: pushUET,
       applyYandex: applyYandex,
+      // #24 (item 3): auto-bridge to a documented host-platform consent API when one
+      // exists (Shopify Customer Privacy API, WP Consent API); detection-only warning
+      // otherwise. `scriptEl` carries the optional data-blakfy-host override.
+      installHostAdapter: (s) => installHostAdapter(s, scriptEl),
       getTCString: getTCString,
       optOutCCPA: optOutCCPA,
       isOptedOutCCPA: isOptedOutCCPA,
@@ -486,6 +492,7 @@ const bootstrap = async () => {
   if (state) {
     pushGCM(state);
     pushUET(state);
+    installHostAdapter(state, scriptEl);
     applyYandex(state, {
       unblock: (cat) => {
         unblockScripts(cat);

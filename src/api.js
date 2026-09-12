@@ -28,8 +28,12 @@ export const createAPI = (ctx) => {
   };
 
   const closeUI = () => {
-    if (typeof document !== "undefined") {
-      const overlays = document.querySelectorAll(".blakfy-overlay");
+    // #35: overlays render inside the widget's shadow root now, not directly under
+    // document — document.querySelectorAll never sees into a shadow tree, so the
+    // mount root (shadow root, or its non-Shadow-DOM fallback) is required here.
+    const queryRoot = ctx.shadowRoot || (typeof document !== "undefined" ? document : null);
+    if (queryRoot) {
+      const overlays = queryRoot.querySelectorAll(".blakfy-overlay");
       for (let i = 0; i < overlays.length; i++) {
         const o = overlays[i];
         if (o && o.parentNode) o.parentNode.removeChild(o);
@@ -131,6 +135,7 @@ export const createAPI = (ctx) => {
 
     if (deps && typeof deps.pushGCM === "function") deps.pushGCM(state);
     if (deps && typeof deps.pushUET === "function") deps.pushUET(state);
+    if (deps && typeof deps.installHostAdapter === "function") deps.installHostAdapter(state);
     if (deps && typeof deps.applyYandex === "function") {
       deps.applyYandex(state, {
         unblock: (cat) => {
