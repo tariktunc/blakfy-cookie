@@ -21,12 +21,13 @@ import { readCookie } from "./core/consent-store.js";
 import { createEmitter } from "./core/events.js";
 import { runCleanup, registerCleanup } from "./gating/cleaner.js";
 import { unblockIframes, installPlaceholders } from "./gating/iframe-unblocker.js";
+import { scanForLeaks, warnLeaks } from "./gating/leak-detector.js";
 import { startObserver, scanAll } from "./gating/observer.js";
 import { unblockScripts } from "./gating/script-unblocker.js";
 import { detectJurisdiction } from "./geo/jurisdiction.js";
 import { detectLocale, detectMainLang, RTL_LOCALES } from "./i18n/detect.js";
 import { getTranslation } from "./i18n/index.js";
-import { applyPreset } from "./presets/_registry.js";
+import { applyPreset, PRESETS } from "./presets/_registry.js";
 import { mountBadges, installAntiTamper } from "./ui/badge.js";
 import { createBanner } from "./ui/banner.js";
 import { installFocusTrap, removeFocusTrap } from "./ui/focus-trap.js";
@@ -214,6 +215,16 @@ const bootstrap = async () => {
     isRTL = info.isRTL;
   });
 
+  // getLeaks(): finds known tracker scripts (from active presets) running outside
+  // Blakfy's own type="text/plain" gate — e.g. a platform-native integration
+  // (Wix Marketing Tags, Shopify Preferences) loading the same tool unmanaged.
+  api.getLeaks = () =>
+    scanForLeaks({
+      activePresetNames: activePresetList,
+      presets: PRESETS,
+      getConsent: api.getConsent,
+    });
+
   if (!window.BlakfyCookie) {
     window.BlakfyCookie = api;
     try {
@@ -221,6 +232,19 @@ const bootstrap = async () => {
     } catch (e) {
       /* CustomEvent unsupported in very old browsers */
     }
+  }
+
+  // Leak scan: run once after platform-native async loaders have had a chance to
+  // inject their own copy of a tracker we also manage. Delayed on purpose — scanning
+  // immediately would miss scripts platforms inject asynchronously post-load.
+  if (activePresetList.length && typeof window.setTimeout === "function") {
+    window.setTimeout(() => {
+      try {
+        warnLeaks(api.getLeaks());
+      } catch (e) {
+        /* ignore */
+      }
+    }, 3000);
   }
 
   // Helper: mount banner overlay

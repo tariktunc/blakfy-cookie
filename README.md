@@ -310,27 +310,28 @@ Tüm `<script>` tag'i üzerine konabilen `data-blakfy-*` attribute'ları:
 
 `window.BlakfyCookie` global olarak erişilebilir. Tüm v1 metodları korunmuştur, v2'de yeni metodlar eklendi.
 
-| Metod                   | Sürüm  | İmza                                               | Açıklama                                                                                   |
-| ----------------------- | ------ | -------------------------------------------------- | ------------------------------------------------------------------------------------------ |
-| `version`               | v1     | `string`                                           | Kütüphane sürümü, örn. `"2.2.0"`.                                                          |
-| `open()`                | v1     | `() => void`                                       | Tercihler modalını aç.                                                                     |
-| `acceptAll()`           | v1     | `() => void`                                       | Tüm kategorileri kabul et.                                                                 |
-| `rejectAll()`           | v1     | `() => void`                                       | Tüm kategorileri reddet (essential dışında).                                               |
-| `getConsent(cat)`       | v1     | `(c: ConsentCategory) => boolean`                  | Kategori onaylı mı. `essential` her zaman `true`.                                          |
-| `getState()`            | v1     | `() => BlakfyConsentState \| null`                 | Tam consent state objesi.                                                                  |
-| `onChange(fn)`          | v1     | `(fn: (state) => void) => void`                    | State değişince çağrılır.                                                                  |
-| `setLocale(loc)`        | v1     | `(loc: BlakfyLocale) => void`                      | Dili değiştir (UI re-render).                                                              |
-| `getMainLang()`         | v1     | `() => BlakfyLocale`                               | Audit log için ayarlanan birincil dil.                                                     |
-| `onConsent(cat, fn)`    | **v2** | `(c, fn: (granted: boolean) => void) => void`      | Kategori-bazlı listener. Mevcut state ile **anında** çağrılır, sonra her değişimde tekrar. |
-| `registerCleanup(opts)` | **v2** | `(opts: { category, cookies?, storage? }) => void` | Onay geri çekildiğinde silinecek cookie'leri/localStorage anahtarlarını kaydet.            |
-| `unblock(cat)`          | **v2** | `(c: ConsentCategory) => void`                     | Kategori için tag-gating'i manuel aç.                                                      |
-| `scan()`                | **v2** | `() => ConsentCategory[]`                          | DOM'u tekrar tara (SPA navigasyonu sonrası).                                               |
-| `usePreset(name)`       | **v2** | `(name: string) => Preset \| null`                 | Hazır preset'i runtime'da uygula.                                                          |
-| `tcf.getTCString()`     | **v2** | `() => string`                                     | IAB TCF v2.2 TC string.                                                                    |
-| `ccpa.optOut()`         | **v2** | `() => void`                                       | CCPA "Do Not Sell" opt-out.                                                                |
-| `ccpa.isOptedOut()`     | **v2** | `() => boolean`                                    | CCPA opt-out durumu.                                                                       |
-| `getJurisdiction()`     | **v2** | `() => "GDPR" \| "CCPA" \| "LGPD" \| "default"`    | Tespit edilen yetki alanı.                                                                 |
-| `window.__tcfapi(...)`  | **v2** | IAB standart                                       | `getTCData`, `addEventListener`, `removeEventListener` (TCF v2.2 spec).                    |
+| Metod                   | Sürüm      | İmza                                               | Açıklama                                                                                                                                                                            |
+| ----------------------- | ---------- | -------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `version`               | v1         | `string`                                           | Kütüphane sürümü, örn. `"2.2.0"`.                                                                                                                                                   |
+| `open()`                | v1         | `() => void`                                       | Tercihler modalını aç.                                                                                                                                                              |
+| `acceptAll()`           | v1         | `() => void`                                       | Tüm kategorileri kabul et.                                                                                                                                                          |
+| `rejectAll()`           | v1         | `() => void`                                       | Tüm kategorileri reddet (essential dışında).                                                                                                                                        |
+| `getConsent(cat)`       | v1         | `(c: ConsentCategory) => boolean`                  | Kategori onaylı mı. `essential` her zaman `true`.                                                                                                                                   |
+| `getState()`            | v1         | `() => BlakfyConsentState \| null`                 | Tam consent state objesi.                                                                                                                                                           |
+| `onChange(fn)`          | v1         | `(fn: (state) => void) => void`                    | State değişince çağrılır.                                                                                                                                                           |
+| `setLocale(loc)`        | v1         | `(loc: BlakfyLocale) => void`                      | Dili değiştir (UI re-render).                                                                                                                                                       |
+| `getMainLang()`         | v1         | `() => BlakfyLocale`                               | Audit log için ayarlanan birincil dil.                                                                                                                                              |
+| `onConsent(cat, fn)`    | **v2**     | `(c, fn: (granted: boolean) => void) => void`      | Kategori-bazlı listener. Mevcut state ile **anında** çağrılır, sonra her değişimde tekrar.                                                                                          |
+| `registerCleanup(opts)` | **v2**     | `(opts: { category, cookies?, storage? }) => void` | Onay geri çekildiğinde silinecek cookie'leri/localStorage anahtarlarını kaydet.                                                                                                     |
+| `unblock(cat)`          | **v2**     | `(c: ConsentCategory) => void`                     | Kategori için tag-gating'i manuel aç.                                                                                                                                               |
+| `scan()`                | **v2**     | `() => ConsentCategory[]`                          | DOM'u tekrar tara (SPA navigasyonu sonrası).                                                                                                                                        |
+| `usePreset(name)`       | **v2**     | `(name: string) => Preset \| null`                 | Hazır preset'i runtime'da uygula.                                                                                                                                                   |
+| `tcf.getTCString()`     | **v2**     | `() => string`                                     | IAB TCF v2.2 TC string.                                                                                                                                                             |
+| `ccpa.optOut()`         | **v2**     | `() => void`                                       | CCPA "Do Not Sell" opt-out.                                                                                                                                                         |
+| `ccpa.isOptedOut()`     | **v2**     | `() => boolean`                                    | CCPA opt-out durumu.                                                                                                                                                                |
+| `getJurisdiction()`     | **v2**     | `() => "GDPR" \| "CCPA" \| "LGPD" \| "default"`    | Tespit edilen yetki alanı.                                                                                                                                                          |
+| `getLeaks()`            | **v2.3.2** | `() => LeakReport[]`                               | Aktif preset'lerin host'larına uyan ama Blakfy'nin `type="text/plain"` kapısından geçmemiş script'leri bulur. Bkz. [Platform-native tracker riski](#platform-native-tracker-riski). |
+| `window.__tcfapi(...)`  | **v2**     | IAB standart                                       | `getTCData`, `addEventListener`, `removeEventListener` (TCF v2.2 spec).                                                                                                             |
 
 **ConsentCategory:** `"essential"` | `"analytics"` | `"marketing"` | `"functional"` | `"recording"`
 
@@ -445,6 +446,27 @@ window.BlakfyCookie.registerCleanup({
   storage: ["myAppMarketingCache"],
 });
 ```
+
+---
+
+## Platform-native tracker riski
+
+**Blakfy sadece kendi enjekte ettiği / `type="text/plain"` ile işaretlenmiş script'leri yönetebilir.** Wix, Shopify, İkas, Ticimax gibi platformların kendi "Marketing Integrations" / "Pazarlama Entegrasyonları" panelinden bağlanan GA4, Facebook Pixel, Yandex Metrica gibi araçlar bu widget'ın **tamamen dışında**, platformun kendi runtime'ı tarafından enjekte edilir — reddet/kabul kararına bakmadan çalışırlar.
+
+Bunu canlıda yaşadık: Wix'te GA4 + Facebook Pixel, hem "Marketing Integrations" panelinden hem de ayrı bir "Marketing Tags" API katmanından bağlıydı; birini kapatmak yetmedi, ikisini de bulup kapatmak gerekti. Ayrıca Facebook'un **Conversions API (server-side)** gibi entegrasyonlar tarayıcıdan bağımsız çalıştığı için client-side gating'in görüş alanının tamamen dışındadır — GDPR/KVKK kapsamı dışında değildir, ayrıca gate edilmesi gerekir.
+
+**v2.3.2+ ile: sızıntı tespiti (`getLeaks()`)**
+
+Aktif preset'lerden (`data-blakfy-presets`) her biri için host listesi (`googletagmanager.com`, `connect.facebook.net`, vb.) taranır; sayfada bu host'lara uyan ama Blakfy'nin kapısından geçmemiş (`data-blakfy-unblocked="true"` işareti olmayan) bir `<script src>` bulunursa, bootstrap'tan ~3 saniye sonra otomatik `console.warn` ile bildirilir. Manuel tetiklemek için:
+
+```js
+window.BlakfyCookie.getLeaks();
+// → [{ preset: "ga4", name: "Google Analytics 4", host: "googletagmanager.com", src: "...", category: "analytics", consentGranted: false }]
+```
+
+**Bunun yapamadığı şey:** sadece _tespit_ eder, engelleyemez — platformun kendi native entegrasyonu tarayıcı düzeyinde Blakfy'nin erişemeyeceği bir yerden enjekte edildiği için silinmesi gerekir (platformun kendi ayarlar panelinden). Sunucu-taraflı (CAPI gibi) entegrasyonlar hiç görülemez, ayrıca elle denetlenmelidir.
+
+**Platform bazlı not:** Wix'te doğrulandı (Marketing Integrations + ayrı Marketing Tags API). Shopify, İkas, Ticimax, WordPress'te native entegrasyon panellerinin aynı şekilde bypass edip etmediği **doğrulanmadı** — her platformda bu widget'ı devreye almadan önce `getLeaks()` ile veya DevTools Network sekmesinden reddet-sonrası kontrol yapılmalı.
 
 ---
 
@@ -578,6 +600,7 @@ Veya React:
 
 ## Diğer Kaynaklar
 
+- [`docs/platform-guides.md`](./docs/platform-guides.md) — Wix (doğrulandı) / İkas / Ticimax / Shopify / WordPress kurulum + native tracker kontrol adımları
 - [`docs/architecture.md`](./docs/architecture.md) — modül yapısı, veri akışı, boyut bütçesi
 - [`docs/compliance.md`](./docs/compliance.md) — her yasa için detaylı uyumluluk mappingleri
 - [`CHANGELOG.md`](./CHANGELOG.md) — sürüm notları
