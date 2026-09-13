@@ -13,14 +13,14 @@ describe("BlakfyCookieProvider", () => {
     expect(screen.getByTestId("child")).toHaveTextContent("Hello");
   });
 
-  it("injects widget script with default npm CDN URL (cdnVersion=2)", () => {
+  it("injects widget script with default npm CDN URL (cdnVersion=latest, owner decision 2026-09-14)", () => {
     render(<BlakfyCookieProvider />);
     const scripts = document.querySelectorAll("script[id^='blakfy']");
     const widgetScript = Array.from(scripts).find((s) =>
       s.getAttribute("src")?.includes("/dist/cookie.min.js")
     );
     expect(widgetScript).toBeTruthy();
-    expect(widgetScript?.getAttribute("src")).toContain("@blakfy/cookie@2");
+    expect(widgetScript?.getAttribute("src")).toContain("@blakfy/cookie@latest");
     expect(widgetScript?.getAttribute("src")).toContain("/npm/");
   });
 

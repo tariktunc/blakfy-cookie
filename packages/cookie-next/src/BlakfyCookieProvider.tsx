@@ -32,7 +32,12 @@ export function BlakfyCookieProvider({
   dnt,
   statusUrl,
   statusEnabled,
-  cdnVersion = "2",
+  // Owner decision 2026-09-14: default is "latest", not a pinned/floating-major
+  // version -- every site auto-updates to the newest publish, no manual redeploy.
+  // Mirrors the accessibility-widget policy (CLAUDE.md 6 CORE DECISIONS #4). A site
+  // that needs SRI (which requires a fixed, hashable file) or deliberate change
+  // control should still pass an explicit cdnVersion override.
+  cdnVersion = "latest",
   src: srcOverride,
 }: Props) {
   useEffect(() => {

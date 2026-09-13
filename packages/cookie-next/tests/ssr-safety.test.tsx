@@ -69,7 +69,7 @@ describe("SSR safety (Node environment, no window)", () => {
   it("BlakfyCookieProvider SSR output includes widget script tag", () => {
     const html = renderToString(<BlakfyCookieProvider />);
     expect(html).toContain("script");
-    expect(html).toContain("@blakfy/cookie@2");
+    expect(html).toContain("@blakfy/cookie@latest");
     expect(html).toContain("/dist/cookie.min.js");
   });
 

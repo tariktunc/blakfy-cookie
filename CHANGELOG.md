@@ -4,6 +4,12 @@ All notable changes follow [Keep a Changelog](https://keepachangelog.com/) and S
 
 ---
 
+## [cookie-next 2.3.2] — 2026-09-14
+
+### Changed
+
+- **Default `cdnVersion` changed from `"2"` (floating major) to `"latest"`** — owner decision: every site auto-updates to the newest publish with zero manual redeploy, mirroring the accessibility-widget policy (CLAUDE.md 6 CORE DECISIONS #4). A site that needs SRI (which requires a fixed, hashable file) or deliberate change control should pass an explicit `cdnVersion` override — `BlakfyCookieProvider` never applies `integrity`/`crossOrigin` itself, so this is safe for every current install.
+
 ## [2.4.1] — 2026-09-13
 
 ### Fixed
