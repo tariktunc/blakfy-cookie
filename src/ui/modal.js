@@ -205,15 +205,13 @@ const buildServiceCard = (presetKey, meta, t) => {
 
   card.appendChild(body);
 
-  header.addEventListener("click", () => {
-    const hidden = body.getAttribute("aria-hidden") === "true";
-    body.setAttribute("aria-hidden", hidden ? "false" : "true");
-    toggle.textContent = hidden ? "▾" : "▸";
-  });
-
-  return card;
+  return { card, header, body, toggle };
 };
 
+// #54: accordion — only one service card body may be open at a time. Each
+// card's own click handler used to toggle only itself, so opening a second
+// card left the first one open too and their stacked bodies overlapped the
+// modal. closeOthers() collapses every sibling before the clicked card opens.
 const buildServicesPanel = (activePresets, t) => {
   const panel = el("div", {
     class: "blakfy-tab-panel",
@@ -229,9 +227,31 @@ const buildServicesPanel = (activePresets, t) => {
     });
     list.appendChild(empty);
   } else {
+    const entries = [];
     for (let i = 0; i < activePresets.length; i++) {
       const { key, meta } = activePresets[i];
-      if (meta) list.appendChild(buildServiceCard(key, meta, t));
+      if (meta) {
+        const entry = buildServiceCard(key, meta, t);
+        entries.push(entry);
+        list.appendChild(entry.card);
+      }
+    }
+
+    const closeOthers = (except) => {
+      for (const entry of entries) {
+        if (entry === except) continue;
+        entry.body.setAttribute("aria-hidden", "true");
+        entry.toggle.textContent = "▸";
+      }
+    };
+
+    for (const entry of entries) {
+      entry.header.addEventListener("click", () => {
+        const hidden = entry.body.getAttribute("aria-hidden") === "true";
+        closeOthers(entry);
+        entry.body.setAttribute("aria-hidden", hidden ? "false" : "true");
+        entry.toggle.textContent = hidden ? "▾" : "▸";
+      });
     }
   }
 
