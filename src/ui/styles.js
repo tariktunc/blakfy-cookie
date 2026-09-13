@@ -81,7 +81,15 @@ const RULES = [
   ".blakfy-tab-panel[aria-hidden=false]{display:block}",
   // Service list + cards
   ".blakfy-service-list{display:flex;flex-direction:column;gap:8px;max-height:420px;overflow-y:auto;padding-right:2px}",
-  ".blakfy-service-card{border:1px solid #eee;border-radius:6px;overflow:hidden}",
+  // flex-shrink:0 is load-bearing, not decoration. Per the flexbox spec, a flex
+  // item's automatic minimum size is its CONTENT size only while overflow:visible —
+  // the moment overflow is anything else (hidden, here, to get rounded corners on
+  // the header), that automatic minimum drops to 0. Without flex-shrink:0, once an
+  // opened card pushes .blakfy-service-list's total content past its max-height,
+  // flexbox shrinks every card to fit inside 420px instead of the list scrolling —
+  // each card's own overflow:hidden then silently clips its last field(s) (e.g.
+  // "Saklama Süresi") with no visible scrollbar to explain why.
+  ".blakfy-service-card{border:1px solid #eee;border-radius:6px;overflow:hidden;flex-shrink:0}",
   // Fixed min-height (not just padding+line-height) so a CLOSED header's rendered
   // size can never depend on sub-pixel text-layout rounding. Without this, opening
   // another card further down could add a scroll bar to the modal, which narrows
