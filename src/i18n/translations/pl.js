@@ -39,9 +39,9 @@ export default {
     cta: "Zezwól",
   },
   tabs: {
-    categories: "Categories",
-    services: "Services",
-    about: "About",
+    categories: "Kategorie",
+    services: "Usługi",
+    about: "Informacje",
   },
   service: {
     description: "Description",
@@ -68,5 +68,13 @@ export default {
       "This website uses Blakfy Cookie Management Platform (CMP) to manage your consent preferences in compliance with GDPR, KVKK, CCPA and other applicable privacy regulations.",
     version: "Version",
     learnMore: "Learn more at blakfy.com",
+  },
+  cookiePanel: {
+    caveat:
+      "Ta lista pokazuje pliki cookie odczytywalne przez tę stronę (document.cookie). Nie widzi plików cookie HttpOnly i nie informuje o localStorage, IndexedDB ani fingerprintingu — to widok częściowy, a nie pełny wykaz.",
+    empty: "Nie wykryto żadnych plików cookie na tej stronie.",
+    unrecognised: "Nierozpoznane — nie pasuje do żadnej znanej usługi",
+    essential: "Niezbędne — nie można usunąć",
+    delete: "Usuń",
   },
 };

@@ -39,9 +39,9 @@ export default {
     cta: "Povolit",
   },
   tabs: {
-    categories: "Categories",
-    services: "Services",
-    about: "About",
+    categories: "Kategorie",
+    services: "Služby",
+    about: "O aplikaci",
   },
   service: {
     description: "Description",
@@ -68,5 +68,13 @@ export default {
       "This website uses Blakfy Cookie Management Platform (CMP) to manage your consent preferences in compliance with GDPR, KVKK, CCPA and other applicable privacy regulations.",
     version: "Version",
     learnMore: "Learn more at blakfy.com",
+  },
+  cookiePanel: {
+    caveat:
+      "Tento seznam zobrazuje cookies čitelné touto stránkou (document.cookie). Nevidí HttpOnly cookies a nic neříká o localStorage, IndexedDB ani fingerprintingu — jde o částečný pohled, nikoli o úplný soupis.",
+    empty: "Na této stránce nebyly zjištěny žádné cookies.",
+    unrecognised: "Nerozpoznáno — neodpovídá žádné známé službě",
+    essential: "Nezbytné — nelze smazat",
+    delete: "Smazat",
   },
 };

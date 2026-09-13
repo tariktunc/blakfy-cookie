@@ -39,9 +39,9 @@ export default {
     cta: "اجازت دیں",
   },
   tabs: {
-    categories: "Categories",
-    services: "Services",
-    about: "About",
+    categories: "زمرہ جات",
+    services: "خدمات",
+    about: "کے بارے میں",
   },
   service: {
     description: "Description",
@@ -68,5 +68,13 @@ export default {
       "This website uses Blakfy Cookie Management Platform (CMP) to manage your consent preferences in compliance with GDPR, KVKK, CCPA and other applicable privacy regulations.",
     version: "Version",
     learnMore: "Learn more at blakfy.com",
+  },
+  cookiePanel: {
+    caveat:
+      "یہ فہرست ان کوکیز کو دکھاتی ہے جو یہ صفحہ پڑھ سکتا ہے (document.cookie)۔ یہ HttpOnly کوکیز نہیں دیکھ سکتی اور localStorage، IndexedDB یا فنگر پرنٹنگ کے بارے میں کچھ نہیں بتاتی — یہ ایک جزوی منظر ہے، مکمل فہرست نہیں۔",
+    empty: "اس صفحے پر کوئی کوکی نہیں ملی۔",
+    unrecognised: "غیر شناخت شدہ — کسی معروف سروس سے مطابقت نہیں رکھتی",
+    essential: "لازمی — حذف نہیں کیا جا سکتا",
+    delete: "حذف کریں",
   },
 };

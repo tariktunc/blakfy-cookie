@@ -33,9 +33,9 @@ export default {
     cta: "허용",
   },
   tabs: {
-    categories: "Categories",
-    services: "Services",
-    about: "About",
+    categories: "카테고리",
+    services: "서비스",
+    about: "정보",
   },
   service: {
     description: "Description",
@@ -62,5 +62,13 @@ export default {
       "This website uses Blakfy Cookie Management Platform (CMP) to manage your consent preferences in compliance with GDPR, KVKK, CCPA and other applicable privacy regulations.",
     version: "Version",
     learnMore: "Learn more at blakfy.com",
+  },
+  cookiePanel: {
+    caveat:
+      "이 목록은 이 페이지가 읽을 수 있는 쿠키(document.cookie)를 표시합니다. HttpOnly 쿠키는 볼 수 없으며 localStorage, IndexedDB 또는 핑거프린팅에 대해서는 알 수 없습니다 — 완전한 목록이 아니라 부분적인 보기입니다.",
+    empty: "이 페이지에서 쿠키가 감지되지 않았습니다.",
+    unrecognised: "인식되지 않음 — 알려진 서비스와 일치하지 않음",
+    essential: "필수 — 삭제할 수 없음",
+    delete: "삭제",
   },
 };

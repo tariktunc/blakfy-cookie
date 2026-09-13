@@ -39,9 +39,9 @@ export default {
     cta: "Дозволити",
   },
   tabs: {
-    categories: "Categories",
-    services: "Services",
-    about: "About",
+    categories: "Категорії",
+    services: "Сервіси",
+    about: "Про нас",
   },
   service: {
     description: "Description",
@@ -68,5 +68,13 @@ export default {
       "This website uses Blakfy Cookie Management Platform (CMP) to manage your consent preferences in compliance with GDPR, KVKK, CCPA and other applicable privacy regulations.",
     version: "Version",
     learnMore: "Learn more at blakfy.com",
+  },
+  cookiePanel: {
+    caveat:
+      "Цей список показує файли cookie, доступні для читання цією сторінкою (document.cookie). Він не бачить HttpOnly-cookie і нічого не повідомляє про localStorage, IndexedDB чи фінгерпринтинг — це частковий огляд, а не повний перелік.",
+    empty: "На цій сторінці не виявлено жодних файлів cookie.",
+    unrecognised: "Не розпізнано — не відповідає жодній відомій службі",
+    essential: "Обов'язковий — не може бути видалений",
+    delete: "Видалити",
   },
 };

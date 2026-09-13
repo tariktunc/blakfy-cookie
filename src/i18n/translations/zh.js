@@ -25,9 +25,9 @@ export default {
     cta: "允许",
   },
   tabs: {
-    categories: "Categories",
-    services: "Services",
-    about: "About",
+    categories: "分类",
+    services: "服务",
+    about: "关于",
   },
   service: {
     description: "Description",
@@ -54,5 +54,13 @@ export default {
       "This website uses Blakfy Cookie Management Platform (CMP) to manage your consent preferences in compliance with GDPR, KVKK, CCPA and other applicable privacy regulations.",
     version: "Version",
     learnMore: "Learn more at blakfy.com",
+  },
+  cookiePanel: {
+    caveat:
+      "此列表显示此页面可读取的 Cookie（document.cookie）。它无法查看 HttpOnly Cookie，也不会说明 localStorage、IndexedDB 或指纹识别的情况 — 这只是部分视图，并非完整清单。",
+    empty: "此页面未检测到任何 Cookie。",
+    unrecognised: "未识别 — 与任何已知服务不匹配",
+    essential: "必要 — 无法删除",
+    delete: "删除",
   },
 };

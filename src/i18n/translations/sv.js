@@ -39,9 +39,9 @@ export default {
     cta: "Tillåt",
   },
   tabs: {
-    categories: "Categories",
-    services: "Services",
-    about: "About",
+    categories: "Kategorier",
+    services: "Tjänster",
+    about: "Om",
   },
   service: {
     description: "Description",
@@ -68,5 +68,13 @@ export default {
       "This website uses Blakfy Cookie Management Platform (CMP) to manage your consent preferences in compliance with GDPR, KVKK, CCPA and other applicable privacy regulations.",
     version: "Version",
     learnMore: "Learn more at blakfy.com",
+  },
+  cookiePanel: {
+    caveat:
+      "Den här listan visar cookies som är läsbara av den här sidan (document.cookie). Den kan inte se HttpOnly-cookies och säger inget om localStorage, IndexedDB eller fingeravtryck — det är en partiell vy, inte en fullständig inventering.",
+    empty: "Inga cookies upptäcktes på den här sidan.",
+    unrecognised: "Okänd — matchar ingen känd tjänst",
+    essential: "Nödvändig — kan inte tas bort",
+    delete: "Ta bort",
   },
 };

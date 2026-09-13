@@ -39,9 +39,9 @@ export default {
     cta: "السماح",
   },
   tabs: {
-    categories: "Categories",
-    services: "Services",
-    about: "About",
+    categories: "الفئات",
+    services: "الخدمات",
+    about: "حول",
   },
   service: {
     description: "Description",
@@ -68,5 +68,13 @@ export default {
       "This website uses Blakfy Cookie Management Platform (CMP) to manage your consent preferences in compliance with GDPR, KVKK, CCPA and other applicable privacy regulations.",
     version: "Version",
     learnMore: "Learn more at blakfy.com",
+  },
+  cookiePanel: {
+    caveat:
+      "تعرض هذه القائمة ملفات تعريف الارتباط التي يمكن لهذه الصفحة قراءتها (document.cookie). لا يمكنها رؤية ملفات تعريف الارتباط من نوع HttpOnly، ولا تعطي أي معلومات عن localStorage أو IndexedDB أو البصمة الرقمية — إنها عرض جزئي، وليست جردًا كاملاً.",
+    empty: "لم يتم اكتشاف أي ملفات تعريف ارتباط في هذه الصفحة.",
+    unrecognised: "غير معروف — لا يتطابق مع أي خدمة معروفة",
+    essential: "ضروري — لا يمكن حذفه",
+    delete: "حذف",
   },
 };

@@ -36,9 +36,9 @@ export default {
     cta: "許可する",
   },
   tabs: {
-    categories: "Categories",
-    services: "Services",
-    about: "About",
+    categories: "カテゴリー",
+    services: "サービス",
+    about: "概要",
   },
   service: {
     description: "Description",
@@ -65,5 +65,13 @@ export default {
       "This website uses Blakfy Cookie Management Platform (CMP) to manage your consent preferences in compliance with GDPR, KVKK, CCPA and other applicable privacy regulations.",
     version: "Version",
     learnMore: "Learn more at blakfy.com",
+  },
+  cookiePanel: {
+    caveat:
+      "このリストは、このページが読み取れるCookie（document.cookie）を表示しています。HttpOnly Cookieは検出できず、localStorage、IndexedDB、フィンガープリンティングについては何も示しません — これは完全な一覧ではなく、部分的な表示です。",
+    empty: "このページではCookieが検出されませんでした。",
+    unrecognised: "未認識 — 既知のサービスと一致しません",
+    essential: "必須 — 削除できません",
+    delete: "削除",
   },
 };

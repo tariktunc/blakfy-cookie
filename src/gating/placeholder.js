@@ -7,9 +7,10 @@ const fmt = (tpl, vars) => {
 
 export const createPlaceholder = ({ category, srcUrl, t, onAccept }) => {
   const ph = (t && t.placeholder) || {};
+  const cat = (t && t.cat && t.cat[category] && t.cat[category].title) || category || "";
   const titleText = ph.title || "Content blocked";
   const descText = fmt(ph.desc || "Allow {category} cookies to view this content.", {
-    category: category || "",
+    category: cat,
   });
   const ctaText = ph.cta || "Allow";
 

@@ -39,9 +39,9 @@ export default {
     cta: "अनुमति दें",
   },
   tabs: {
-    categories: "Categories",
-    services: "Services",
-    about: "About",
+    categories: "श्रेणियाँ",
+    services: "सेवाएँ",
+    about: "जानकारी",
   },
   service: {
     description: "Description",
@@ -68,5 +68,13 @@ export default {
       "This website uses Blakfy Cookie Management Platform (CMP) to manage your consent preferences in compliance with GDPR, KVKK, CCPA and other applicable privacy regulations.",
     version: "Version",
     learnMore: "Learn more at blakfy.com",
+  },
+  cookiePanel: {
+    caveat:
+      "यह सूची उन कुकीज़ को दिखाती है जो यह पेज पढ़ सकता है (document.cookie)। यह HttpOnly कुकीज़ को नहीं देख सकती और localStorage, IndexedDB या फ़िंगरप्रिंटिंग के बारे में कुछ नहीं बताती — यह एक आंशिक दृश्य है, पूर्ण सूची नहीं।",
+    empty: "इस पेज पर कोई कुकी नहीं मिली।",
+    unrecognised: "अज्ञात — किसी ज्ञात सेवा से मेल नहीं खाती",
+    essential: "आवश्यक — हटाई नहीं जा सकती",
+    delete: "हटाएं",
   },
 };

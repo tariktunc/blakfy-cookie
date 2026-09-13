@@ -39,9 +39,9 @@ export default {
     cta: "Разрешить",
   },
   tabs: {
-    categories: "Categories",
-    services: "Services",
-    about: "About",
+    categories: "Категории",
+    services: "Сервисы",
+    about: "О нас",
   },
   service: {
     description: "Description",
@@ -68,5 +68,13 @@ export default {
       "This website uses Blakfy Cookie Management Platform (CMP) to manage your consent preferences in compliance with GDPR, KVKK, CCPA and other applicable privacy regulations.",
     version: "Version",
     learnMore: "Learn more at blakfy.com",
+  },
+  cookiePanel: {
+    caveat:
+      "Этот список показывает cookie, доступные для чтения этой страницей (document.cookie). Он не видит HttpOnly-cookie и ничего не сообщает о localStorage, IndexedDB или фингерпринтинге — это частичный обзор, а не полная инвентаризация.",
+    empty: "На этой странице cookie не обнаружены.",
+    unrecognised: "Не распознано — не соответствует ни одной известной службе",
+    essential: "Обязательный — нельзя удалить",
+    delete: "Удалить",
   },
 };

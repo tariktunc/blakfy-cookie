@@ -65,4 +65,12 @@ export default {
     version: "Version",
     learnMore: "Learn more at blakfy.com",
   },
+  cookiePanel: {
+    caveat:
+      "This list shows cookies readable by this page (document.cookie). It cannot see HttpOnly cookies and says nothing about localStorage, IndexedDB, or fingerprinting — it is a partial view, not a complete inventory.",
+    empty: "No cookies detected on this page.",
+    unrecognised: "Unrecognised — not matched to any known service",
+    essential: "Essential — cannot be deleted",
+    delete: "Delete",
+  },
 };

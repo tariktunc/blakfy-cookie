@@ -39,9 +39,9 @@ export default {
     cta: "Izinkan",
   },
   tabs: {
-    categories: "Categories",
-    services: "Services",
-    about: "About",
+    categories: "Kategori",
+    services: "Layanan",
+    about: "Tentang",
   },
   service: {
     description: "Description",
@@ -68,5 +68,13 @@ export default {
       "This website uses Blakfy Cookie Management Platform (CMP) to manage your consent preferences in compliance with GDPR, KVKK, CCPA and other applicable privacy regulations.",
     version: "Version",
     learnMore: "Learn more at blakfy.com",
+  },
+  cookiePanel: {
+    caveat:
+      "Daftar ini menampilkan cookie yang dapat dibaca oleh halaman ini (document.cookie). Tidak dapat melihat cookie HttpOnly dan tidak memberi informasi tentang localStorage, IndexedDB, atau fingerprinting — ini adalah tampilan sebagian, bukan inventaris lengkap.",
+    empty: "Tidak ada cookie yang terdeteksi di halaman ini.",
+    unrecognised: "Tidak dikenali — tidak cocok dengan layanan yang diketahui",
+    essential: "Esensial — tidak dapat dihapus",
+    delete: "Hapus",
   },
 };

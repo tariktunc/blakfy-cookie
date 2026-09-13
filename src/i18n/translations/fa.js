@@ -39,9 +39,9 @@ export default {
     cta: "اجازه دادن",
   },
   tabs: {
-    categories: "Categories",
-    services: "Services",
-    about: "About",
+    categories: "دسته‌بندی‌ها",
+    services: "خدمات",
+    about: "درباره",
   },
   service: {
     description: "Description",
@@ -68,5 +68,13 @@ export default {
       "This website uses Blakfy Cookie Management Platform (CMP) to manage your consent preferences in compliance with GDPR, KVKK, CCPA and other applicable privacy regulations.",
     version: "Version",
     learnMore: "Learn more at blakfy.com",
+  },
+  cookiePanel: {
+    caveat:
+      "این فهرست کوکی‌های قابل خواندن توسط این صفحه را نشان می‌دهد (document.cookie). نمی‌تواند کوکی‌های HttpOnly را ببیند و درباره localStorage، IndexedDB یا اثرانگشت‌گیری اطلاعاتی نمی‌دهد — این یک نمای جزئی است، نه یک فهرست کامل.",
+    empty: "هیچ کوکی‌ای در این صفحه شناسایی نشد.",
+    unrecognised: "ناشناخته — با هیچ سرویس شناخته‌شده‌ای مطابقت ندارد",
+    essential: "ضروری — قابل حذف نیست",
+    delete: "حذف",
   },
 };

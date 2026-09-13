@@ -29,9 +29,9 @@ export default {
     cta: "אפשר",
   },
   tabs: {
-    categories: "Categories",
-    services: "Services",
-    about: "About",
+    categories: "קטגוריות",
+    services: "שירותים",
+    about: "אודות",
   },
   service: {
     description: "Description",
@@ -58,5 +58,13 @@ export default {
       "This website uses Blakfy Cookie Management Platform (CMP) to manage your consent preferences in compliance with GDPR, KVKK, CCPA and other applicable privacy regulations.",
     version: "Version",
     learnMore: "Learn more at blakfy.com",
+  },
+  cookiePanel: {
+    caveat:
+      "רשימה זו מציגה עוגיות שניתנות לקריאה על ידי דף זה (document.cookie). היא אינה יכולה לראות עוגיות HttpOnly ואינה אומרת דבר על localStorage, IndexedDB או טביעת אצבע — זהו מבט חלקי, לא מלאי מלא.",
+    empty: "לא זוהו עוגיות בדף זה.",
+    unrecognised: "לא מזוהה — אינו תואם לשירות ידוע",
+    essential: "חיוני — לא ניתן למחוק",
+    delete: "מחק",
   },
 };

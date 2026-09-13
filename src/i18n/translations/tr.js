@@ -69,4 +69,12 @@ export default {
     version: "Sürüm",
     learnMore: "blakfy.com'da daha fazla bilgi",
   },
+  cookiePanel: {
+    caveat:
+      "Bu liste, bu sayfanın okuyabildiği çerezleri gösterir (document.cookie). HttpOnly çerezleri göremez; localStorage, IndexedDB veya parmak izi (fingerprinting) hakkında bilgi vermez — tam bir envanter değil, kısmi bir görünümdür.",
+    empty: "Bu sayfada hiçbir çerez tespit edilmedi.",
+    unrecognised: "Tanınmıyor — bilinen bir hizmetle eşleşmedi",
+    essential: "Zorunlu — silinemez",
+    delete: "Sil",
+  },
 };
