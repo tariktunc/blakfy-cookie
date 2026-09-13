@@ -4032,8 +4032,13 @@
     // by a fraction of a pixel.
     ".blakfy-service-card-header{display:flex;align-items:center;gap:8px;min-height:40px;box-sizing:border-box;padding:10px 12px;cursor:pointer;background:#fafafa;user-select:none}",
     ".blakfy-service-card-header:hover{background:#f3f3f3}",
-    ".blakfy-service-name{flex:1;font-size:13px;font-weight:600;color:#222}",
-    ".blakfy-service-cat{font-size:11px;padding:2px 8px;border-radius:999px;background:#eee;color:#555;text-transform:capitalize}",
+    // line-height:1 on both — without it they inherit .blakfy-card's line-height:1.5,
+    // which makes each span's own line-box taller than its glyphs. align-items:center
+    // on the header then centers that oversized line-box, not the text itself, so the
+    // glyphs (sitting low within their line-box, per normal font metrics) render
+    // visibly below-center inside the header row.
+    ".blakfy-service-name{flex:1;font-size:13px;font-weight:600;color:#222;line-height:1}",
+    ".blakfy-service-cat{font-size:11px;padding:2px 8px;border-radius:999px;background:#eee;color:#555;text-transform:capitalize;line-height:1}",
     ".blakfy-service-toggle{font-size:11px;color:#aaa;line-height:1}",
     ".blakfy-service-body[aria-hidden=true]{display:none}",
     ".blakfy-service-body[aria-hidden=false]{display:block;padding:12px;border-top:1px solid #eee}",
