@@ -687,17 +687,17 @@
       if (which === "banner") bannerRoot = root2;
     };
     const closeUI = (force) => {
-      if (!force && !state) return;
       const queryRoot = ctx.shadowRoot || (typeof document !== "undefined" ? document : null);
+      const selector = force || state ? ".blakfy-overlay" : ".blakfy-overlay.modal";
       if (queryRoot) {
-        const overlays = queryRoot.querySelectorAll(".blakfy-overlay");
+        const overlays = queryRoot.querySelectorAll(selector);
         for (let i = 0; i < overlays.length; i++) {
           const o = overlays[i];
           if (o && o.parentNode) o.parentNode.removeChild(o);
         }
       }
       modalRoot = null;
-      bannerRoot = null;
+      if (force || state) bannerRoot = null;
       if (deps && typeof deps.removeFocusTrap === "function") deps.removeFocusTrap();
     };
     let warnedNoCategoryArg = false;

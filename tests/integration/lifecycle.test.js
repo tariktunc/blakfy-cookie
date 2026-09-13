@@ -137,13 +137,16 @@ describe("full DOM lifecycle (#31)", () => {
     expect(state.marketing).toBe(false);
   });
 
-  it("backdrop click on the preferences modal must not dismiss it before a decision exists", async () => {
-    // Bug: the modal's backdrop-click handler called the same closeUI() that removes
-    // EVERY ".blakfy-overlay" node, including the banner sitting behind the modal —
-    // not just the modal itself. Before any decision exists that left the visitor
-    // with no banner, no modal, and no FAB (the FAB only mounts once a decision
-    // exists, #34): a dead end, no way to ever open cookie preferences again on this
-    // pageload. A backdrop click must never stand in for a real choice.
+  it("backdrop click on the preferences modal closes ONLY the modal before a decision exists, leaving the banner up", async () => {
+    // Bug (round 1): the modal's backdrop-click handler called the same closeUI()
+    // that removes EVERY ".blakfy-overlay" node, including the banner sitting behind
+    // the modal. Before any decision exists that left the visitor with no banner, no
+    // modal, and no FAB (the FAB only mounts once a decision exists, #34): a dead
+    // end, no way to ever open cookie preferences again on this pageload.
+    //
+    // Owner decision (round 2): dismissing the modal must not force a decision
+    // either, so the fix isn't "don't close it" — it's "close only the modal,
+    // leave the banner so the visitor still has Accept/Reject/Save available".
     await boot();
     clickAct("prefs");
     await FLUSH();
@@ -156,13 +159,27 @@ describe("full DOM lifecycle (#31)", () => {
     modalOverlay.dispatchEvent(new Event("click", { bubbles: true }));
     await FLUSH();
 
-    expect(
-      qs(".blakfy-card[aria-modal='true']"),
-      "modal must stay open with no decision"
-    ).toBeTruthy();
+    expect(qs(".blakfy-card[aria-modal='true']"), "the modal itself should close").toBeNull();
     expect(
       qs(".blakfy-overlay.widget"),
-      "the banner behind it must not be removed either"
+      "the banner behind it must stay up — no decision was made"
+    ).toBeTruthy();
+    expect(readConsentCookie()).toBeNull();
+  });
+
+  it("the X button closes only the modal before a decision exists, leaving the banner up", async () => {
+    await boot();
+    clickAct("prefs");
+    await FLUSH();
+    expect(qs(".blakfy-card[aria-modal='true']")).toBeTruthy();
+
+    qs(".blakfy-close").click();
+    await FLUSH();
+
+    expect(qs(".blakfy-card[aria-modal='true']"), "the modal itself should close").toBeNull();
+    expect(
+      qs(".blakfy-overlay.widget"),
+      "the banner behind it must stay up — no decision was made"
     ).toBeTruthy();
     expect(readConsentCookie()).toBeNull();
   });

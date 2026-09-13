@@ -33,28 +33,31 @@ export const createAPI = (ctx) => {
   };
 
   // closeUI(force): dismissing the preferences modal (backdrop click, Escape, the X
-  // button) all route through here. Before any decision exists (state === null), a
-  // dismissal must never be allowed to stand in for a real choice — and closeUI()
-  // removes EVERY ".blakfy-overlay" node, which also deletes the banner behind the
-  // modal, not just the modal itself. Without a decision, the FAB never mounts
-  // either (#34), so that combination was a dead end: no banner, no modal, no way to
-  // ever open cookie preferences again on this pageload. commit() (the only path
-  // that produces a real decision) passes force:true to still close normally.
+  // button) all route through here. Owner decision: dismissing the modal must never
+  // by itself count as a choice — but it also must not trap the visitor. So before a
+  // decision exists (state === null), closeUI() removes ONLY the modal overlay and
+  // leaves the banner behind it in place: the visitor still sees Accept/Reject/Save,
+  // just not the expanded preferences panel. Every path back to "no way to ever
+  // decide" (deleting the banner too, per the old bug) stays closed off — the FAB
+  // (#34) still only mounts once a real decision exists, so the banner staying
+  // mounted is the visitor's only route back if they dismiss the modal first.
+  // commit() (the only path that produces a real decision) passes force:true, which
+  // closes everything, matching the pre-existing behavior once a choice is made.
   const closeUI = (force) => {
-    if (!force && !state) return;
     // #35: overlays render inside the widget's shadow root now, not directly under
     // document — document.querySelectorAll never sees into a shadow tree, so the
     // mount root (shadow root, or its non-Shadow-DOM fallback) is required here.
     const queryRoot = ctx.shadowRoot || (typeof document !== "undefined" ? document : null);
+    const selector = force || state ? ".blakfy-overlay" : ".blakfy-overlay.modal";
     if (queryRoot) {
-      const overlays = queryRoot.querySelectorAll(".blakfy-overlay");
+      const overlays = queryRoot.querySelectorAll(selector);
       for (let i = 0; i < overlays.length; i++) {
         const o = overlays[i];
         if (o && o.parentNode) o.parentNode.removeChild(o);
       }
     }
     modalRoot = null;
-    bannerRoot = null;
+    if (force || state) bannerRoot = null;
     if (deps && typeof deps.removeFocusTrap === "function") deps.removeFocusTrap();
   };
 
