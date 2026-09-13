@@ -32,7 +32,16 @@ export const createAPI = (ctx) => {
     if (which === "banner") bannerRoot = root;
   };
 
-  const closeUI = () => {
+  // closeUI(force): dismissing the preferences modal (backdrop click, Escape, the X
+  // button) all route through here. Before any decision exists (state === null), a
+  // dismissal must never be allowed to stand in for a real choice — and closeUI()
+  // removes EVERY ".blakfy-overlay" node, which also deletes the banner behind the
+  // modal, not just the modal itself. Without a decision, the FAB never mounts
+  // either (#34), so that combination was a dead end: no banner, no modal, no way to
+  // ever open cookie preferences again on this pageload. commit() (the only path
+  // that produces a real decision) passes force:true to still close normally.
+  const closeUI = (force) => {
+    if (!force && !state) return;
     // #35: overlays render inside the widget's shadow root now, not directly under
     // document — document.querySelectorAll never sees into a shadow tree, so the
     // mount root (shadow root, or its non-Shadow-DOM fallback) is required here.
@@ -174,7 +183,7 @@ export const createAPI = (ctx) => {
       if (wasGranted && !isGranted) emitter.emit("consent:" + cat, false);
     }
 
-    closeUI();
+    closeUI(true);
   };
 
   const acceptAll = () =>

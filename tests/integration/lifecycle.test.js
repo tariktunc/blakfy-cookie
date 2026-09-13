@@ -137,6 +137,55 @@ describe("full DOM lifecycle (#31)", () => {
     expect(state.marketing).toBe(false);
   });
 
+  it("backdrop click on the preferences modal must not dismiss it before a decision exists", async () => {
+    // Bug: the modal's backdrop-click handler called the same closeUI() that removes
+    // EVERY ".blakfy-overlay" node, including the banner sitting behind the modal —
+    // not just the modal itself. Before any decision exists that left the visitor
+    // with no banner, no modal, and no FAB (the FAB only mounts once a decision
+    // exists, #34): a dead end, no way to ever open cookie preferences again on this
+    // pageload. A backdrop click must never stand in for a real choice.
+    await boot();
+    clickAct("prefs");
+    await FLUSH();
+
+    const modalOverlay = qs(".blakfy-overlay.modal");
+    expect(modalOverlay, "opening Preferences should mount the modal overlay").toBeTruthy();
+    expect(qs(".blakfy-card[aria-modal='true']")).toBeTruthy();
+
+    // Click the backdrop itself (event.target === overlay), not the card inside it.
+    modalOverlay.dispatchEvent(new Event("click", { bubbles: true }));
+    await FLUSH();
+
+    expect(
+      qs(".blakfy-card[aria-modal='true']"),
+      "modal must stay open with no decision"
+    ).toBeTruthy();
+    expect(
+      qs(".blakfy-overlay.widget"),
+      "the banner behind it must not be removed either"
+    ).toBeTruthy();
+    expect(readConsentCookie()).toBeNull();
+  });
+
+  it("backdrop click DOES close the modal once a decision already exists (reopened via FAB)", async () => {
+    await boot();
+    clickAct("accept");
+    await FLUSH();
+
+    const fab = qs(".blakfy-fab");
+    fab.click();
+    await FLUSH();
+    const modalOverlay = qs(".blakfy-overlay.modal");
+    expect(modalOverlay).toBeTruthy();
+
+    modalOverlay.dispatchEvent(new Event("click", { bubbles: true }));
+    await FLUSH();
+
+    expect(qs(".blakfy-card[aria-modal='true']")).toBeNull();
+    // the prior decision must be untouched by dismissing without changes
+    expect(readConsentCookie().analytics).toBe(true);
+  });
+
   it("reopening after a decision (BlakfyCookie.open) shows the modal, not the first-visit banner", async () => {
     await boot();
     clickAct("accept");

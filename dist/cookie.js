@@ -125,6 +125,124 @@
     }
   };
 
+  // src/core/config.js
+  var RUNTIME_VERSION = "2.4.0" ? "2.4.0" : "2";
+  var STATUS_BASE = "https://cdn.jsdelivr.net/npm/@blakfy/cookie@" + RUNTIME_VERSION;
+  var DEFAULTS = {
+    locale: "auto",
+    mainLang: null,
+    // #49 (owner decision 2026-09-12): default to "auto" (in-widget generated notice)
+    // instead of a hardcoded path most sites never created — that hardcoded default is
+    // exactly what produced live 404s on suestebeauty.com and senelli.com. A site with
+    // a real policy page still sets data-blakfy-policy-url explicitly and gets the old
+    // off-site link behaviour.
+    policyUrl: "auto",
+    policyVersion: "1.0",
+    auditEndpoint: null,
+    // #30 (item 6): optional operator error-reporting hook. Read directly off the <script>
+    // element by index.js's bootstrap-error handler (not through readConfig()'s output) so a
+    // throw inside readConfig() itself still has a chance to be reported.
+    errorEndpoint: null,
+    // #49: required for the generated in-widget notice (GDPR Art. 13(1)(a) / KVKK
+    // Md.10 controller identity). Left unset, the notice renders but is marked
+    // incomplete and says so loudly — see src/compliance/policy-text.js.
+    operator: null,
+    operatorContact: null,
+    operatorAddress: null,
+    position: "bottom-center",
+    margin: "16",
+    theme: "auto",
+    // #56: owner decision — default look is neutral, not the old brand-green. Site
+    // owners who want a brand color still set data-blakfy-accent; this only changes
+    // what renders when that attribute is absent. #6b7280 (neutral gray) rather than
+    // pure #000/#fff because it stays legible against both the light card background
+    // (#fff) and the dark theme card background (#1a1a1a) without a theme-specific fork.
+    accent: "#6b7280",
+    presets: null,
+    tcf: "false",
+    cmpId: "0",
+    ccpa: "auto",
+    gpc: "respect",
+    dnt: "respect",
+    statusUrl: STATUS_BASE + "/status.json",
+    statusEnabled: true,
+    // #30 (scale readiness — multi-domain/subdomain scope): host-only by default
+    // (matches existing behaviour). Set data-blakfy-cookie-domain=".example.com" so a
+    // decision made on www.example.com also carries to shop.example.com — otherwise a
+    // visitor is asked again on every subdomain, which is a real defect for clients
+    // running a shop on a subdomain. Document the apex/www implication for anyone not
+    // redirecting to a canonical host: an unset value means example.com and
+    // www.example.com are treated as two different sites for consent purposes.
+    cookieDomain: null,
+    // #34: reopen FAB — "off" disables it (a site wiring its own footer link
+    // instead). Wix installs commonly already occupy the right corner with
+    // chat/map buttons, so "left" is the stock default everywhere.
+    fabSide: "left",
+    fabOffset: null,
+    fabSize: null,
+    fabColor: null,
+    // #39: cookie transparency panel — off by default (issue proposal: "Off by default;
+    // a site opts in"). Lists cookies actually present in document.cookie, with
+    // per-cookie delete. data-blakfy-cookie-panel="true" to enable.
+    cookiePanel: "false"
+  };
+  var CAPTURED_SCRIPT_EL = typeof document !== "undefined" ? document.currentScript : null;
+  var getScriptEl = () => {
+    if (CAPTURED_SCRIPT_EL) return CAPTURED_SCRIPT_EL;
+    if (typeof document === "undefined") return null;
+    const all = document.getElementsByTagName("script");
+    return all[all.length - 1] || null;
+  };
+  var detectPlacementIssue = (el2) => {
+    if (!el2) {
+      return "no usable <script> element could be resolved (document.currentScript was null and no fallback script was found) \u2014 this usually means the tag has the `async` attribute, which is not supported. Load this script WITHOUT async/defer, placed body-last, per the install docs.";
+    }
+    if (typeof el2.hasAttribute === "function" && el2.hasAttribute("async")) {
+      return "this script tag has the `async` attribute. document.currentScript is null for async scripts per spec, so this install cannot reliably read its own data-blakfy-* attributes and may silently fall back to the wrong <script> tag on the page. Remove `async` and load this script body-last instead.";
+    }
+    if (typeof document !== "undefined" && document.head && typeof el2.closest === "function" && el2.closest("head") === document.head) {
+      return "this script tag is placed in <head>. The install docs call for body-last placement; loading in <head> risks executing before the DOM the widget mounts into exists, and commonly pairs with `async`/`defer` mistakes. Move the tag to just before </body>.";
+    }
+    return null;
+  };
+  var readConfig = (scriptEl) => {
+    const el2 = scriptEl || getScriptEl();
+    const attr = (name, fallback) => {
+      if (!el2) return fallback;
+      const v = el2.getAttribute(name);
+      return v == null ? fallback : v;
+    };
+    return {
+      locale: attr("data-blakfy-locale", DEFAULTS.locale),
+      mainLang: attr("data-blakfy-main-lang", DEFAULTS.mainLang),
+      policyUrl: attr("data-blakfy-policy-url", DEFAULTS.policyUrl),
+      policyVersion: attr("data-blakfy-version", DEFAULTS.policyVersion),
+      auditEndpoint: attr("data-blakfy-audit-endpoint", DEFAULTS.auditEndpoint),
+      errorEndpoint: attr("data-blakfy-error-endpoint", DEFAULTS.errorEndpoint),
+      operator: attr("data-blakfy-operator", DEFAULTS.operator),
+      operatorContact: attr("data-blakfy-operator-contact", DEFAULTS.operatorContact),
+      operatorAddress: attr("data-blakfy-operator-address", DEFAULTS.operatorAddress),
+      position: attr("data-blakfy-position", DEFAULTS.position),
+      margin: attr("data-blakfy-margin", DEFAULTS.margin),
+      theme: attr("data-blakfy-theme", DEFAULTS.theme),
+      accent: attr("data-blakfy-accent", DEFAULTS.accent),
+      presets: attr("data-blakfy-presets", DEFAULTS.presets),
+      tcf: attr("data-blakfy-tcf", DEFAULTS.tcf),
+      cmpId: attr("data-blakfy-cmp-id", DEFAULTS.cmpId),
+      ccpa: attr("data-blakfy-ccpa", DEFAULTS.ccpa),
+      gpc: attr("data-blakfy-gpc", DEFAULTS.gpc),
+      dnt: attr("data-blakfy-dnt", DEFAULTS.dnt),
+      statusUrl: attr("data-blakfy-status-url", DEFAULTS.statusUrl),
+      statusEnabled: attr("data-blakfy-status", "true") !== "false",
+      cookieDomain: attr("data-blakfy-cookie-domain", DEFAULTS.cookieDomain),
+      fabSide: attr("data-blakfy-fab", DEFAULTS.fabSide),
+      fabOffset: attr("data-blakfy-fab-offset", DEFAULTS.fabOffset),
+      fabSize: attr("data-blakfy-fab-size", DEFAULTS.fabSize),
+      fabColor: attr("data-blakfy-fab-color", DEFAULTS.fabColor),
+      cookiePanel: attr("data-blakfy-cookie-panel", DEFAULTS.cookiePanel) === "true"
+    };
+  };
+
   // src/core/consent-store.js
   var COOKIE_NAME = "blakfy_consent";
   var COOKIE_TTL_DAYS = 365;
@@ -399,6 +517,13 @@
       description: "This website uses Blakfy Cookie Management Platform (CMP) to manage your consent preferences in compliance with GDPR, KVKK, CCPA and other applicable privacy regulations.",
       version: "Version",
       learnMore: "Learn more at blakfy.com"
+    },
+    cookiePanel: {
+      caveat: "This list shows cookies readable by this page (document.cookie). It cannot see HttpOnly cookies and says nothing about localStorage, IndexedDB, or fingerprinting \u2014 it is a partial view, not a complete inventory.",
+      empty: "No cookies detected on this page.",
+      unrecognised: "Unrecognised \u2014 not matched to any known service",
+      essential: "Essential \u2014 cannot be deleted",
+      delete: "Delete"
     }
   };
 
@@ -469,6 +594,13 @@
       description: "Bu web sitesi; GDPR, KVKK, CCPA ve di\u011Fer ge\xE7erli gizlilik mevzuatlar\u0131na uyum sa\u011Flamak amac\u0131yla r\u0131za tercihlerinizi y\xF6netmek i\xE7in Blakfy \xC7erez Y\xF6netim Platformu'nu (CMP) kullanmaktad\u0131r.",
       version: "S\xFCr\xFCm",
       learnMore: "blakfy.com'da daha fazla bilgi"
+    },
+    cookiePanel: {
+      caveat: "Bu liste, bu sayfan\u0131n okuyabildi\u011Fi \xE7erezleri g\xF6sterir (document.cookie). HttpOnly \xE7erezleri g\xF6remez; localStorage, IndexedDB veya parmak izi (fingerprinting) hakk\u0131nda bilgi vermez \u2014 tam bir envanter de\u011Fil, k\u0131smi bir g\xF6r\xFCn\xFCmd\xFCr.",
+      empty: "Bu sayfada hi\xE7bir \xE7erez tespit edilmedi.",
+      unrecognised: "Tan\u0131nm\u0131yor \u2014 bilinen bir hizmetle e\u015Fle\u015Fmedi",
+      essential: "Zorunlu \u2014 silinemez",
+      delete: "Sil"
     }
   };
 
@@ -537,7 +669,7 @@
   };
 
   // src/api.js
-  var VERSION = "2.2.0";
+  var VERSION = RUNTIME_VERSION;
   var CATEGORIES = ["analytics", "marketing", "functional", "recording"];
   var createAPI = (ctx) => {
     const { config, emitter, deps } = ctx;
@@ -554,7 +686,8 @@
       if (which === "modal") modalRoot = root2;
       if (which === "banner") bannerRoot = root2;
     };
-    const closeUI = () => {
+    const closeUI = (force) => {
+      if (!force && !state) return;
       const queryRoot = ctx.shadowRoot || (typeof document !== "undefined" ? document : null);
       if (queryRoot) {
         const overlays = queryRoot.querySelectorAll(".blakfy-overlay");
@@ -662,7 +795,7 @@
         if (!wasGranted && isGranted) emitter.emit("consent:" + cat, true);
         if (wasGranted && !isGranted) emitter.emit("consent:" + cat, false);
       }
-      closeUI();
+      closeUI(true);
     };
     const acceptAll = () => commit({ analytics: true, marketing: true, functional: true, recording: true }, "accept_all");
     const rejectAll = () => commit(
@@ -1151,119 +1284,6 @@
     if (typeof unblock !== "function") return;
     if (s.analytics === true) unblock("analytics");
     if (s.recording === true) unblock("recording");
-  };
-
-  // src/core/config.js
-  var RUNTIME_VERSION = "2.4.0" ? "2.4.0" : "2";
-  var STATUS_BASE = "https://cdn.jsdelivr.net/npm/@blakfy/cookie@" + RUNTIME_VERSION;
-  var DEFAULTS = {
-    locale: "auto",
-    mainLang: null,
-    // #49 (owner decision 2026-09-12): default to "auto" (in-widget generated notice)
-    // instead of a hardcoded path most sites never created — that hardcoded default is
-    // exactly what produced live 404s on suestebeauty.com and senelli.com. A site with
-    // a real policy page still sets data-blakfy-policy-url explicitly and gets the old
-    // off-site link behaviour.
-    policyUrl: "auto",
-    policyVersion: "1.0",
-    auditEndpoint: null,
-    // #30 (item 6): optional operator error-reporting hook. Read directly off the <script>
-    // element by index.js's bootstrap-error handler (not through readConfig()'s output) so a
-    // throw inside readConfig() itself still has a chance to be reported.
-    errorEndpoint: null,
-    // #49: required for the generated in-widget notice (GDPR Art. 13(1)(a) / KVKK
-    // Md.10 controller identity). Left unset, the notice renders but is marked
-    // incomplete and says so loudly — see src/compliance/policy-text.js.
-    operator: null,
-    operatorContact: null,
-    operatorAddress: null,
-    position: "bottom-center",
-    margin: "16",
-    theme: "auto",
-    accent: "#3E5C3A",
-    presets: null,
-    tcf: "false",
-    cmpId: "0",
-    ccpa: "auto",
-    gpc: "respect",
-    dnt: "respect",
-    statusUrl: STATUS_BASE + "/status.json",
-    statusEnabled: true,
-    // #30 (scale readiness — multi-domain/subdomain scope): host-only by default
-    // (matches existing behaviour). Set data-blakfy-cookie-domain=".example.com" so a
-    // decision made on www.example.com also carries to shop.example.com — otherwise a
-    // visitor is asked again on every subdomain, which is a real defect for clients
-    // running a shop on a subdomain. Document the apex/www implication for anyone not
-    // redirecting to a canonical host: an unset value means example.com and
-    // www.example.com are treated as two different sites for consent purposes.
-    cookieDomain: null,
-    // #34: reopen FAB — "off" disables it (a site wiring its own footer link
-    // instead). Wix installs commonly already occupy the right corner with
-    // chat/map buttons, so "left" is the stock default everywhere.
-    fabSide: "left",
-    fabOffset: null,
-    fabSize: null,
-    fabColor: null,
-    // #39: cookie transparency panel — off by default (issue proposal: "Off by default;
-    // a site opts in"). Lists cookies actually present in document.cookie, with
-    // per-cookie delete. data-blakfy-cookie-panel="true" to enable.
-    cookiePanel: "false"
-  };
-  var CAPTURED_SCRIPT_EL = typeof document !== "undefined" ? document.currentScript : null;
-  var getScriptEl = () => {
-    if (CAPTURED_SCRIPT_EL) return CAPTURED_SCRIPT_EL;
-    if (typeof document === "undefined") return null;
-    const all = document.getElementsByTagName("script");
-    return all[all.length - 1] || null;
-  };
-  var detectPlacementIssue = (el2) => {
-    if (!el2) {
-      return "no usable <script> element could be resolved (document.currentScript was null and no fallback script was found) \u2014 this usually means the tag has the `async` attribute, which is not supported. Load this script WITHOUT async/defer, placed body-last, per the install docs.";
-    }
-    if (typeof el2.hasAttribute === "function" && el2.hasAttribute("async")) {
-      return "this script tag has the `async` attribute. document.currentScript is null for async scripts per spec, so this install cannot reliably read its own data-blakfy-* attributes and may silently fall back to the wrong <script> tag on the page. Remove `async` and load this script body-last instead.";
-    }
-    if (typeof document !== "undefined" && document.head && typeof el2.closest === "function" && el2.closest("head") === document.head) {
-      return "this script tag is placed in <head>. The install docs call for body-last placement; loading in <head> risks executing before the DOM the widget mounts into exists, and commonly pairs with `async`/`defer` mistakes. Move the tag to just before </body>.";
-    }
-    return null;
-  };
-  var readConfig = (scriptEl) => {
-    const el2 = scriptEl || getScriptEl();
-    const attr = (name, fallback) => {
-      if (!el2) return fallback;
-      const v = el2.getAttribute(name);
-      return v == null ? fallback : v;
-    };
-    return {
-      locale: attr("data-blakfy-locale", DEFAULTS.locale),
-      mainLang: attr("data-blakfy-main-lang", DEFAULTS.mainLang),
-      policyUrl: attr("data-blakfy-policy-url", DEFAULTS.policyUrl),
-      policyVersion: attr("data-blakfy-version", DEFAULTS.policyVersion),
-      auditEndpoint: attr("data-blakfy-audit-endpoint", DEFAULTS.auditEndpoint),
-      errorEndpoint: attr("data-blakfy-error-endpoint", DEFAULTS.errorEndpoint),
-      operator: attr("data-blakfy-operator", DEFAULTS.operator),
-      operatorContact: attr("data-blakfy-operator-contact", DEFAULTS.operatorContact),
-      operatorAddress: attr("data-blakfy-operator-address", DEFAULTS.operatorAddress),
-      position: attr("data-blakfy-position", DEFAULTS.position),
-      margin: attr("data-blakfy-margin", DEFAULTS.margin),
-      theme: attr("data-blakfy-theme", DEFAULTS.theme),
-      accent: attr("data-blakfy-accent", DEFAULTS.accent),
-      presets: attr("data-blakfy-presets", DEFAULTS.presets),
-      tcf: attr("data-blakfy-tcf", DEFAULTS.tcf),
-      cmpId: attr("data-blakfy-cmp-id", DEFAULTS.cmpId),
-      ccpa: attr("data-blakfy-ccpa", DEFAULTS.ccpa),
-      gpc: attr("data-blakfy-gpc", DEFAULTS.gpc),
-      dnt: attr("data-blakfy-dnt", DEFAULTS.dnt),
-      statusUrl: attr("data-blakfy-status-url", DEFAULTS.statusUrl),
-      statusEnabled: attr("data-blakfy-status", "true") !== "false",
-      cookieDomain: attr("data-blakfy-cookie-domain", DEFAULTS.cookieDomain),
-      fabSide: attr("data-blakfy-fab", DEFAULTS.fabSide),
-      fabOffset: attr("data-blakfy-fab-offset", DEFAULTS.fabOffset),
-      fabSize: attr("data-blakfy-fab-size", DEFAULTS.fabSize),
-      fabColor: attr("data-blakfy-fab-color", DEFAULTS.fabColor),
-      cookiePanel: attr("data-blakfy-cookie-panel", DEFAULTS.cookiePanel) === "true"
-    };
   };
 
   // src/core/events.js
@@ -1909,6 +1929,214 @@
       cookiePolicyUrl: "https://policies.google.com/technologies/cookies"
     }
   };
+  var SERVICE_METADATA_I18N = {
+    tr: {
+      ga4: {
+        description: "Web sitesi ziyaret\xE7ilerinin siteyle nas\u0131l etkile\u015Fime girdi\u011Fini anlamalar\u0131na yard\u0131mc\u0131 olmak i\xE7in trafik verilerini toplayan ve raporlayan web sitesi analitik hizmeti.",
+        purposes: ["Analitik", "Performans \xF6l\xE7\xFCm\xFC", "Kullan\u0131c\u0131 davran\u0131\u015F\u0131 analizi"],
+        technologies: ["\xC7erezler", "JavaScript"],
+        dataCollected: [
+          "IP adresi",
+          "Taray\u0131c\u0131 bilgisi",
+          "Kullan\u0131m verisi",
+          "Cihaz bilgisi",
+          "Co\u011Frafi konum",
+          "Ziyaret tarihi ve saati",
+          "Ziyaret edilen sayfalar"
+        ]
+      },
+      gtm: {
+        description: "Site sahiplerinin site kodunu de\u011Fi\u015Ftirmeden pazarlama ve analitik etiketlerini y\xF6netip yay\u0131nlamas\u0131n\u0131 sa\u011Flayan etiket y\xF6netim sistemi.",
+        purposes: ["Etiket y\xF6netimi", "Analitik", "Pazarlama"],
+        technologies: ["Web sitesi etiketleri", "JavaScript"],
+        dataCollected: ["Toplu etiket tetikleme verisi", "Tan\u0131lama verisi"]
+      },
+      facebook: {
+        description: "Meta taraf\u0131ndan geli\u015Ftirilen, reklam etkinli\u011Fini \xF6l\xE7en ve siteyi ziyaret eden kullan\u0131c\u0131lar\u0131n yeniden hedeflenmesini sa\u011Flayan izleme teknolojisi.",
+        purposes: ["Analitik", "Pazarlama", "Yeniden hedefleme", "Reklam", "D\xF6n\xFC\u015F\xFCm izleme"],
+        technologies: ["\xC7erezler", "Piksel"],
+        dataCollected: [
+          "IP adresi",
+          "Taray\u0131c\u0131 bilgisi",
+          "Cihaz bilgisi",
+          "Ziyaret edilen sayfalar",
+          "Piksel ID",
+          "G\xF6r\xFCnt\xFClenen reklamlar",
+          "Kullan\u0131m davran\u0131\u015F\u0131",
+          "Y\xF6nlendiren URL"
+        ]
+      },
+      clarity: {
+        description: "Kullan\u0131c\u0131 oturumlar\u0131n\u0131 kaydeden ve \u0131s\u0131 haritalar\u0131 olu\u015Fturan, ziyaret\xE7ilerin siteyle nas\u0131l etkile\u015Fime girdi\u011Fini anlamaya yard\u0131mc\u0131 olan davran\u0131\u015Fsal analitik arac\u0131.",
+        purposes: ["Analitik", "Is\u0131 haritalar\u0131", "Oturum kayd\u0131"],
+        technologies: ["\xC7erezler", "JavaScript"],
+        dataCollected: [
+          "IP adresi",
+          "Fare hareketleri",
+          "T\u0131klamalar",
+          "Kayd\u0131rmalar",
+          "Taray\u0131c\u0131 bilgisi",
+          "Cihaz bilgisi",
+          "Y\xF6nlendiren URL"
+        ]
+      },
+      hotjar: {
+        description: "Is\u0131 haritalar\u0131, oturum kay\u0131tlar\u0131 ve geri bildirim ara\xE7lar\u0131 sunarak ziyaret\xE7i davran\u0131\u015F\u0131n\u0131 anlamay\u0131 sa\u011Flayan kullan\u0131c\u0131 deneyimi analitik platformu.",
+        purposes: ["Analitik", "Is\u0131 haritalar\u0131", "Kullan\u0131c\u0131 geri bildirimi", "Oturum kayd\u0131"],
+        technologies: ["\xC7erezler", "Piksel", "JavaScript"],
+        dataCollected: [
+          "IP adresi",
+          "Kullan\u0131m verisi",
+          "Fare hareketleri",
+          "T\u0131klama davran\u0131\u015F\u0131",
+          "Cihaz bilgisi",
+          "Taray\u0131c\u0131 bilgisi"
+        ]
+      },
+      youtube: {
+        description: "Google'a ait video bar\u0131nd\u0131rma hizmeti. Etkinle\u015Ftirildi\u011Finde, sitede g\xF6m\xFCl\xFC YouTube videolar\u0131 oynat\u0131labilir ve ilgili \xE7erezler ayarlan\u0131r.",
+        purposes: ["Pazarlama", "Video i\xE7erik sunumu", "Ki\u015Fiselle\u015Ftirme"],
+        technologies: ["\xC7erezler", "Piksel"],
+        dataCollected: [
+          "IP adresi",
+          "Taray\u0131c\u0131 bilgisi",
+          "Kullan\u0131m verisi",
+          "Video izleme verisi",
+          "Cihaz bilgisi"
+        ]
+      },
+      vimeo: {
+        description: "Video bar\u0131nd\u0131rma ve payla\u015F\u0131m platformu. Etkinle\u015Ftirildi\u011Finde, sitede g\xF6m\xFCl\xFC Vimeo videolar\u0131 oynat\u0131labilir.",
+        purposes: ["Pazarlama", "Video i\xE7erik sunumu"],
+        technologies: ["\xC7erezler", "JavaScript"],
+        dataCollected: ["IP adresi", "Taray\u0131c\u0131 bilgisi", "Video izleme verisi", "Cihaz bilgisi"]
+      },
+      linkedin: {
+        description: "LinkedIn taraf\u0131ndan sunulan, d\xF6n\xFC\u015F\xFCm izleme ve site ziyaret\xE7ilerinin LinkedIn Reklamlar\u0131 \xFCzerinden yeniden hedeflenmesini sa\u011Flayan analitik ve yeniden hedefleme etiketi.",
+        purposes: ["Pazarlama", "Analitik", "Yeniden hedefleme", "D\xF6n\xFC\u015F\xFCm izleme"],
+        technologies: ["\xC7erezler", "Piksel"],
+        dataCollected: [
+          "IP adresi",
+          "Cihaz bilgisi",
+          "Ziyaret edilen sayfalar",
+          "Y\xF6nlendiren URL",
+          "Mesleki veri"
+        ]
+      },
+      yandex: {
+        description: "Optimizasyon ve pazarlama ama\xE7lar\u0131yla kullan\u0131c\u0131 davran\u0131\u015F\u0131na ili\u015Fkin istatistiksel verileri toplay\u0131p de\u011Ferlendiren web analitik hizmeti.",
+        purposes: ["Analitik", "Optimizasyon"],
+        technologies: ["\xC7erezler", "Web i\u015Faret\xE7ileri", "Piksel"],
+        dataCollected: [
+          "IP adresi",
+          "Taray\u0131c\u0131 bilgisi",
+          "Kullan\u0131m verisi",
+          "Cihaz bilgisi",
+          "Ziyaret tarihi ve saati",
+          "Co\u011Frafi konum"
+        ]
+      },
+      bing: {
+        description: "Microsoft Bing taraf\u0131ndan sunulan, Bing Ads kampanyalar\u0131 i\xE7in d\xF6n\xFC\u015F\xFCm izleme ve kitle hedeflemeyi sa\u011Flayan Evrensel Etkinlik \u0130zleme (UET) etiketi.",
+        purposes: ["Pazarlama", "D\xF6n\xFC\u015F\xFCm izleme", "Kitle hedefleme"],
+        technologies: ["\xC7erezler", "Piksel"],
+        dataCollected: ["IP adresi", "Taray\u0131c\u0131 bilgisi", "D\xF6n\xFC\u015F\xFCm verisi", "Cihaz bilgisi"]
+      },
+      tiktok: {
+        description: "TikTok reklam performans\u0131n\u0131 \xF6l\xE7en ve TikTok reklam kampanyalar\u0131 i\xE7in yeniden hedeflemeyi sa\u011Flayan TikTok izleme pikseli.",
+        purposes: ["Pazarlama", "Yeniden hedefleme", "D\xF6n\xFC\u015F\xFCm izleme"],
+        technologies: ["\xC7erezler", "Piksel"],
+        dataCollected: [
+          "IP adresi",
+          "Taray\u0131c\u0131 bilgisi",
+          "Kullan\u0131m verisi",
+          "Cihaz bilgisi",
+          "Ziyaret edilen sayfalar"
+        ]
+      },
+      pinterest: {
+        description: "Pinterest taraf\u0131ndan sunulan, d\xF6n\xFC\u015F\xFCmleri izleyen ve site ziyaret\xE7ilerinin Pinterest Reklamlar\u0131 \xFCzerinden hedeflenmesini sa\u011Flayan analitik ve yeniden hedefleme etiketi.",
+        purposes: ["Pazarlama", "Yeniden hedefleme", "D\xF6n\xFC\u015F\xFCm izleme"],
+        technologies: ["\xC7erezler", "Piksel"],
+        dataCollected: ["IP adresi", "Taray\u0131c\u0131 bilgisi", "Kullan\u0131m verisi", "Cihaz bilgisi"]
+      },
+      tawkto: {
+        description: "Site ziyaret\xE7ilerinin destek temsilcileriyle ger\xE7ek zamanl\u0131 ileti\u015Fim kurmas\u0131n\u0131 sa\u011Flayan canl\u0131 sohbet widget'\u0131.",
+        purposes: ["Fonksiyonel", "Canl\u0131 sohbet", "M\xFC\u015Fteri deste\u011Fi"],
+        technologies: ["\xC7erezler", "JavaScript"],
+        dataCollected: [
+          "IP adresi",
+          "Taray\u0131c\u0131 bilgisi",
+          "Sohbet mesajlar\u0131",
+          "Kullan\u0131m verisi",
+          "Cihaz bilgisi"
+        ]
+      },
+      intercom: {
+        description: "Canl\u0131 sohbet, uygulama i\xE7i mesajla\u015Fma ve m\xFC\u015Fteri destek ara\xE7lar\u0131 sunan m\xFC\u015Fteri mesajla\u015Fma platformu.",
+        purposes: ["Fonksiyonel", "M\xFC\u015Fteri deste\u011Fi", "Pazarlama"],
+        technologies: ["\xC7erezler", "JavaScript"],
+        dataCollected: [
+          "IP adresi",
+          "Taray\u0131c\u0131 bilgisi",
+          "Sohbet mesajlar\u0131",
+          "Kullan\u0131m verisi",
+          "Cihaz bilgisi",
+          "E-posta adresi"
+        ]
+      },
+      hubspot: {
+        description: "CRM ve pazarlama otomasyonu platformu. Potansiyel m\xFC\u015Fteri olu\u015Fturma ve pazarlama otomasyonunu sa\u011Flamak i\xE7in site ziyaret\xE7i davran\u0131\u015F\u0131n\u0131 izler.",
+        purposes: ["Pazarlama", "Analitik", "CRM", "Potansiyel m\xFC\u015Fteri olu\u015Fturma"],
+        technologies: ["\xC7erezler", "Piksel", "JavaScript"],
+        dataCollected: [
+          "IP adresi",
+          "Taray\u0131c\u0131 bilgisi",
+          "Form g\xF6nderimleri",
+          "Ziyaret edilen sayfalar",
+          "Kullan\u0131m verisi",
+          "E-posta adresi"
+        ]
+      },
+      mailchimp: {
+        description: "E-posta pazarlama ve otomasyon platformu. Abone y\xF6netimi i\xE7in e-posta kampanyas\u0131 etkile\u015Fimlerini ve site aktivitesini izler.",
+        purposes: ["Pazarlama", "E-posta kampanyalar\u0131", "Analitik"],
+        technologies: ["\xC7erezler", "Piksel", "Web i\u015Faret\xE7ileri"],
+        dataCollected: [
+          "IP adresi",
+          "E-posta davran\u0131\u015F\u0131",
+          "Form g\xF6nderimleri",
+          "Cihaz bilgisi",
+          "Taray\u0131c\u0131 bilgisi"
+        ]
+      },
+      maps: {
+        description: "Konumlar\u0131 g\xF6stermek ve yol tarifi sa\u011Flamak i\xE7in sitede g\xF6m\xFCl\xFC, Google taraf\u0131ndan sunulan interaktif harita hizmeti.",
+        purposes: ["Fonksiyonel", "Harita g\xF6sterimi", "Konum hizmetleri"],
+        technologies: ["\xC7erezler", "JavaScript"],
+        dataCollected: ["IP adresi", "Konum verisi", "Kullan\u0131m verisi", "Cihaz bilgisi"]
+      },
+      recaptcha: {
+        description: "Formlar\u0131 ve etkile\u015Fimli \xF6\u011Feleri otomatik k\xF6t\xFCye kullan\u0131mdan koruyan, Google taraf\u0131ndan sunulan bot tespiti ve g\xFCvenlik hizmeti.",
+        purposes: ["Fonksiyonel", "G\xFCvenlik", "Bot tespiti"],
+        technologies: ["\xC7erezler", "JavaScript"],
+        dataCollected: [
+          "IP adresi",
+          "Taray\u0131c\u0131 parmak izi",
+          "Kullan\u0131m verisi",
+          "Cihaz bilgisi",
+          "Fare davran\u0131\u015F\u0131"
+        ]
+      }
+    }
+  };
+  var getServiceMeta = (key, locale) => {
+    const base = SERVICE_METADATA[key];
+    if (!base) return null;
+    const overlay = SERVICE_METADATA_I18N[locale] && SERVICE_METADATA_I18N[locale][key];
+    if (!overlay) return base;
+    return { ...base, ...overlay };
+  };
 
   // src/data/cookie-inspector.js
   var matchesPreset = (matcher, name) => matcher instanceof RegExp ? matcher.test(name) : matcher === name;
@@ -1980,9 +2208,10 @@
   };
   var createPlaceholder = ({ category, srcUrl, t, onAccept }) => {
     const ph = t && t.placeholder || {};
+    const cat = t && t.cat && t.cat[category] && t.cat[category].title || category || "";
     const titleText = ph.title || "Content blocked";
     const descText = fmt(ph.desc || "Allow {category} cookies to view this content.", {
-      category: category || ""
+      category: cat
     });
     const ctaText = ph.cta || "Allow";
     const wrap = document.createElement("div");
@@ -3248,12 +3477,7 @@
       body.appendChild(links);
     }
     card.appendChild(body);
-    header.addEventListener("click", () => {
-      const hidden = body.getAttribute("aria-hidden") === "true";
-      body.setAttribute("aria-hidden", hidden ? "false" : "true");
-      toggle.textContent = hidden ? "\u25BE" : "\u25B8";
-    });
-    return card;
+    return { card, header, body, toggle };
   };
   var buildServicesPanel = (activePresets, t) => {
     const panel = el("div", {
@@ -3269,9 +3493,29 @@
       });
       list.appendChild(empty);
     } else {
+      const entries = [];
       for (let i = 0; i < activePresets.length; i++) {
         const { key, meta } = activePresets[i];
-        if (meta) list.appendChild(buildServiceCard(key, meta, t));
+        if (meta) {
+          const entry = buildServiceCard(key, meta, t);
+          entries.push(entry);
+          list.appendChild(entry.card);
+        }
+      }
+      const closeOthers = (except) => {
+        for (const entry of entries) {
+          if (entry === except) continue;
+          entry.body.setAttribute("aria-hidden", "true");
+          entry.toggle.textContent = "\u25B8";
+        }
+      };
+      for (const entry of entries) {
+        entry.header.addEventListener("click", () => {
+          const hidden = entry.body.getAttribute("aria-hidden") === "true";
+          closeOthers(entry);
+          entry.body.setAttribute("aria-hidden", hidden ? "false" : "true");
+          entry.toggle.textContent = hidden ? "\u25BE" : "\u25B8";
+        });
       }
     }
     panel.appendChild(list);
@@ -3525,7 +3769,7 @@
     if (presets && presets.length) {
       for (let i = 0; i < presets.length; i++) {
         const key = typeof presets[i] === "string" ? presets[i] : presets[i].key;
-        const meta = SERVICE_METADATA[key] || (typeof presets[i] === "object" ? presets[i].meta : null);
+        const meta = getServiceMeta(key, locale) || (typeof presets[i] === "object" ? presets[i].meta : null);
         if (meta) enriched.push({ key, meta });
       }
     }
@@ -3705,6 +3949,12 @@
     "/* Layout architecture is locked \u2014 only --blakfy-accent is overridable */",
     // Modal mode (centered, dimmed backdrop)
     ".blakfy-overlay.modal{position:fixed !important;inset:0;background:rgba(0,0,0,.4);z-index:2147483646 !important;display:flex !important;align-items:center;justify-content:center;padding:16px}",
+    // #57: on a short viewport (<500px tall) the card had no max-height/overflow, so it
+    // overflowed both above and below the visible area with no way to scroll to the
+    // header/close button or the accept/save actions — a dead end for anyone without a
+    // physical Escape key. Capping height to the overlay's own padded viewport and
+    // scrolling the card's own content keeps both ends reachable.
+    ".blakfy-overlay.modal .blakfy-card{max-height:calc(100vh - 32px);overflow-y:auto}",
     // Widget mode (transparent, no backdrop)
     ".blakfy-overlay.widget{position:fixed !important;inset:auto;background:transparent;padding:0;display:block !important;z-index:2147483646 !important;pointer-events:none}",
     ".blakfy-overlay.widget .blakfy-card{width:min(96vw,1100px);max-width:none;border-radius:8px;position:relative;pointer-events:auto;padding-bottom:40px;box-sizing:border-box}",
@@ -3720,17 +3970,23 @@
     ".blakfy-overlay.widget.top-left{top:var(--blakfy-margin,16px);left:var(--blakfy-margin,16px);right:auto;bottom:auto}",
     ".blakfy-overlay.widget.center{top:50%;left:50%;right:auto;bottom:auto;transform:translate(-50%,-50%)}",
     // Card base (shared by banner + modal)
-    ".blakfy-card{box-sizing:border-box;background:#fff;color:#222;border-radius:16px;max-width:560px;width:100%;padding:24px;border:3px solid var(--blakfy-accent,#3E5C3A);font-family:system-ui,-apple-system,sans-serif;line-height:1.5;position:relative}",
+    // Bottom padding is wider than the rest — the "Powered by Blakfy Studio" badge is
+    // absolutely positioned at bottom:8px/right:12px inside this card (see badge.js),
+    // and without this reserved strip the last action button (often the rightmost —
+    // Accept All) sits directly under it. This used to be reserved only in widget mode
+    // (".blakfy-overlay.widget .blakfy-card"); the preferences MODAL had no such
+    // reservation, so the badge overlapped its Accept/Save buttons every time.
+    ".blakfy-card{box-sizing:border-box;background:#fff;color:#222;border-radius:16px;max-width:560px;width:100%;padding:24px 24px 40px;border:3px solid var(--blakfy-accent,#6b7280);font-family:system-ui,-apple-system,sans-serif;line-height:1.5;position:relative}",
     ".blakfy-card[dir=rtl]{text-align:right}",
     ".blakfy-card h2{margin:0 0 8px;font-size:18px;font-weight:600}",
     ".blakfy-card p{margin:0 0 16px;font-size:14px;color:#444}",
-    ".blakfy-card a{color:var(--blakfy-accent,#3E5C3A);text-decoration:underline}",
+    ".blakfy-card a{color:var(--blakfy-accent,#6b7280);text-decoration:underline}",
     // Actions
     ".blakfy-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}",
     // Buttons (3px radius per spec)
     ".blakfy-btn{flex:1;min-width:120px;min-height:44px;padding:12px 16px;border:1px solid #ddd;border-radius:3px;background:#fff;color:#222;font-size:14px;font-weight:500;cursor:pointer;transition:transform .1s,background .15s}",
     ".blakfy-btn:hover{transform:translateY(-1px)}",
-    ".blakfy-btn-primary{background:var(--blakfy-accent,#3E5C3A);color:#fff;border-color:transparent}",
+    ".blakfy-btn-primary{background:var(--blakfy-accent,#6b7280);color:#fff;border-color:transparent}",
     ".blakfy-cat{padding:12px 0;border-top:1px solid #eee;display:flex;align-items:flex-start;gap:12px}",
     ".blakfy-cat:first-of-type{border-top:none}",
     ".blakfy-cat-text{flex:1}",
@@ -3738,7 +3994,7 @@
     ".blakfy-cat-text span{font-size:13px;color:#666}",
     // Switches (pill-shaped — UX standard)
     ".blakfy-switch{flex-shrink:0;width:44px;height:24px;border-radius:999px;background:#ccc;position:relative;cursor:pointer;border:none;padding:0}",
-    ".blakfy-switch[aria-checked=true]{background:var(--blakfy-accent,#3E5C3A)}",
+    ".blakfy-switch[aria-checked=true]{background:var(--blakfy-accent,#6b7280)}",
     ".blakfy-switch::after{content:'';position:absolute;top:2px;left:2px;width:20px;height:20px;border-radius:50%;background:#fff;transition:transform .2s}",
     ".blakfy-switch[aria-checked=true]::after{transform:translateX(20px)}",
     ".blakfy-switch:disabled{opacity:.6;cursor:not-allowed}",
@@ -3755,13 +4011,13 @@
     "@media (prefers-reduced-motion:reduce){.blakfy-btn,.blakfy-switch::after{transition:none}}",
     // Responsive
     "@media (max-width:1024px){.blakfy-card{max-width:440px}}",
-    "@media (max-width:768px){.blakfy-card{max-width:calc(100vw - 2 * var(--blakfy-margin,16px));padding:18px}.blakfy-card h2{font-size:16px}.blakfy-card p{font-size:13px}.blakfy-btn{flex:1 1 100%;min-height:44px;padding:10px 14px;font-size:13px}.blakfy-overlay.widget.bottom-center,.blakfy-overlay.widget.top-center{left:var(--blakfy-margin,16px);right:var(--blakfy-margin,16px);transform:none}.blakfy-overlay.widget .blakfy-card{width:100%}.blakfy-overlay.widget .blakfy-actions .blakfy-btn{flex:1 1 100%;min-width:0}}",
+    "@media (max-width:768px){.blakfy-card{max-width:calc(100vw - 2 * var(--blakfy-margin,16px));padding:18px 18px 40px}.blakfy-card h2{font-size:16px}.blakfy-card p{font-size:13px}.blakfy-btn{flex:1 1 100%;min-height:44px;padding:10px 14px;font-size:13px}.blakfy-overlay.widget.bottom-center,.blakfy-overlay.widget.top-center{left:var(--blakfy-margin,16px);right:var(--blakfy-margin,16px);transform:none}.blakfy-overlay.widget .blakfy-card{width:100%}.blakfy-overlay.widget .blakfy-actions .blakfy-btn{flex:1 1 100%;min-width:0}}",
     "@media (max-width:480px){.blakfy-overlay.widget .blakfy-card{width:100%;max-width:calc(100vw - 2 * var(--blakfy-margin,16px))}}",
     // Tab bar
     ".blakfy-tabs{display:flex;border-bottom:2px solid #eee;margin:12px 0 16px;gap:0}",
     ".blakfy-tab-btn{flex:1;background:none;border:none;border-bottom:2px solid transparent;margin-bottom:-2px;padding:8px 10px;font-size:13px;font-weight:500;color:#666;cursor:pointer;transition:color .15s,border-color .15s;white-space:nowrap;font-family:inherit}",
     ".blakfy-tab-btn:hover{color:#222}",
-    ".blakfy-tab-btn--active{color:var(--blakfy-accent,#3E5C3A);border-bottom-color:var(--blakfy-accent,#3E5C3A);font-weight:600}",
+    ".blakfy-tab-btn--active{color:var(--blakfy-accent,#6b7280);border-bottom-color:var(--blakfy-accent,#6b7280);font-weight:600}",
     // Tab panels
     ".blakfy-tab-panel[aria-hidden=true]{display:none}",
     ".blakfy-tab-panel[aria-hidden=false]{display:block}",
@@ -3779,7 +4035,7 @@
     ".blakfy-service-dt{font-size:11px;font-weight:600;color:#888;text-transform:uppercase;letter-spacing:.4px;white-space:nowrap}",
     ".blakfy-service-dd{margin:0;font-size:12px;color:#444;word-break:break-word}",
     ".blakfy-service-links{display:flex;gap:12px;margin-top:8px;flex-wrap:wrap}",
-    ".blakfy-service-links a{font-size:12px;color:var(--blakfy-accent,#3E5C3A);text-decoration:underline}",
+    ".blakfy-service-links a{font-size:12px;color:var(--blakfy-accent,#6b7280);text-decoration:underline}",
     ".blakfy-svc-empty{font-size:13px;color:#888;padding:16px 0}",
     // Cookie transparency panel (#39)
     ".blakfy-cookie-caveat{font-size:11px;color:#888;line-height:1.5;margin:0 0 12px;padding:8px 10px;background:#f7f7f7;border-radius:6px}",
@@ -3796,7 +4052,7 @@
     ".blakfy-about-brand{display:flex;align-items:center;gap:8px;margin-bottom:14px}",
     ".blakfy-about-brand strong{font-size:15px;color:#222}",
     ".blakfy-about-panel p{font-size:13px;color:#555;margin:0 0 10px;line-height:1.6}",
-    ".blakfy-about-panel a{font-size:13px;color:var(--blakfy-accent,#3E5C3A);text-decoration:underline}",
+    ".blakfy-about-panel a{font-size:13px;color:var(--blakfy-accent,#6b7280);text-decoration:underline}",
     ".blakfy-about-meta{font-size:12px;color:#aaa;margin-top:12px}",
     "@media (max-width:480px){.blakfy-tab-btn{font-size:12px;padding:8px 6px}.blakfy-service-list{max-height:260px}}",
     // ── Themes: gray ──────────────────────────────────────────────────────────
@@ -3805,19 +4061,25 @@
     ".blakfy-card[data-blakfy-theme=gray] .blakfy-service-card-header{background:#e8e8e8}",
     ".blakfy-card[data-blakfy-theme=gray] .blakfy-service-card-header:hover{background:#ddd}",
     // ── Themes: dark ──────────────────────────────────────────────────────────
-    ".blakfy-card[data-blakfy-theme=dark]{background:#1a1a1a;color:#f0f0f0;border-color:var(--blakfy-accent,#3E5C3A)}",
+    ".blakfy-card[data-blakfy-theme=dark]{background:#1a1a1a;color:#f0f0f0;border-color:var(--blakfy-accent,#6b7280)}",
     ".blakfy-card[data-blakfy-theme=dark] p{color:#aaa}",
     ".blakfy-card[data-blakfy-theme=dark] .blakfy-cat-text span{color:#999}",
     ".blakfy-card[data-blakfy-theme=dark] .blakfy-cat{border-top-color:#333}",
     ".blakfy-card[data-blakfy-theme=dark] .blakfy-btn{background:#2a2a2a;color:#f0f0f0;border-color:#444}",
     ".blakfy-card[data-blakfy-theme=dark] .blakfy-btn:hover{background:#333}",
     ".blakfy-card[data-blakfy-theme=dark] .blakfy-switch{background:#444}",
+    // #59: this rule's specificity (2 classes+attribute) beats the base
+    // `.blakfy-switch[aria-checked=true]` rule above (1 class+attribute) and comes
+    // later in the sheet, so a checked switch in dark theme always fell back to
+    // #444 instead of the accent colour. Re-declaring checked state here, scoped to
+    // dark theme, restores it without touching the light-theme rule.
+    ".blakfy-card[data-blakfy-theme=dark] .blakfy-switch[aria-checked=true]{background:var(--blakfy-accent,#6b7280)}",
     ".blakfy-card[data-blakfy-theme=dark] .blakfy-close{color:#aaa}",
     ".blakfy-card[data-blakfy-theme=dark] .blakfy-close:hover{background:#2a2a2a}",
     ".blakfy-card[data-blakfy-theme=dark] .blakfy-tabs{border-bottom-color:#333}",
     ".blakfy-card[data-blakfy-theme=dark] .blakfy-tab-btn{color:#888}",
     ".blakfy-card[data-blakfy-theme=dark] .blakfy-tab-btn:hover{color:#f0f0f0}",
-    ".blakfy-card[data-blakfy-theme=dark] .blakfy-tab-btn--active{color:var(--blakfy-accent,#3E5C3A);border-bottom-color:var(--blakfy-accent,#3E5C3A)}",
+    ".blakfy-card[data-blakfy-theme=dark] .blakfy-tab-btn--active{color:var(--blakfy-accent,#6b7280);border-bottom-color:var(--blakfy-accent,#6b7280)}",
     ".blakfy-card[data-blakfy-theme=dark] .blakfy-service-card{border-color:#333}",
     ".blakfy-card[data-blakfy-theme=dark] .blakfy-service-card-header{background:#252525}",
     ".blakfy-card[data-blakfy-theme=dark] .blakfy-service-card-header:hover{background:#2e2e2e}",
@@ -3842,7 +4104,7 @@
     // and any --blakfy-fab-* override a site sets on ITS OWN :root still inherit in across
     // the shadow boundary (custom properties are inheritable), so a site override always
     // wins; these are only the widget's own defaults.
-    ":host,:root{--blakfy-fab-side:left;--blakfy-fab-offset-x:20px;--blakfy-fab-offset-y:20px;--blakfy-fab-z:2147483640;--blakfy-fab-size:40px;--blakfy-fab-target:44px;--blakfy-fab-icon-size:20px;--blakfy-fab-bg:var(--blakfy-accent,#3E5C3A);--blakfy-fab-color:#fff;--blakfy-fab-radius:50%;--blakfy-fab-shadow:0 2px 8px rgb(0 0 0 / 0.18);--blakfy-fab-opacity:0.55;--blakfy-fab-opacity-hover:1}",
+    ":host,:root{--blakfy-fab-side:left;--blakfy-fab-offset-x:20px;--blakfy-fab-offset-y:20px;--blakfy-fab-z:2147483640;--blakfy-fab-size:40px;--blakfy-fab-target:44px;--blakfy-fab-icon-size:20px;--blakfy-fab-bg:var(--blakfy-accent,#6b7280);--blakfy-fab-color:#fff;--blakfy-fab-radius:50%;--blakfy-fab-shadow:0 2px 8px rgb(0 0 0 / 0.18);--blakfy-fab-opacity:0.55;--blakfy-fab-opacity-hover:1}",
     ".blakfy-fab{position:fixed;z-index:var(--blakfy-fab-z);width:var(--blakfy-fab-target);height:var(--blakfy-fab-target);display:flex;align-items:center;justify-content:center;padding:0;border:none;cursor:pointer;background:transparent;bottom:calc(var(--blakfy-fab-offset-y) + env(safe-area-inset-bottom,0px))}",
     ".blakfy-fab::before{content:'';position:absolute;width:var(--blakfy-fab-size);height:var(--blakfy-fab-size);border-radius:var(--blakfy-fab-radius);background:var(--blakfy-fab-bg);box-shadow:var(--blakfy-fab-shadow);opacity:var(--blakfy-fab-opacity);transition:opacity .15s}",
     ".blakfy-fab:hover::before,.blakfy-fab:focus-visible::before{opacity:var(--blakfy-fab-opacity-hover)}",
