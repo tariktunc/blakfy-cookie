@@ -1,7 +1,7 @@
 // blakfy-cookie/src/ui/modal.js — preferences modal: Categories | Services | About
 
 import { buildPolicyText, isAutoPolicy } from "../compliance/policy-text.js";
-import { SERVICE_METADATA } from "../data/service-metadata.js";
+import { getServiceMeta } from "../data/service-metadata.js";
 
 // #26: "recording" (session-recording/heatmap tracking) is its own explicit category —
 // it must never be silently folded into "analytics". Real state field since
@@ -573,7 +573,7 @@ export const createModal = ({
     for (let i = 0; i < presets.length; i++) {
       const key = typeof presets[i] === "string" ? presets[i] : presets[i].key;
       const meta =
-        SERVICE_METADATA[key] || (typeof presets[i] === "object" ? presets[i].meta : null);
+        getServiceMeta(key, locale) || (typeof presets[i] === "object" ? presets[i].meta : null);
       if (meta) enriched.push({ key, meta });
     }
   }

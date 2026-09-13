@@ -455,3 +455,239 @@ export const SERVICE_METADATA = {
     cookiePolicyUrl: "https://policies.google.com/technologies/cookies",
   },
 };
+
+// #55: SERVICE_METADATA above is English-only source data. This overlay supplies
+// locale-specific description/purposes/technologies/dataCollected — the fields the
+// Hizmetler (Services) and Politika (Policy) tabs display verbatim to the visitor.
+// Legal-entity names/addresses and factual fields (retention, transferCountries,
+// URLs) are not translated. Unlisted locales fall back to English via getServiceMeta.
+const SERVICE_METADATA_I18N = {
+  tr: {
+    ga4: {
+      description:
+        "Web sitesi ziyaretçilerinin siteyle nasıl etkileşime girdiğini anlamalarına yardımcı olmak için trafik verilerini toplayan ve raporlayan web sitesi analitik hizmeti.",
+      purposes: ["Analitik", "Performans ölçümü", "Kullanıcı davranışı analizi"],
+      technologies: ["Çerezler", "JavaScript"],
+      dataCollected: [
+        "IP adresi",
+        "Tarayıcı bilgisi",
+        "Kullanım verisi",
+        "Cihaz bilgisi",
+        "Coğrafi konum",
+        "Ziyaret tarihi ve saati",
+        "Ziyaret edilen sayfalar",
+      ],
+    },
+    gtm: {
+      description:
+        "Site sahiplerinin site kodunu değiştirmeden pazarlama ve analitik etiketlerini yönetip yayınlamasını sağlayan etiket yönetim sistemi.",
+      purposes: ["Etiket yönetimi", "Analitik", "Pazarlama"],
+      technologies: ["Web sitesi etiketleri", "JavaScript"],
+      dataCollected: ["Toplu etiket tetikleme verisi", "Tanılama verisi"],
+    },
+    facebook: {
+      description:
+        "Meta tarafından geliştirilen, reklam etkinliğini ölçen ve siteyi ziyaret eden kullanıcıların yeniden hedeflenmesini sağlayan izleme teknolojisi.",
+      purposes: ["Analitik", "Pazarlama", "Yeniden hedefleme", "Reklam", "Dönüşüm izleme"],
+      technologies: ["Çerezler", "Piksel"],
+      dataCollected: [
+        "IP adresi",
+        "Tarayıcı bilgisi",
+        "Cihaz bilgisi",
+        "Ziyaret edilen sayfalar",
+        "Piksel ID",
+        "Görüntülenen reklamlar",
+        "Kullanım davranışı",
+        "Yönlendiren URL",
+      ],
+    },
+    clarity: {
+      description:
+        "Kullanıcı oturumlarını kaydeden ve ısı haritaları oluşturan, ziyaretçilerin siteyle nasıl etkileşime girdiğini anlamaya yardımcı olan davranışsal analitik aracı.",
+      purposes: ["Analitik", "Isı haritaları", "Oturum kaydı"],
+      technologies: ["Çerezler", "JavaScript"],
+      dataCollected: [
+        "IP adresi",
+        "Fare hareketleri",
+        "Tıklamalar",
+        "Kaydırmalar",
+        "Tarayıcı bilgisi",
+        "Cihaz bilgisi",
+        "Yönlendiren URL",
+      ],
+    },
+    hotjar: {
+      description:
+        "Isı haritaları, oturum kayıtları ve geri bildirim araçları sunarak ziyaretçi davranışını anlamayı sağlayan kullanıcı deneyimi analitik platformu.",
+      purposes: ["Analitik", "Isı haritaları", "Kullanıcı geri bildirimi", "Oturum kaydı"],
+      technologies: ["Çerezler", "Piksel", "JavaScript"],
+      dataCollected: [
+        "IP adresi",
+        "Kullanım verisi",
+        "Fare hareketleri",
+        "Tıklama davranışı",
+        "Cihaz bilgisi",
+        "Tarayıcı bilgisi",
+      ],
+    },
+    youtube: {
+      description:
+        "Google'a ait video barındırma hizmeti. Etkinleştirildiğinde, sitede gömülü YouTube videoları oynatılabilir ve ilgili çerezler ayarlanır.",
+      purposes: ["Pazarlama", "Video içerik sunumu", "Kişiselleştirme"],
+      technologies: ["Çerezler", "Piksel"],
+      dataCollected: [
+        "IP adresi",
+        "Tarayıcı bilgisi",
+        "Kullanım verisi",
+        "Video izleme verisi",
+        "Cihaz bilgisi",
+      ],
+    },
+    vimeo: {
+      description:
+        "Video barındırma ve paylaşım platformu. Etkinleştirildiğinde, sitede gömülü Vimeo videoları oynatılabilir.",
+      purposes: ["Pazarlama", "Video içerik sunumu"],
+      technologies: ["Çerezler", "JavaScript"],
+      dataCollected: ["IP adresi", "Tarayıcı bilgisi", "Video izleme verisi", "Cihaz bilgisi"],
+    },
+    linkedin: {
+      description:
+        "LinkedIn tarafından sunulan, dönüşüm izleme ve site ziyaretçilerinin LinkedIn Reklamları üzerinden yeniden hedeflenmesini sağlayan analitik ve yeniden hedefleme etiketi.",
+      purposes: ["Pazarlama", "Analitik", "Yeniden hedefleme", "Dönüşüm izleme"],
+      technologies: ["Çerezler", "Piksel"],
+      dataCollected: [
+        "IP adresi",
+        "Cihaz bilgisi",
+        "Ziyaret edilen sayfalar",
+        "Yönlendiren URL",
+        "Mesleki veri",
+      ],
+    },
+    yandex: {
+      description:
+        "Optimizasyon ve pazarlama amaçlarıyla kullanıcı davranışına ilişkin istatistiksel verileri toplayıp değerlendiren web analitik hizmeti.",
+      purposes: ["Analitik", "Optimizasyon"],
+      technologies: ["Çerezler", "Web işaretçileri", "Piksel"],
+      dataCollected: [
+        "IP adresi",
+        "Tarayıcı bilgisi",
+        "Kullanım verisi",
+        "Cihaz bilgisi",
+        "Ziyaret tarihi ve saati",
+        "Coğrafi konum",
+      ],
+    },
+    bing: {
+      description:
+        "Microsoft Bing tarafından sunulan, Bing Ads kampanyaları için dönüşüm izleme ve kitle hedeflemeyi sağlayan Evrensel Etkinlik İzleme (UET) etiketi.",
+      purposes: ["Pazarlama", "Dönüşüm izleme", "Kitle hedefleme"],
+      technologies: ["Çerezler", "Piksel"],
+      dataCollected: ["IP adresi", "Tarayıcı bilgisi", "Dönüşüm verisi", "Cihaz bilgisi"],
+    },
+    tiktok: {
+      description:
+        "TikTok reklam performansını ölçen ve TikTok reklam kampanyaları için yeniden hedeflemeyi sağlayan TikTok izleme pikseli.",
+      purposes: ["Pazarlama", "Yeniden hedefleme", "Dönüşüm izleme"],
+      technologies: ["Çerezler", "Piksel"],
+      dataCollected: [
+        "IP adresi",
+        "Tarayıcı bilgisi",
+        "Kullanım verisi",
+        "Cihaz bilgisi",
+        "Ziyaret edilen sayfalar",
+      ],
+    },
+    pinterest: {
+      description:
+        "Pinterest tarafından sunulan, dönüşümleri izleyen ve site ziyaretçilerinin Pinterest Reklamları üzerinden hedeflenmesini sağlayan analitik ve yeniden hedefleme etiketi.",
+      purposes: ["Pazarlama", "Yeniden hedefleme", "Dönüşüm izleme"],
+      technologies: ["Çerezler", "Piksel"],
+      dataCollected: ["IP adresi", "Tarayıcı bilgisi", "Kullanım verisi", "Cihaz bilgisi"],
+    },
+    tawkto: {
+      description:
+        "Site ziyaretçilerinin destek temsilcileriyle gerçek zamanlı iletişim kurmasını sağlayan canlı sohbet widget'ı.",
+      purposes: ["Fonksiyonel", "Canlı sohbet", "Müşteri desteği"],
+      technologies: ["Çerezler", "JavaScript"],
+      dataCollected: [
+        "IP adresi",
+        "Tarayıcı bilgisi",
+        "Sohbet mesajları",
+        "Kullanım verisi",
+        "Cihaz bilgisi",
+      ],
+    },
+    intercom: {
+      description:
+        "Canlı sohbet, uygulama içi mesajlaşma ve müşteri destek araçları sunan müşteri mesajlaşma platformu.",
+      purposes: ["Fonksiyonel", "Müşteri desteği", "Pazarlama"],
+      technologies: ["Çerezler", "JavaScript"],
+      dataCollected: [
+        "IP adresi",
+        "Tarayıcı bilgisi",
+        "Sohbet mesajları",
+        "Kullanım verisi",
+        "Cihaz bilgisi",
+        "E-posta adresi",
+      ],
+    },
+    hubspot: {
+      description:
+        "CRM ve pazarlama otomasyonu platformu. Potansiyel müşteri oluşturma ve pazarlama otomasyonunu sağlamak için site ziyaretçi davranışını izler.",
+      purposes: ["Pazarlama", "Analitik", "CRM", "Potansiyel müşteri oluşturma"],
+      technologies: ["Çerezler", "Piksel", "JavaScript"],
+      dataCollected: [
+        "IP adresi",
+        "Tarayıcı bilgisi",
+        "Form gönderimleri",
+        "Ziyaret edilen sayfalar",
+        "Kullanım verisi",
+        "E-posta adresi",
+      ],
+    },
+    mailchimp: {
+      description:
+        "E-posta pazarlama ve otomasyon platformu. Abone yönetimi için e-posta kampanyası etkileşimlerini ve site aktivitesini izler.",
+      purposes: ["Pazarlama", "E-posta kampanyaları", "Analitik"],
+      technologies: ["Çerezler", "Piksel", "Web işaretçileri"],
+      dataCollected: [
+        "IP adresi",
+        "E-posta davranışı",
+        "Form gönderimleri",
+        "Cihaz bilgisi",
+        "Tarayıcı bilgisi",
+      ],
+    },
+    maps: {
+      description:
+        "Konumları göstermek ve yol tarifi sağlamak için sitede gömülü, Google tarafından sunulan interaktif harita hizmeti.",
+      purposes: ["Fonksiyonel", "Harita gösterimi", "Konum hizmetleri"],
+      technologies: ["Çerezler", "JavaScript"],
+      dataCollected: ["IP adresi", "Konum verisi", "Kullanım verisi", "Cihaz bilgisi"],
+    },
+    recaptcha: {
+      description:
+        "Formları ve etkileşimli öğeleri otomatik kötüye kullanımdan koruyan, Google tarafından sunulan bot tespiti ve güvenlik hizmeti.",
+      purposes: ["Fonksiyonel", "Güvenlik", "Bot tespiti"],
+      technologies: ["Çerezler", "JavaScript"],
+      dataCollected: [
+        "IP adresi",
+        "Tarayıcı parmak izi",
+        "Kullanım verisi",
+        "Cihaz bilgisi",
+        "Fare davranışı",
+      ],
+    },
+  },
+};
+
+// Merges the English base record with the locale overlay's translated fields.
+// Falls back to the English fields for any locale/service without an overlay
+// entry, so a missing translation degrades gracefully instead of crashing.
+export const getServiceMeta = (key, locale) => {
+  const base = SERVICE_METADATA[key];
+  if (!base) return null;
+  const overlay = SERVICE_METADATA_I18N[locale] && SERVICE_METADATA_I18N[locale][key];
+  if (!overlay) return base;
+  return { ...base, ...overlay };
+};
