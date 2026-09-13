@@ -1,10 +1,10 @@
 # Blakfy Cookie Widget
 
-> [![CI](https://github.com/tariktunc/blakfy-cookie/actions/workflows/test.yml/badge.svg)](https://github.com/tariktunc/blakfy-cookie/actions/workflows/test.yml) [![npm version](https://img.shields.io/npm/v/@blakfy/cookie.svg)](https://www.npmjs.com/package/@blakfy/cookie) [![npm downloads](https://img.shields.io/npm/dm/@blakfy/cookie.svg)](https://www.npmjs.com/package/@blakfy/cookie) ![MIT](https://img.shields.io/badge/license-MIT-blue) ![size](https://img.shields.io/badge/size-30.2KB-success) ![tests](https://img.shields.io/badge/tests-365-success) ![langs](https://img.shields.io/badge/languages-23-orange) ![presets](https://img.shields.io/badge/presets-18-purple)
+> [![CI](https://github.com/tariktunc/blakfy-cookie/actions/workflows/test.yml/badge.svg)](https://github.com/tariktunc/blakfy-cookie/actions/workflows/test.yml) [![npm version](https://img.shields.io/npm/v/@blakfy/cookie.svg)](https://www.npmjs.com/package/@blakfy/cookie) [![npm downloads](https://img.shields.io/npm/dm/@blakfy/cookie.svg)](https://www.npmjs.com/package/@blakfy/cookie) ![MIT](https://img.shields.io/badge/license-MIT-blue) ![size](https://img.shields.io/badge/size-32.7KB-success) ![tests](https://img.shields.io/badge/tests-484-success) ![langs](https://img.shields.io/badge/languages-23-orange) ![presets](https://img.shields.io/badge/presets-18-purple)
 >
 > Tek script ile **KVKK + GDPR + CCPA + Google CMv2 + Microsoft UET + Yandex Metrica + IAB TCF v2.2** uyumlu cookie consent (çerez onayı) widget. **23 dil**, **18 hazır preset** (üçüncü parti araç entegrasyonu), **3 renk teması**, **3-tab tercihler modalı** (Kategoriler / Hizmetler / Hakkında), **tag-gating** (script engelleme/serbest bırakma) dahil.
 
-**Versiyon:** 2.2.0 • **Lisans:** MIT • **npm:** `@blakfy/cookie@2.2.0` · `@blakfy/cookie-next@2.2.0` • **CDN:** `cdn.jsdelivr.net/npm/@blakfy/cookie@2.2.0`
+**Versiyon:** 2.4.1 • **Lisans:** MIT • **npm:** `@blakfy/cookie@2.4.1` · `@blakfy/cookie-next@2.3.1` • **CDN:** `cdn.jsdelivr.net/npm/@blakfy/cookie@2.4.1`
 
 ---
 
@@ -16,10 +16,10 @@
 
 | Strateji                    | URL                                                            | Ne zaman kullan                                                               |
 | --------------------------- | -------------------------------------------------------------- | ----------------------------------------------------------------------------- |
-| **Pinned** (sabit sürüm)    | `cdn.jsdelivr.net/npm/@blakfy/cookie@2.2.0/dist/cookie.min.js` | Production — değişikliklerin gözden geçirilerek kabul edilmesini istersen     |
+| **Pinned** (sabit sürüm)    | `cdn.jsdelivr.net/npm/@blakfy/cookie@2.4.1/dist/cookie.min.js` | Production — değişikliklerin gözden geçirilerek kabul edilmesini istersen     |
 | **Auto-patch** (semver tag) | `cdn.jsdelivr.net/npm/@blakfy/cookie@2/dist/cookie.min.js`     | Otomatik güvenlik/patch güncellemeleri — major (`@3`) gelene kadar takip eder |
 
-unpkg da çalışır: `unpkg.com/@blakfy/cookie@2.2.0/dist/cookie.min.js`.
+unpkg da çalışır: `unpkg.com/@blakfy/cookie@2.4.1/dist/cookie.min.js`.
 
 > ⚠️ **SRI (Subresource Integrity) — zorunlu okuma.** Bu script `<head>`'de en önce yüklenen,
 > `ESSENTIAL` kategoride tag-gating'den muaf, tüm sayfa üzerinde en yüksek yetkiye sahip
@@ -57,7 +57,7 @@ Bundler ile gelen versiyonu kontrol etmek için: `import { version } from "@blak
 <!-- Bootstrap: Tüm consent sinyallerini 'denied' olarak başlatır -->
 <!-- integrity: her release'de "npm run sri" ile üretilir (dist/sri-hashes.json) -->
 <script
-  src="https://cdn.jsdelivr.net/npm/@blakfy/cookie@2.2.0/dist/cookie-defaults.min.js"
+  src="https://cdn.jsdelivr.net/npm/@blakfy/cookie@2.4.1/dist/cookie-defaults.min.js"
   integrity="sha384-<npm run sri çıktısındaki hash>"
   crossorigin="anonymous"
 ></script>
@@ -88,7 +88,7 @@ Bunlar olduğu gibi kalır. Bootstrap zaten consent default'larını `denied` ol
 ```html
 <!-- integrity: her release'de "npm run sri" ile üretilir (dist/sri-hashes.json) -->
 <script
-  src="https://cdn.jsdelivr.net/npm/@blakfy/cookie@2.2.0/dist/cookie.min.js"
+  src="https://cdn.jsdelivr.net/npm/@blakfy/cookie@2.4.1/dist/cookie.min.js"
   integrity="sha384-<npm run sri çıktısındaki hash>"
   crossorigin="anonymous"
   data-blakfy-locale="auto"
@@ -371,7 +371,7 @@ Tüm `<script>` tag'i üzerine konabilen `data-blakfy-*` attribute'ları:
 
 | Metod                   | Sürüm      | İmza                                               | Açıklama                                                                                                                                                                            |
 | ----------------------- | ---------- | -------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `version`               | v1         | `string`                                           | Kütüphane sürümü, örn. `"2.2.0"`.                                                                                                                                                   |
+| `version`               | v1         | `string`                                           | Kütüphane sürümü, örn. `"2.4.1"`.                                                                                                                                                   |
 | `open()`                | v1         | `() => void`                                       | Tercihler modalını aç.                                                                                                                                                              |
 | `acceptAll()`           | v1         | `() => void`                                       | Tüm kategorileri kabul et.                                                                                                                                                          |
 | `rejectAll()`           | v1         | `() => void`                                       | Tüm kategorileri reddet (essential dışında).                                                                                                                                        |

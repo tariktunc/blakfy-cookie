@@ -4,6 +4,26 @@ All notable changes follow [Keep a Changelog](https://keepachangelog.com/) and S
 
 ---
 
+## [2.4.1] — 2026-09-13
+
+### Fixed
+
+- **Services accordion opens one at a time (#54)** — opening a card now closes any other open card instead of stacking them.
+- **cookiePanel + tab labels translated in all 23 locales (#52, #58)** — the Cookies-tab disclaimer, empty/unrecognised/essential/delete strings, and the Categories/Services/About tab labels were English placeholders in every locale but tr/en; now real translations everywhere.
+- **Gated placeholder shows the translated category name (#61)** — a blocked embed used to interpolate the raw internal id (`marketing`) into the message text in every language, including tr.
+- **Service metadata localized for tr (#55)** — `getServiceMeta(key, locale)` overlays translated description/purposes/technologies/dataCollected onto the English base for all 18 presets; other locales fall back to English until translated.
+- **Dark-theme checked switch was invisible (#59)** — a higher-specificity dark-theme rule was overriding the accent-colored checked state, making it indistinguishable from unchecked.
+- **`window.BlakfyCookie.version` / About panel showed a stale 2.2.0 (#60)** — now sources the real build-time-injected version.
+- **Default accent changed from brand green to neutral gray (#56)** — owner design decision; `data-blakfy-accent` customization unaffected.
+- **Modal overflowed on short viewports with no way to scroll (#57)** — `.blakfy-overlay.modal .blakfy-card` now caps height and scrolls internally.
+- **Service-card headers jittered by sub-pixel amounts and text wasn't vertically centered** — fixed min-height plus `line-height:1` on the name/category spans (inherited `line-height:1.5` was inflating each span's own line-box, so `align-items:center` centered an oversized box instead of the glyphs).
+- **Accordion body silently clipped trailing fields instead of scrolling** — a flexbox spec gotcha: `.blakfy-service-card{overflow:hidden}` drops its automatic minimum size to 0, so once an opened card pushed the list past its 420px max-height, flexbox shrank every card to fit rather than the list scrolling. `flex-shrink:0` fixes it.
+- **Dismissing the preferences modal (backdrop click, Escape, the X button) could delete the banner behind it and force a decision-less dead end** — before a decision exists, dismissal now closes only the modal and leaves the banner mounted; a decision (`commit()`) still closes everything.
+
+### Changed
+
+- **Bundle budget raised 32 → 33 KB gzip** for the bundled core (`cookie.min.js`) — the Turkish service-metadata overlay above pushed it past 32 KB; a deliberate, reviewed move rather than a silent regression.
+
 ## [cookie-next 2.3.1] — 2026-08-25
 
 ### Changed

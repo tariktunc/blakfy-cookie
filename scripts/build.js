@@ -72,7 +72,12 @@ const TARGETS = [
 ];
 
 const BUDGETS = {
-  "cookie.min.js": 32 * 1024, // #38: tr/en bundled inline, other 21 locales split into dist/i18n/
+  // #38: tr/en bundled inline, other 21 locales split into dist/i18n/. Raised
+  // 32 -> 33 KB in 2.4.1 — the Turkish service-metadata overlay (#55, TR
+  // descriptions/purposes/technologies/dataCollected for all 18 presets) pushed the
+  // bundled core past 32 KB; a conscious, owner-approved budget move rather than a
+  // silent regression.
+  "cookie.min.js": 33 * 1024,
   "cookie-defaults.min.js": 1.5 * 1024,
 };
 

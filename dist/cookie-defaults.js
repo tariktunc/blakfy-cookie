@@ -1,5 +1,5 @@
 /*!
- * Blakfy Cookie Widget v2.4.0
+ * Blakfy Cookie Widget v2.4.1
  * https://github.com/tariktunc/blakfy-cookie
  * MIT License | (c) Blakfy Studio
  *
