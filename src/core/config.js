@@ -42,7 +42,12 @@ export const DEFAULTS = {
   position: "bottom-center",
   margin: "16",
   theme: "auto",
-  accent: "#3E5C3A",
+  // #56: owner decision — default look is neutral, not the old brand-green. Site
+  // owners who want a brand color still set data-blakfy-accent; this only changes
+  // what renders when that attribute is absent. #6b7280 (neutral gray) rather than
+  // pure #000/#fff because it stays legible against both the light card background
+  // (#fff) and the dark theme card background (#1a1a1a) without a theme-specific fork.
+  accent: "#6b7280",
   presets: null,
   tcf: "false",
   cmpId: "0",

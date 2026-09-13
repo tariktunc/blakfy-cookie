@@ -22,17 +22,17 @@ const RULES = [
   ".blakfy-overlay.widget.top-left{top:var(--blakfy-margin,16px);left:var(--blakfy-margin,16px);right:auto;bottom:auto}",
   ".blakfy-overlay.widget.center{top:50%;left:50%;right:auto;bottom:auto;transform:translate(-50%,-50%)}",
   // Card base (shared by banner + modal)
-  ".blakfy-card{box-sizing:border-box;background:#fff;color:#222;border-radius:16px;max-width:560px;width:100%;padding:24px;border:3px solid var(--blakfy-accent,#3E5C3A);font-family:system-ui,-apple-system,sans-serif;line-height:1.5;position:relative}",
+  ".blakfy-card{box-sizing:border-box;background:#fff;color:#222;border-radius:16px;max-width:560px;width:100%;padding:24px;border:3px solid var(--blakfy-accent,#6b7280);font-family:system-ui,-apple-system,sans-serif;line-height:1.5;position:relative}",
   ".blakfy-card[dir=rtl]{text-align:right}",
   ".blakfy-card h2{margin:0 0 8px;font-size:18px;font-weight:600}",
   ".blakfy-card p{margin:0 0 16px;font-size:14px;color:#444}",
-  ".blakfy-card a{color:var(--blakfy-accent,#3E5C3A);text-decoration:underline}",
+  ".blakfy-card a{color:var(--blakfy-accent,#6b7280);text-decoration:underline}",
   // Actions
   ".blakfy-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}",
   // Buttons (3px radius per spec)
   ".blakfy-btn{flex:1;min-width:120px;min-height:44px;padding:12px 16px;border:1px solid #ddd;border-radius:3px;background:#fff;color:#222;font-size:14px;font-weight:500;cursor:pointer;transition:transform .1s,background .15s}",
   ".blakfy-btn:hover{transform:translateY(-1px)}",
-  ".blakfy-btn-primary{background:var(--blakfy-accent,#3E5C3A);color:#fff;border-color:transparent}",
+  ".blakfy-btn-primary{background:var(--blakfy-accent,#6b7280);color:#fff;border-color:transparent}",
   ".blakfy-cat{padding:12px 0;border-top:1px solid #eee;display:flex;align-items:flex-start;gap:12px}",
   ".blakfy-cat:first-of-type{border-top:none}",
   ".blakfy-cat-text{flex:1}",
@@ -40,7 +40,7 @@ const RULES = [
   ".blakfy-cat-text span{font-size:13px;color:#666}",
   // Switches (pill-shaped — UX standard)
   ".blakfy-switch{flex-shrink:0;width:44px;height:24px;border-radius:999px;background:#ccc;position:relative;cursor:pointer;border:none;padding:0}",
-  ".blakfy-switch[aria-checked=true]{background:var(--blakfy-accent,#3E5C3A)}",
+  ".blakfy-switch[aria-checked=true]{background:var(--blakfy-accent,#6b7280)}",
   ".blakfy-switch::after{content:'';position:absolute;top:2px;left:2px;width:20px;height:20px;border-radius:50%;background:#fff;transition:transform .2s}",
   ".blakfy-switch[aria-checked=true]::after{transform:translateX(20px)}",
   ".blakfy-switch:disabled{opacity:.6;cursor:not-allowed}",
@@ -63,7 +63,7 @@ const RULES = [
   ".blakfy-tabs{display:flex;border-bottom:2px solid #eee;margin:12px 0 16px;gap:0}",
   ".blakfy-tab-btn{flex:1;background:none;border:none;border-bottom:2px solid transparent;margin-bottom:-2px;padding:8px 10px;font-size:13px;font-weight:500;color:#666;cursor:pointer;transition:color .15s,border-color .15s;white-space:nowrap;font-family:inherit}",
   ".blakfy-tab-btn:hover{color:#222}",
-  ".blakfy-tab-btn--active{color:var(--blakfy-accent,#3E5C3A);border-bottom-color:var(--blakfy-accent,#3E5C3A);font-weight:600}",
+  ".blakfy-tab-btn--active{color:var(--blakfy-accent,#6b7280);border-bottom-color:var(--blakfy-accent,#6b7280);font-weight:600}",
   // Tab panels
   ".blakfy-tab-panel[aria-hidden=true]{display:none}",
   ".blakfy-tab-panel[aria-hidden=false]{display:block}",
@@ -81,7 +81,7 @@ const RULES = [
   ".blakfy-service-dt{font-size:11px;font-weight:600;color:#888;text-transform:uppercase;letter-spacing:.4px;white-space:nowrap}",
   ".blakfy-service-dd{margin:0;font-size:12px;color:#444;word-break:break-word}",
   ".blakfy-service-links{display:flex;gap:12px;margin-top:8px;flex-wrap:wrap}",
-  ".blakfy-service-links a{font-size:12px;color:var(--blakfy-accent,#3E5C3A);text-decoration:underline}",
+  ".blakfy-service-links a{font-size:12px;color:var(--blakfy-accent,#6b7280);text-decoration:underline}",
   ".blakfy-svc-empty{font-size:13px;color:#888;padding:16px 0}",
   // Cookie transparency panel (#39)
   ".blakfy-cookie-caveat{font-size:11px;color:#888;line-height:1.5;margin:0 0 12px;padding:8px 10px;background:#f7f7f7;border-radius:6px}",
@@ -98,7 +98,7 @@ const RULES = [
   ".blakfy-about-brand{display:flex;align-items:center;gap:8px;margin-bottom:14px}",
   ".blakfy-about-brand strong{font-size:15px;color:#222}",
   ".blakfy-about-panel p{font-size:13px;color:#555;margin:0 0 10px;line-height:1.6}",
-  ".blakfy-about-panel a{font-size:13px;color:var(--blakfy-accent,#3E5C3A);text-decoration:underline}",
+  ".blakfy-about-panel a{font-size:13px;color:var(--blakfy-accent,#6b7280);text-decoration:underline}",
   ".blakfy-about-meta{font-size:12px;color:#aaa;margin-top:12px}",
   "@media (max-width:480px){.blakfy-tab-btn{font-size:12px;padding:8px 6px}.blakfy-service-list{max-height:260px}}",
   // ── Themes: gray ──────────────────────────────────────────────────────────
@@ -107,7 +107,7 @@ const RULES = [
   ".blakfy-card[data-blakfy-theme=gray] .blakfy-service-card-header{background:#e8e8e8}",
   ".blakfy-card[data-blakfy-theme=gray] .blakfy-service-card-header:hover{background:#ddd}",
   // ── Themes: dark ──────────────────────────────────────────────────────────
-  ".blakfy-card[data-blakfy-theme=dark]{background:#1a1a1a;color:#f0f0f0;border-color:var(--blakfy-accent,#3E5C3A)}",
+  ".blakfy-card[data-blakfy-theme=dark]{background:#1a1a1a;color:#f0f0f0;border-color:var(--blakfy-accent,#6b7280)}",
   ".blakfy-card[data-blakfy-theme=dark] p{color:#aaa}",
   ".blakfy-card[data-blakfy-theme=dark] .blakfy-cat-text span{color:#999}",
   ".blakfy-card[data-blakfy-theme=dark] .blakfy-cat{border-top-color:#333}",
@@ -119,13 +119,13 @@ const RULES = [
   // later in the sheet, so a checked switch in dark theme always fell back to
   // #444 instead of the accent colour. Re-declaring checked state here, scoped to
   // dark theme, restores it without touching the light-theme rule.
-  ".blakfy-card[data-blakfy-theme=dark] .blakfy-switch[aria-checked=true]{background:var(--blakfy-accent,#3E5C3A)}",
+  ".blakfy-card[data-blakfy-theme=dark] .blakfy-switch[aria-checked=true]{background:var(--blakfy-accent,#6b7280)}",
   ".blakfy-card[data-blakfy-theme=dark] .blakfy-close{color:#aaa}",
   ".blakfy-card[data-blakfy-theme=dark] .blakfy-close:hover{background:#2a2a2a}",
   ".blakfy-card[data-blakfy-theme=dark] .blakfy-tabs{border-bottom-color:#333}",
   ".blakfy-card[data-blakfy-theme=dark] .blakfy-tab-btn{color:#888}",
   ".blakfy-card[data-blakfy-theme=dark] .blakfy-tab-btn:hover{color:#f0f0f0}",
-  ".blakfy-card[data-blakfy-theme=dark] .blakfy-tab-btn--active{color:var(--blakfy-accent,#3E5C3A);border-bottom-color:var(--blakfy-accent,#3E5C3A)}",
+  ".blakfy-card[data-blakfy-theme=dark] .blakfy-tab-btn--active{color:var(--blakfy-accent,#6b7280);border-bottom-color:var(--blakfy-accent,#6b7280)}",
   ".blakfy-card[data-blakfy-theme=dark] .blakfy-service-card{border-color:#333}",
   ".blakfy-card[data-blakfy-theme=dark] .blakfy-service-card-header{background:#252525}",
   ".blakfy-card[data-blakfy-theme=dark] .blakfy-service-card-header:hover{background:#2e2e2e}",
@@ -150,7 +150,7 @@ const RULES = [
   // and any --blakfy-fab-* override a site sets on ITS OWN :root still inherit in across
   // the shadow boundary (custom properties are inheritable), so a site override always
   // wins; these are only the widget's own defaults.
-  ":host,:root{--blakfy-fab-side:left;--blakfy-fab-offset-x:20px;--blakfy-fab-offset-y:20px;--blakfy-fab-z:2147483640;--blakfy-fab-size:40px;--blakfy-fab-target:44px;--blakfy-fab-icon-size:20px;--blakfy-fab-bg:var(--blakfy-accent,#3E5C3A);--blakfy-fab-color:#fff;--blakfy-fab-radius:50%;--blakfy-fab-shadow:0 2px 8px rgb(0 0 0 / 0.18);--blakfy-fab-opacity:0.55;--blakfy-fab-opacity-hover:1}",
+  ":host,:root{--blakfy-fab-side:left;--blakfy-fab-offset-x:20px;--blakfy-fab-offset-y:20px;--blakfy-fab-z:2147483640;--blakfy-fab-size:40px;--blakfy-fab-target:44px;--blakfy-fab-icon-size:20px;--blakfy-fab-bg:var(--blakfy-accent,#6b7280);--blakfy-fab-color:#fff;--blakfy-fab-radius:50%;--blakfy-fab-shadow:0 2px 8px rgb(0 0 0 / 0.18);--blakfy-fab-opacity:0.55;--blakfy-fab-opacity-hover:1}",
   ".blakfy-fab{position:fixed;z-index:var(--blakfy-fab-z);width:var(--blakfy-fab-target);height:var(--blakfy-fab-target);display:flex;align-items:center;justify-content:center;padding:0;border:none;cursor:pointer;background:transparent;bottom:calc(var(--blakfy-fab-offset-y) + env(safe-area-inset-bottom,0px))}",
   ".blakfy-fab::before{content:'';position:absolute;width:var(--blakfy-fab-size);height:var(--blakfy-fab-size);border-radius:var(--blakfy-fab-radius);background:var(--blakfy-fab-bg);box-shadow:var(--blakfy-fab-shadow);opacity:var(--blakfy-fab-opacity);transition:opacity .15s}",
   ".blakfy-fab:hover::before,.blakfy-fab:focus-visible::before{opacity:var(--blakfy-fab-opacity-hover)}",
