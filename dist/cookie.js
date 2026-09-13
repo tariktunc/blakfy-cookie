@@ -4024,7 +4024,13 @@
     // Service list + cards
     ".blakfy-service-list{display:flex;flex-direction:column;gap:8px;max-height:420px;overflow-y:auto;padding-right:2px}",
     ".blakfy-service-card{border:1px solid #eee;border-radius:6px;overflow:hidden}",
-    ".blakfy-service-card-header{display:flex;align-items:center;gap:8px;padding:10px 12px;cursor:pointer;background:#fafafa;user-select:none}",
+    // Fixed min-height (not just padding+line-height) so a CLOSED header's rendered
+    // size can never depend on sub-pixel text-layout rounding. Without this, opening
+    // another card further down could add a scroll bar to the modal, which narrows
+    // the content box by the scrollbar's width and reflows every header's text at a
+    // slightly different sub-pixel width — visible as closed cards above it shrinking
+    // by a fraction of a pixel.
+    ".blakfy-service-card-header{display:flex;align-items:center;gap:8px;min-height:40px;box-sizing:border-box;padding:10px 12px;cursor:pointer;background:#fafafa;user-select:none}",
     ".blakfy-service-card-header:hover{background:#f3f3f3}",
     ".blakfy-service-name{flex:1;font-size:13px;font-weight:600;color:#222}",
     ".blakfy-service-cat{font-size:11px;padding:2px 8px;border-radius:999px;background:#eee;color:#555;text-transform:capitalize}",
