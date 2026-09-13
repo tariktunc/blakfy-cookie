@@ -4,7 +4,7 @@
 >
 > Tek script ile **KVKK + GDPR + CCPA + Google CMv2 + Microsoft UET + Yandex Metrica + IAB TCF v2.2** uyumlu cookie consent (çerez onayı) widget. **23 dil**, **18 hazır preset** (üçüncü parti araç entegrasyonu), **3 renk teması**, **3-tab tercihler modalı** (Kategoriler / Hizmetler / Hakkında), **tag-gating** (script engelleme/serbest bırakma) dahil.
 
-**Versiyon:** 2.4.1 • **Lisans:** MIT • **npm:** `@blakfy/cookie@2.4.1` · `@blakfy/cookie-next@2.3.1` • **CDN:** `cdn.jsdelivr.net/npm/@blakfy/cookie@2.4.1`
+**Versiyon:** 2.4.1 • **Lisans:** MIT • **npm:** `@blakfy/cookie@2.4.1` · `@blakfy/cookie-next@2.3.2` • **CDN:** `cdn.jsdelivr.net/npm/@blakfy/cookie@latest` (varsayılan, owner kararı 2026-09-14)
 
 ---
 
@@ -14,20 +14,22 @@
 
 ### A) CDN (önerilen — sıfır konfigürasyon)
 
-| Strateji                    | URL                                                            | Ne zaman kullan                                                               |
-| --------------------------- | -------------------------------------------------------------- | ----------------------------------------------------------------------------- |
-| **Pinned** (sabit sürüm)    | `cdn.jsdelivr.net/npm/@blakfy/cookie@2.4.1/dist/cookie.min.js` | Production — değişikliklerin gözden geçirilerek kabul edilmesini istersen     |
-| **Auto-patch** (semver tag) | `cdn.jsdelivr.net/npm/@blakfy/cookie@2/dist/cookie.min.js`     | Otomatik güvenlik/patch güncellemeleri — major (`@3`) gelene kadar takip eder |
+| Strateji                             | URL                                                             | Ne zaman kullan                                                                                |
+| ------------------------------------ | --------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
+| **`@latest`** (önerilen, varsayılan) | `cdn.jsdelivr.net/npm/@blakfy/cookie@latest/dist/cookie.min.js` | Owner kararı 2026-09-14: her site otomatik en güncel sürüme geçsin, manuel redeploy gerekmesin |
+| **Pinned + SRI** (istisna)           | `cdn.jsdelivr.net/npm/@blakfy/cookie@2.4.1/dist/cookie.min.js`  | SADECE SRI kuruluysa — SRI sabit/hash'lenebilir dosya ister, `@latest` ile uyuşmaz             |
 
-unpkg da çalışır: `unpkg.com/@blakfy/cookie@2.4.1/dist/cookie.min.js`.
+unpkg da çalışır: `unpkg.com/@blakfy/cookie@latest/dist/cookie.min.js`.
 
 > ⚠️ **SRI (Subresource Integrity) — zorunlu okuma.** Bu script `<head>`'de en önce yüklenen,
 > `ESSENTIAL` kategoride tag-gating'den muaf, tüm sayfa üzerinde en yüksek yetkiye sahip
 > script'tir. CDN'den `integrity`/`crossorigin` olmadan yüklemek, tedarik zinciri (supply-chain)
 > saldırısına açık kapı bırakır — bkz. [docs/compliance.md §13](./docs/compliance.md#13-content-security-policy-csp--sri-subresource-integrity).
-> Her zaman **pinned** bir sürüm (`@2.3.2`, ASLA `@2`/`@latest`) + `integrity` hash'i birlikte
-> kullan; auto-patch tag SRI'yı by design bozar (hash sürümle birlikte değişir). Hash'ler her
-> release'de `npm run sri` ile üretilir — bkz. Quick Start adım 1 ve 3.
+> **Bu, `@latest` varsayılanının TEK istisnasıdır (owner kararı 2026-09-14):** SRI kullanan bir
+> site **pinned** bir sürüm (`@2.4.1`) + `integrity` hash'i birlikte kullanmak ZORUNDADIR —
+> `@latest`/floating tag SRI'yı by design bozar (hash sürümle birlikte değişir). SRI kurulu
+> değilse `@latest` kullan. Hash'ler her release'de `npm run sri` ile üretilir — bkz. Quick Start
+> adım 1 ve 3.
 
 ### B) npm / bundler (Vite, Webpack, Rollup, Astro)
 
@@ -138,7 +140,7 @@ Shopify için: theme `theme.liquid` dosyasının `<head>` ve `</body>` öncesi n
 ### Next.js 14+ (önerilen — App Router)
 
 ```bash
-npm install @blakfy/cookie-next@2
+npm install @blakfy/cookie-next@latest
 ```
 
 `app/layout.tsx`:
