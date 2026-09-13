@@ -1,12 +1,17 @@
 // blakfy-cookie/src/api.js — public window.BlakfyCookie surface (v1 contract preserved + v2 additions)
 
 import { postAudit } from "./core/audit.js";
+import { RUNTIME_VERSION } from "./core/config.js";
 import { writeCookie, buildState } from "./core/consent-store.js";
 import { scanAll } from "./gating/observer.js";
 import { normalizeLocale, RTL_LOCALES } from "./i18n/detect.js";
 import { getTranslation, loadTranslation, DEFAULT_LOCALE } from "./i18n/index.js";
 
-const VERSION = "2.2.0";
+// #60: this used to be a hand-written literal that nobody updated across
+// 2.2.1/2.3.0/2.3.1/2.4.0 — window.BlakfyCookie.version and the About panel kept
+// reporting 2.2.0. RUNTIME_VERSION is the same build-time-injected value #41
+// already pins the status endpoint to, so there is only one source of truth now.
+const VERSION = RUNTIME_VERSION;
 const CATEGORIES = ["analytics", "marketing", "functional", "recording"];
 
 export const createAPI = (ctx) => {

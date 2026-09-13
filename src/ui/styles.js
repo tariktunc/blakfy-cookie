@@ -114,6 +114,12 @@ const RULES = [
   ".blakfy-card[data-blakfy-theme=dark] .blakfy-btn{background:#2a2a2a;color:#f0f0f0;border-color:#444}",
   ".blakfy-card[data-blakfy-theme=dark] .blakfy-btn:hover{background:#333}",
   ".blakfy-card[data-blakfy-theme=dark] .blakfy-switch{background:#444}",
+  // #59: this rule's specificity (2 classes+attribute) beats the base
+  // `.blakfy-switch[aria-checked=true]` rule above (1 class+attribute) and comes
+  // later in the sheet, so a checked switch in dark theme always fell back to
+  // #444 instead of the accent colour. Re-declaring checked state here, scoped to
+  // dark theme, restores it without touching the light-theme rule.
+  ".blakfy-card[data-blakfy-theme=dark] .blakfy-switch[aria-checked=true]{background:var(--blakfy-accent,#3E5C3A)}",
   ".blakfy-card[data-blakfy-theme=dark] .blakfy-close{color:#aaa}",
   ".blakfy-card[data-blakfy-theme=dark] .blakfy-close:hover{background:#2a2a2a}",
   ".blakfy-card[data-blakfy-theme=dark] .blakfy-tabs{border-bottom-color:#333}",

@@ -6,7 +6,7 @@ export const CDN_BASE = "https://cdn.jsdelivr.net/npm/@blakfy/cookie@2";
 // in scripts/build.js (and by vitest.config.js's `define` for tests), both reading the
 // exact version straight from package.json. Falling back to CDN_BASE's floating "@2" only
 // happens if a bundle was somehow built without going through scripts/build.js at all.
-const RUNTIME_VERSION =
+export const RUNTIME_VERSION =
   typeof __BLAKFY_PKG_VERSION__ !== "undefined" && __BLAKFY_PKG_VERSION__
     ? __BLAKFY_PKG_VERSION__
     : "2";
