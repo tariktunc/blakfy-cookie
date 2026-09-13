@@ -7,6 +7,12 @@ const RULES = [
   "/* Layout architecture is locked — only --blakfy-accent is overridable */",
   // Modal mode (centered, dimmed backdrop)
   ".blakfy-overlay.modal{position:fixed !important;inset:0;background:rgba(0,0,0,.4);z-index:2147483646 !important;display:flex !important;align-items:center;justify-content:center;padding:16px}",
+  // #57: on a short viewport (<500px tall) the card had no max-height/overflow, so it
+  // overflowed both above and below the visible area with no way to scroll to the
+  // header/close button or the accept/save actions — a dead end for anyone without a
+  // physical Escape key. Capping height to the overlay's own padded viewport and
+  // scrolling the card's own content keeps both ends reachable.
+  ".blakfy-overlay.modal .blakfy-card{max-height:calc(100vh - 32px);overflow-y:auto}",
   // Widget mode (transparent, no backdrop)
   ".blakfy-overlay.widget{position:fixed !important;inset:auto;background:transparent;padding:0;display:block !important;z-index:2147483646 !important;pointer-events:none}",
   ".blakfy-overlay.widget .blakfy-card{width:min(96vw,1100px);max-width:none;border-radius:8px;position:relative;pointer-events:auto;padding-bottom:40px;box-sizing:border-box}",
