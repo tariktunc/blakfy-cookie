@@ -181,7 +181,7 @@ const RULES = [
   // and any --blakfy-fab-* override a site sets on ITS OWN :root still inherit in across
   // the shadow boundary (custom properties are inheritable), so a site override always
   // wins; these are only the widget's own defaults.
-  ":host,:root{--blakfy-fab-side:left;--blakfy-fab-offset-x:20px;--blakfy-fab-offset-y:20px;--blakfy-fab-z:2147483640;--blakfy-fab-size:40px;--blakfy-fab-target:44px;--blakfy-fab-icon-size:20px;--blakfy-fab-bg:var(--blakfy-accent,#6b7280);--blakfy-fab-color:#fff;--blakfy-fab-radius:50%;--blakfy-fab-shadow:0 2px 8px rgb(0 0 0 / 0.18);--blakfy-fab-opacity:0.55;--blakfy-fab-opacity-hover:1}",
+  ":host,:root{--blakfy-fab-side:right;--blakfy-fab-offset-x:20px;--blakfy-fab-offset-y:20px;--blakfy-fab-z:2147483640;--blakfy-fab-size:40px;--blakfy-fab-target:44px;--blakfy-fab-icon-size:20px;--blakfy-fab-bg:var(--blakfy-accent,#6b7280);--blakfy-fab-color:#fff;--blakfy-fab-radius:50%;--blakfy-fab-shadow:0 2px 8px rgb(0 0 0 / 0.18);--blakfy-fab-opacity:0.55;--blakfy-fab-opacity-hover:1}",
   ".blakfy-fab{position:fixed;z-index:var(--blakfy-fab-z);width:var(--blakfy-fab-target);height:var(--blakfy-fab-target);display:flex;align-items:center;justify-content:center;padding:0;border:none;cursor:pointer;background:transparent;bottom:calc(var(--blakfy-fab-offset-y) + env(safe-area-inset-bottom,0px))}",
   ".blakfy-fab::before{content:'';position:absolute;width:var(--blakfy-fab-size);height:var(--blakfy-fab-size);border-radius:var(--blakfy-fab-radius);background:var(--blakfy-fab-bg);box-shadow:var(--blakfy-fab-shadow);opacity:var(--blakfy-fab-opacity);transition:opacity .15s}",
   ".blakfy-fab:hover::before,.blakfy-fab:focus-visible::before{opacity:var(--blakfy-fab-opacity-hover)}",

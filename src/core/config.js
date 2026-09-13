@@ -65,9 +65,13 @@ export const DEFAULTS = {
   // www.example.com are treated as two different sites for consent purposes.
   cookieDomain: null,
   // #34: reopen FAB — "off" disables it (a site wiring its own footer link
-  // instead). Wix installs commonly already occupy the right corner with
-  // chat/map buttons, so "left" is the stock default everywhere.
-  fabSide: "left",
+  // instead). Default flipped to "right" 2026-09-14: the Blakfy accessibility
+  // widget's FAB is bottom-left on EVERY site (CLAUDE.md Core Decision #4,
+  // non-negotiable) and this cookie FAB used to default to the same corner,
+  // sitting directly on top of it. "left" is still available via
+  // data-blakfy-fab="left" for sites where the right corner is genuinely
+  // occupied (e.g. a Wix chat/map widget) and the accessibility widget is off.
+  fabSide: "right",
   fabOffset: null,
   fabSize: null,
   fabColor: null,

@@ -175,9 +175,13 @@
     // www.example.com are treated as two different sites for consent purposes.
     cookieDomain: null,
     // #34: reopen FAB — "off" disables it (a site wiring its own footer link
-    // instead). Wix installs commonly already occupy the right corner with
-    // chat/map buttons, so "left" is the stock default everywhere.
-    fabSide: "left",
+    // instead). Default flipped to "right" 2026-09-14: the Blakfy accessibility
+    // widget's FAB is bottom-left on EVERY site (CLAUDE.md Core Decision #4,
+    // non-negotiable) and this cookie FAB used to default to the same corner,
+    // sitting directly on top of it. "left" is still available via
+    // data-blakfy-fab="left" for sites where the right corner is genuinely
+    // occupied (e.g. a Wix chat/map widget) and the accessibility widget is off.
+    fabSide: "right",
     fabOffset: null,
     fabSize: null,
     fabColor: null,
@@ -3163,10 +3167,10 @@
     return btn;
   };
   var resolveFabConfig = (config) => {
-    const side = config && config.fabSide ? String(config.fabSide) : "left";
+    const side = config && config.fabSide ? String(config.fabSide) : "right";
     if (side === "off") return null;
     return {
-      side: side === "right" ? "right" : "left",
+      side: side === "left" ? "left" : "right",
       offset: config && config.fabOffset != null ? config.fabOffset : null,
       size: config && config.fabSize != null ? config.fabSize : null,
       color: config && config.fabColor != null ? config.fabColor : null
@@ -4123,7 +4127,7 @@
     // and any --blakfy-fab-* override a site sets on ITS OWN :root still inherit in across
     // the shadow boundary (custom properties are inheritable), so a site override always
     // wins; these are only the widget's own defaults.
-    ":host,:root{--blakfy-fab-side:left;--blakfy-fab-offset-x:20px;--blakfy-fab-offset-y:20px;--blakfy-fab-z:2147483640;--blakfy-fab-size:40px;--blakfy-fab-target:44px;--blakfy-fab-icon-size:20px;--blakfy-fab-bg:var(--blakfy-accent,#6b7280);--blakfy-fab-color:#fff;--blakfy-fab-radius:50%;--blakfy-fab-shadow:0 2px 8px rgb(0 0 0 / 0.18);--blakfy-fab-opacity:0.55;--blakfy-fab-opacity-hover:1}",
+    ":host,:root{--blakfy-fab-side:right;--blakfy-fab-offset-x:20px;--blakfy-fab-offset-y:20px;--blakfy-fab-z:2147483640;--blakfy-fab-size:40px;--blakfy-fab-target:44px;--blakfy-fab-icon-size:20px;--blakfy-fab-bg:var(--blakfy-accent,#6b7280);--blakfy-fab-color:#fff;--blakfy-fab-radius:50%;--blakfy-fab-shadow:0 2px 8px rgb(0 0 0 / 0.18);--blakfy-fab-opacity:0.55;--blakfy-fab-opacity-hover:1}",
     ".blakfy-fab{position:fixed;z-index:var(--blakfy-fab-z);width:var(--blakfy-fab-target);height:var(--blakfy-fab-target);display:flex;align-items:center;justify-content:center;padding:0;border:none;cursor:pointer;background:transparent;bottom:calc(var(--blakfy-fab-offset-y) + env(safe-area-inset-bottom,0px))}",
     ".blakfy-fab::before{content:'';position:absolute;width:var(--blakfy-fab-size);height:var(--blakfy-fab-size);border-radius:var(--blakfy-fab-radius);background:var(--blakfy-fab-bg);box-shadow:var(--blakfy-fab-shadow);opacity:var(--blakfy-fab-opacity);transition:opacity .15s}",
     ".blakfy-fab:hover::before,.blakfy-fab:focus-visible::before{opacity:var(--blakfy-fab-opacity-hover)}",

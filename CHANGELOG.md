@@ -4,6 +4,12 @@ All notable changes follow [Keep a Changelog](https://keepachangelog.com/) and S
 
 ---
 
+## [2.4.2] — 2026-09-14
+
+### Fixed
+
+- **Reopen FAB no longer overlaps the accessibility widget** — the FAB's default `fabSide` was `"left"`, the same corner the Blakfy accessibility widget's FAB always occupies (CLAUDE.md Core Decision #4, non-negotiable). On every site running both widgets the two controls sat exactly on top of each other. Default flipped to `"right"`; `data-blakfy-fab="left"` stays available for sites where the right corner is genuinely occupied (e.g. a Wix chat/map widget) and the accessibility widget is off.
+
 ## [cookie-next 2.3.2] — 2026-09-14
 
 ### Changed

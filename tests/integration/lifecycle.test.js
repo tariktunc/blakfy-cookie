@@ -232,7 +232,7 @@ describe("full DOM lifecycle (#31)", () => {
   });
 
   it("#26: reopen FAB -> withdraw a category -> consent-change hooks fire and cookie updates", async () => {
-    // fabSide defaults to "left" (not "off") — the reopen control this test drives
+    // fabSide defaults to "right" (not "off") — the reopen control this test drives
     // must be reachable without any extra config, matching a stock install.
     await boot();
     clickAct("accept");

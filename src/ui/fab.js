@@ -59,10 +59,12 @@ export const createFab = (opts) => {
  * "off" disables the control entirely (a site wiring its own footer link).
  */
 export const resolveFabConfig = (config) => {
-  const side = config && config.fabSide ? String(config.fabSide) : "left";
+  // Default "right" (2026-09-14) — the accessibility widget's FAB owns
+  // bottom-left on every site, so this control must not default there too.
+  const side = config && config.fabSide ? String(config.fabSide) : "right";
   if (side === "off") return null;
   return {
-    side: side === "right" ? "right" : "left",
+    side: side === "left" ? "left" : "right",
     offset: config && config.fabOffset != null ? config.fabOffset : null,
     size: config && config.fabSize != null ? config.fabSize : null,
     color: config && config.fabColor != null ? config.fabColor : null,

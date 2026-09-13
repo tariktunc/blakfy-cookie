@@ -4,7 +4,7 @@
 >
 > Tek script ile **KVKK + GDPR + CCPA + Google CMv2 + Microsoft UET + Yandex Metrica + IAB TCF v2.2** uyumlu cookie consent (çerez onayı) widget. **23 dil**, **18 hazır preset** (üçüncü parti araç entegrasyonu), **3 renk teması**, **3-tab tercihler modalı** (Kategoriler / Hizmetler / Hakkında), **tag-gating** (script engelleme/serbest bırakma) dahil.
 
-**Versiyon:** 2.4.1 • **Lisans:** MIT • **npm:** `@blakfy/cookie@2.4.1` · `@blakfy/cookie-next@2.3.2` • **CDN:** `cdn.jsdelivr.net/npm/@blakfy/cookie@latest` (varsayılan, owner kararı 2026-09-14)
+**Versiyon:** 2.4.2 • **Lisans:** MIT • **npm:** `@blakfy/cookie@2.4.2` · `@blakfy/cookie-next@2.3.2` • **CDN:** `cdn.jsdelivr.net/npm/@blakfy/cookie@latest` (varsayılan, owner kararı 2026-09-14)
 
 ---
 
@@ -17,7 +17,7 @@
 | Strateji                             | URL                                                             | Ne zaman kullan                                                                                |
 | ------------------------------------ | --------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
 | **`@latest`** (önerilen, varsayılan) | `cdn.jsdelivr.net/npm/@blakfy/cookie@latest/dist/cookie.min.js` | Owner kararı 2026-09-14: her site otomatik en güncel sürüme geçsin, manuel redeploy gerekmesin |
-| **Pinned + SRI** (istisna)           | `cdn.jsdelivr.net/npm/@blakfy/cookie@2.4.1/dist/cookie.min.js`  | SADECE SRI kuruluysa — SRI sabit/hash'lenebilir dosya ister, `@latest` ile uyuşmaz             |
+| **Pinned + SRI** (istisna)           | `cdn.jsdelivr.net/npm/@blakfy/cookie@2.4.2/dist/cookie.min.js`  | SADECE SRI kuruluysa — SRI sabit/hash'lenebilir dosya ister, `@latest` ile uyuşmaz             |
 
 unpkg da çalışır: `unpkg.com/@blakfy/cookie@latest/dist/cookie.min.js`.
 
@@ -26,7 +26,7 @@ unpkg da çalışır: `unpkg.com/@blakfy/cookie@latest/dist/cookie.min.js`.
 > script'tir. CDN'den `integrity`/`crossorigin` olmadan yüklemek, tedarik zinciri (supply-chain)
 > saldırısına açık kapı bırakır — bkz. [docs/compliance.md §13](./docs/compliance.md#13-content-security-policy-csp--sri-subresource-integrity).
 > **Bu, `@latest` varsayılanının TEK istisnasıdır (owner kararı 2026-09-14):** SRI kullanan bir
-> site **pinned** bir sürüm (`@2.4.1`) + `integrity` hash'i birlikte kullanmak ZORUNDADIR —
+> site **pinned** bir sürüm (`@2.4.2`) + `integrity` hash'i birlikte kullanmak ZORUNDADIR —
 > `@latest`/floating tag SRI'yı by design bozar (hash sürümle birlikte değişir). SRI kurulu
 > değilse `@latest` kullan. Hash'ler her release'de `npm run sri` ile üretilir — bkz. Quick Start
 > adım 1 ve 3.
@@ -59,7 +59,7 @@ Bundler ile gelen versiyonu kontrol etmek için: `import { version } from "@blak
 <!-- Bootstrap: Tüm consent sinyallerini 'denied' olarak başlatır -->
 <!-- integrity: her release'de "npm run sri" ile üretilir (dist/sri-hashes.json) -->
 <script
-  src="https://cdn.jsdelivr.net/npm/@blakfy/cookie@2.4.1/dist/cookie-defaults.min.js"
+  src="https://cdn.jsdelivr.net/npm/@blakfy/cookie@2.4.2/dist/cookie-defaults.min.js"
   integrity="sha384-<npm run sri çıktısındaki hash>"
   crossorigin="anonymous"
 ></script>
@@ -90,7 +90,7 @@ Bunlar olduğu gibi kalır. Bootstrap zaten consent default'larını `denied` ol
 ```html
 <!-- integrity: her release'de "npm run sri" ile üretilir (dist/sri-hashes.json) -->
 <script
-  src="https://cdn.jsdelivr.net/npm/@blakfy/cookie@2.4.1/dist/cookie.min.js"
+  src="https://cdn.jsdelivr.net/npm/@blakfy/cookie@2.4.2/dist/cookie.min.js"
   integrity="sha384-<npm run sri çıktısındaki hash>"
   crossorigin="anonymous"
   data-blakfy-locale="auto"
@@ -373,7 +373,7 @@ Tüm `<script>` tag'i üzerine konabilen `data-blakfy-*` attribute'ları:
 
 | Metod                   | Sürüm      | İmza                                               | Açıklama                                                                                                                                                                            |
 | ----------------------- | ---------- | -------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `version`               | v1         | `string`                                           | Kütüphane sürümü, örn. `"2.4.1"`.                                                                                                                                                   |
+| `version`               | v1         | `string`                                           | Kütüphane sürümü, örn. `"2.4.2"`.                                                                                                                                                   |
 | `open()`                | v1         | `() => void`                                       | Tercihler modalını aç.                                                                                                                                                              |
 | `acceptAll()`           | v1         | `() => void`                                       | Tüm kategorileri kabul et.                                                                                                                                                          |
 | `rejectAll()`           | v1         | `() => void`                                       | Tüm kategorileri reddet (essential dışında).                                                                                                                                        |
