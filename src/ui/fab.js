@@ -73,6 +73,9 @@ export const resolveFabConfig = (config) => {
     width: config && config.fabWidth != null ? config.fabWidth : null,
     height: config && config.fabHeight != null ? config.fabHeight : null,
     color: config && config.fabColor != null ? config.fabColor : null,
+    // Raw CSS value (px or %), not a number -- "4px", "50%", "0" all valid.
+    radius: config && config.fabRadius != null ? config.fabRadius : null,
+    iconColor: config && config.fabIconColor != null ? config.fabIconColor : null,
   };
 };
 
@@ -95,6 +98,12 @@ export const applyFabTokens = (btn, resolved) => {
   if (resolved.height != null) {
     btn.style.setProperty("--blakfy-fab-target-h", resolved.height + "px");
     btn.style.setProperty("--blakfy-fab-size-h", resolved.height + "px");
+  }
+  if (resolved.radius != null) {
+    btn.style.setProperty("--blakfy-fab-radius", resolved.radius);
+  }
+  if (resolved.iconColor != null) {
+    btn.style.setProperty("--blakfy-fab-color", resolved.iconColor);
   }
   if (resolved.color != null) {
     btn.style.setProperty("--blakfy-fab-bg", resolved.color);

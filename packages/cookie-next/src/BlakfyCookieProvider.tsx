@@ -44,6 +44,8 @@ export function BlakfyCookieProvider({
   fabWidth,
   fabHeight,
   fabColor,
+  fabRadius,
+  fabIconColor,
   src: srcOverride,
 }: Props) {
   useEffect(() => {
@@ -99,6 +101,8 @@ export function BlakfyCookieProvider({
   if (fabWidth != null) dataAttrs["data-blakfy-fab-width"] = String(fabWidth);
   if (fabHeight != null) dataAttrs["data-blakfy-fab-height"] = String(fabHeight);
   if (fabColor) dataAttrs["data-blakfy-fab-color"] = fabColor;
+  if (fabRadius) dataAttrs["data-blakfy-fab-radius"] = fabRadius;
+  if (fabIconColor) dataAttrs["data-blakfy-fab-icon-color"] = fabIconColor;
 
   return (
     <>

@@ -4,6 +4,21 @@ All notable changes follow [Keep a Changelog](https://keepachangelog.com/) and S
 
 ---
 
+## [2.4.4] — 2026-09-14
+
+### Fixed
+
+- **A site's document `:root` override of `--blakfy-fab-radius` never reached the FAB** — the widget's own stylesheet sets this variable via a `:host,:root` rule, which re-declares it directly on the shadow host; that local declaration blocks inheritance from anything outside the shadow tree, so an external override was silently ignored (found while giving birinciogluticaret-com's FAB sharp rectangle corners — it stayed a 50% pill).
+
+### Added
+
+- **`fabRadius`** (`data-blakfy-fab-radius`) — same mechanism as `fabWidth`/`fabHeight` (an inline override set directly on the button), the only way to reliably change the FAB's corner radius. Accepts any CSS value: `"4px"`, `"50%"`, `"0"`.
+- **`fabIconColor`** (`data-blakfy-fab-icon-color`) — the FAB's glyph color (default white), independent from `fabColor` (the background).
+
+### Changed
+
+- **`--blakfy-fab-bg` no longer auto-links to `--blakfy-accent`** — the FAB used to silently pick up whatever accent color a site set for the banner, so its "default" look changed per site without anyone asking for that (found on birinciogluticaret-com: black, not the documented neutral gray). The FAB's own default is now a fixed, stable `#6b7280` gray; a site that wants it to match its brand passes `fabColor` explicitly.
+
 ## [2.4.3] — 2026-09-14
 
 ### Fixed

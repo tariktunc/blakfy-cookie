@@ -1,5 +1,5 @@
 /*!
- * Blakfy Cookie Widget v2.4.2
+ * Blakfy Cookie Widget v2.4.4
  * https://github.com/tariktunc/blakfy-cookie
  * MIT License | (c) Blakfy Studio
  *
@@ -126,7 +126,7 @@
   };
 
   // src/core/config.js
-  var RUNTIME_VERSION = "2.4.2" ? "2.4.2" : "2";
+  var RUNTIME_VERSION = "2.4.4" ? "2.4.4" : "2";
   var STATUS_BASE = "https://cdn.jsdelivr.net/npm/@blakfy/cookie@" + RUNTIME_VERSION;
   var DEFAULTS = {
     locale: "auto",
@@ -187,6 +187,8 @@
     fabWidth: null,
     fabHeight: null,
     fabColor: null,
+    fabRadius: null,
+    fabIconColor: null,
     // #39: cookie transparency panel — off by default (issue proposal: "Off by default;
     // a site opts in"). Lists cookies actually present in document.cookie, with
     // per-cookie delete. data-blakfy-cookie-panel="true" to enable.
@@ -247,6 +249,13 @@
       fabWidth: attr("data-blakfy-fab-width", DEFAULTS.fabWidth),
       fabHeight: attr("data-blakfy-fab-height", DEFAULTS.fabHeight),
       fabColor: attr("data-blakfy-fab-color", DEFAULTS.fabColor),
+      // #63c: document :root custom-property overrides can't reach this value --
+      // the widget's own :host rule re-declares --blakfy-fab-radius directly on
+      // the shadow host, which shadows (blocks) inheritance from outside document
+      // styles. Only an inline override on the button element itself (below) works,
+      // same as fabWidth/fabHeight already had to be (owner finding 2026-09-14).
+      fabRadius: attr("data-blakfy-fab-radius", DEFAULTS.fabRadius),
+      fabIconColor: attr("data-blakfy-fab-icon-color", DEFAULTS.fabIconColor),
       cookiePanel: attr("data-blakfy-cookie-panel", DEFAULTS.cookiePanel) === "true"
     };
   };
@@ -3182,7 +3191,10 @@
       // invisible touch-target padding around a smaller visible shape.
       width: config && config.fabWidth != null ? config.fabWidth : null,
       height: config && config.fabHeight != null ? config.fabHeight : null,
-      color: config && config.fabColor != null ? config.fabColor : null
+      color: config && config.fabColor != null ? config.fabColor : null,
+      // Raw CSS value (px or %), not a number -- "4px", "50%", "0" all valid.
+      radius: config && config.fabRadius != null ? config.fabRadius : null,
+      iconColor: config && config.fabIconColor != null ? config.fabIconColor : null
     };
   };
   var applyFabTokens = (btn, resolved) => {
@@ -3203,6 +3215,12 @@
     if (resolved.height != null) {
       btn.style.setProperty("--blakfy-fab-target-h", resolved.height + "px");
       btn.style.setProperty("--blakfy-fab-size-h", resolved.height + "px");
+    }
+    if (resolved.radius != null) {
+      btn.style.setProperty("--blakfy-fab-radius", resolved.radius);
+    }
+    if (resolved.iconColor != null) {
+      btn.style.setProperty("--blakfy-fab-color", resolved.iconColor);
     }
     if (resolved.color != null) {
       btn.style.setProperty("--blakfy-fab-bg", resolved.color);
@@ -4151,7 +4169,11 @@
     // the clickable box becomes exactly the visible shape, no invisible touch-target
     // padding around a smaller dot (that mismatch read as "unpositioned/floating" at
     // small custom sizes -- owner finding 2026-09-14, birinciogluticaret-com).
-    ":host,:root{--blakfy-fab-side:right;--blakfy-fab-offset-x:20px;--blakfy-fab-offset-y:20px;--blakfy-fab-z:2147483640;--blakfy-fab-size:40px;--blakfy-fab-target:44px;--blakfy-fab-target-w:var(--blakfy-fab-target);--blakfy-fab-target-h:var(--blakfy-fab-target);--blakfy-fab-size-w:var(--blakfy-fab-size);--blakfy-fab-size-h:var(--blakfy-fab-size);--blakfy-fab-icon-size:20px;--blakfy-fab-bg:var(--blakfy-accent,#6b7280);--blakfy-fab-color:#fff;--blakfy-fab-radius:50%;--blakfy-fab-shadow:0 2px 8px rgb(0 0 0 / 0.18);--blakfy-fab-opacity:0.55;--blakfy-fab-opacity-hover:1}",
+    // --blakfy-fab-bg no longer auto-links to --blakfy-accent (owner decision
+    // 2026-09-14): the FAB's own neutral gray default should not silently change
+    // just because a site set an accent color for the banner. A site that wants
+    // a matching FAB explicitly passes fabColor.
+    ":host,:root{--blakfy-fab-side:right;--blakfy-fab-offset-x:20px;--blakfy-fab-offset-y:20px;--blakfy-fab-z:2147483640;--blakfy-fab-size:40px;--blakfy-fab-target:44px;--blakfy-fab-target-w:var(--blakfy-fab-target);--blakfy-fab-target-h:var(--blakfy-fab-target);--blakfy-fab-size-w:var(--blakfy-fab-size);--blakfy-fab-size-h:var(--blakfy-fab-size);--blakfy-fab-icon-size:20px;--blakfy-fab-bg:#6b7280;--blakfy-fab-color:#fff;--blakfy-fab-radius:50%;--blakfy-fab-shadow:0 2px 8px rgb(0 0 0 / 0.18);--blakfy-fab-opacity:0.55;--blakfy-fab-opacity-hover:1}",
     ".blakfy-fab{position:fixed;z-index:var(--blakfy-fab-z);width:var(--blakfy-fab-target-w);height:var(--blakfy-fab-target-h);display:flex;align-items:center;justify-content:center;padding:0;border:none;cursor:pointer;background:transparent;bottom:calc(var(--blakfy-fab-offset-y) + env(safe-area-inset-bottom,0px))}",
     ".blakfy-fab::before{content:'';position:absolute;inset:0;margin:auto;width:var(--blakfy-fab-size-w);height:var(--blakfy-fab-size-h);border-radius:var(--blakfy-fab-radius);background:var(--blakfy-fab-bg);box-shadow:var(--blakfy-fab-shadow);opacity:var(--blakfy-fab-opacity);transition:opacity .15s}",
     ".blakfy-fab:hover::before,.blakfy-fab:focus-visible::before{opacity:var(--blakfy-fab-opacity-hover)}",

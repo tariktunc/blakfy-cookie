@@ -77,6 +77,8 @@ export const DEFAULTS = {
   fabWidth: null,
   fabHeight: null,
   fabColor: null,
+  fabRadius: null,
+  fabIconColor: null,
   // #39: cookie transparency panel — off by default (issue proposal: "Off by default;
   // a site opts in"). Lists cookies actually present in document.cookie, with
   // per-cookie delete. data-blakfy-cookie-panel="true" to enable.
@@ -172,6 +174,13 @@ export const readConfig = (scriptEl) => {
     fabWidth: attr("data-blakfy-fab-width", DEFAULTS.fabWidth),
     fabHeight: attr("data-blakfy-fab-height", DEFAULTS.fabHeight),
     fabColor: attr("data-blakfy-fab-color", DEFAULTS.fabColor),
+    // #63c: document :root custom-property overrides can't reach this value --
+    // the widget's own :host rule re-declares --blakfy-fab-radius directly on
+    // the shadow host, which shadows (blocks) inheritance from outside document
+    // styles. Only an inline override on the button element itself (below) works,
+    // same as fabWidth/fabHeight already had to be (owner finding 2026-09-14).
+    fabRadius: attr("data-blakfy-fab-radius", DEFAULTS.fabRadius),
+    fabIconColor: attr("data-blakfy-fab-icon-color", DEFAULTS.fabIconColor),
     cookiePanel: attr("data-blakfy-cookie-panel", DEFAULTS.cookiePanel) === "true",
   };
 };

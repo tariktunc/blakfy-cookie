@@ -90,6 +90,13 @@ export interface BlakfyCookieConfig {
   fabWidth?: number;
   fabHeight?: number;
   fabColor?: string;
+  /** #63c: raw CSS value ("4px", "50%", "0") -- document :root overrides of
+   * --blakfy-fab-radius don't reach through the widget's shadow DOM, so this
+   * prop is the only reliable way to change the FAB's corner shape. */
+  fabRadius?: string;
+  /** #63d: the FAB's icon/glyph color (default white) -- independent from
+   * fabColor, which is the background. */
+  fabIconColor?: string;
 }
 
 declare global {
