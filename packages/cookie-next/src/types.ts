@@ -77,6 +77,14 @@ export interface BlakfyCookieConfig {
   statusUrl?: string;
   statusEnabled?: boolean;
   cdnVersion?: string;
+  /** #63: reopen FAB side. Default "right" — the accessibility widget's FAB always
+   * occupies bottom-left (CLAUDE.md Core Decision #4), so a site does not normally
+   * need to set this; pass "left" only when the right corner is genuinely occupied
+   * by something else and the accessibility widget is off. "off" hides the FAB. */
+  fabSide?: "left" | "right" | "off";
+  fabOffset?: number;
+  fabSize?: number;
+  fabColor?: string;
 }
 
 declare global {

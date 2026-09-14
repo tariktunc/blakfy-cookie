@@ -69,6 +69,15 @@ describe("BlakfyCookieProvider", () => {
     expect(widgetScript?.getAttribute("data-blakfy-theme")).toBe("dark");
   });
 
+  it("#63: fabSide/fabOffset/fabSize/fabColor map to data-blakfy-fab*", () => {
+    render(<BlakfyCookieProvider fabSide="right" fabOffset={24} fabSize={44} fabColor="#123456" />);
+    const widgetScript = document.querySelector("script[data-blakfy-locale]");
+    expect(widgetScript?.getAttribute("data-blakfy-fab")).toBe("right");
+    expect(widgetScript?.getAttribute("data-blakfy-fab-offset")).toBe("24");
+    expect(widgetScript?.getAttribute("data-blakfy-fab-size")).toBe("44");
+    expect(widgetScript?.getAttribute("data-blakfy-fab-color")).toBe("#123456");
+  });
+
   it("#45: statusEnabled maps to data-blakfy-status (the vanilla attribute name), not data-blakfy-status-enabled", () => {
     render(<BlakfyCookieProvider statusEnabled={false} />);
     const widgetScript = document.querySelector("script[data-blakfy-locale]");

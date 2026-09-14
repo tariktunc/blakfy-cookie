@@ -38,6 +38,10 @@ export function BlakfyCookieProvider({
   // that needs SRI (which requires a fixed, hashable file) or deliberate change
   // control should still pass an explicit cdnVersion override.
   cdnVersion = "latest",
+  fabSide,
+  fabOffset,
+  fabSize,
+  fabColor,
   src: srcOverride,
 }: Props) {
   useEffect(() => {
@@ -86,6 +90,11 @@ export function BlakfyCookieProvider({
   // vanilla reader never looks at, so `statusEnabled={false}` silently had no effect.
   if (typeof statusEnabled === "boolean")
     dataAttrs["data-blakfy-status"] = statusEnabled ? "true" : "false";
+  // #63: vanilla reads the FAB side from `data-blakfy-fab` (not `data-blakfy-fab-side`).
+  if (fabSide) dataAttrs["data-blakfy-fab"] = fabSide;
+  if (fabOffset != null) dataAttrs["data-blakfy-fab-offset"] = String(fabOffset);
+  if (fabSize != null) dataAttrs["data-blakfy-fab-size"] = String(fabSize);
+  if (fabColor) dataAttrs["data-blakfy-fab-color"] = fabColor;
 
   return (
     <>

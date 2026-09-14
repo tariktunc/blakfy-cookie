@@ -4,6 +4,12 @@ All notable changes follow [Keep a Changelog](https://keepachangelog.com/) and S
 
 ---
 
+## [cookie-next 2.3.3] — 2026-09-14
+
+### Added
+
+- **`fabSide` / `fabOffset` / `fabSize` / `fabColor` props** — the reopen FAB's placement was previously only configurable on the vanilla `data-blakfy-*` attribute path; `BlakfyCookieProvider` now passes these through the same way, needed for sites that must explicitly pin the FAB to one corner regardless of the package default.
+
 ## [2.4.2] — 2026-09-14
 
 ### Fixed
