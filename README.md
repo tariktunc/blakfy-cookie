@@ -718,6 +718,34 @@ Veya React:
 
 ---
 
+## Contributing
+
+Katkılar açık. Süreç ve kod standartları: [`.github/CONTRIBUTING.md`](./.github/CONTRIBUTING.md).
+
+Nereden başlayacağınızı bilmiyorsanız bu iki listeye bakın:
+
+- [**good first issue**](https://github.com/tariktunc/blakfy-cookie/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22) — kapsamı dar, tek dosyaya yakın, tekrar üretim adımları issue içinde yazılı
+- [**help wanted**](https://github.com/tariktunc/blakfy-cookie/issues?q=is%3Aissue+is%3Aopen+label%3A%22help+wanted%22) — tasarım kararı veya alan uzmanlığı gerektiren işler
+
+Issue'lar alanlarına göre etiketli: `compliance` · `accessibility` · `security` · `performance` · `architecture` · `testing`.
+
+Bir issue üzerinde çalışmaya başlamadan önce issue'ya yorum bırakın — aynı işin iki kez yapılmasını önler.
+
+### Katkı öncesi
+
+```bash
+npm install
+npm test          # vitest
+npm run lint      # eslint
+npm run size      # boyut bütçesi (dist/cookie.min.js ≤ 32 KB gzip)
+```
+
+Bu bir çerez onay (consent) aracıdır: davranış değişiklikleri onu kuran her sitede hukuki sonuç doğurur. Bu yüzden davranışı değiştiren her PR'da test ve CHANGELOG girdisi beklenir.
+
+Güvenlik açığı bildirimi için issue açmayın — [`SECURITY.md`](./SECURITY.md).
+
+---
+
 ## License
 
 MIT © Blakfy Studio. "Powered by Blakfy Studio" branding badge anti-tampering korumalı ve kaldırılamaz.
