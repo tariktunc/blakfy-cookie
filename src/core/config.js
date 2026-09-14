@@ -79,6 +79,7 @@ export const DEFAULTS = {
   fabColor: null,
   fabRadius: null,
   fabIconColor: null,
+  fabIconSize: null,
   // #39: cookie transparency panel — off by default (issue proposal: "Off by default;
   // a site opts in"). Lists cookies actually present in document.cookie, with
   // per-cookie delete. data-blakfy-cookie-panel="true" to enable.
@@ -181,6 +182,11 @@ export const readConfig = (scriptEl) => {
     // same as fabWidth/fabHeight already had to be (owner finding 2026-09-14).
     fabRadius: attr("data-blakfy-fab-radius", DEFAULTS.fabRadius),
     fabIconColor: attr("data-blakfy-fab-icon-color", DEFAULTS.fabIconColor),
+    // #63e: default icon is 20px -- bigger than a small custom fabHeight (e.g. 16px)
+    // and touches/overflows the box edges. A site sizing the FAB down must size the
+    // icon down too, hence a dedicated prop rather than assuming a smaller box implies
+    // a smaller icon.
+    fabIconSize: attr("data-blakfy-fab-icon-size", DEFAULTS.fabIconSize),
     cookiePanel: attr("data-blakfy-cookie-panel", DEFAULTS.cookiePanel) === "true",
   };
 };

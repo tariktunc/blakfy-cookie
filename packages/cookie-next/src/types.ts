@@ -97,6 +97,10 @@ export interface BlakfyCookieConfig {
   /** #63d: the FAB's icon/glyph color (default white) -- independent from
    * fabColor, which is the background. */
   fabIconColor?: string;
+  /** #63e: the glyph's own size -- the default (20px) overflows a custom
+   * fabHeight smaller than that (e.g. 16px). Number = px, or pass a raw
+   * CSS value ("12px"). */
+  fabIconSize?: number | string;
 }
 
 declare global {

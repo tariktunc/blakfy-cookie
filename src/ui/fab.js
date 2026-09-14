@@ -76,6 +76,7 @@ export const resolveFabConfig = (config) => {
     // Raw CSS value (px or %), not a number -- "4px", "50%", "0" all valid.
     radius: config && config.fabRadius != null ? config.fabRadius : null,
     iconColor: config && config.fabIconColor != null ? config.fabIconColor : null,
+    iconSize: config && config.fabIconSize != null ? config.fabIconSize : null,
   };
 };
 
@@ -104,6 +105,11 @@ export const applyFabTokens = (btn, resolved) => {
   }
   if (resolved.iconColor != null) {
     btn.style.setProperty("--blakfy-fab-color", resolved.iconColor);
+  }
+  if (resolved.iconSize != null) {
+    const iconSize =
+      typeof resolved.iconSize === "number" ? resolved.iconSize + "px" : resolved.iconSize;
+    btn.style.setProperty("--blakfy-fab-icon-size", iconSize);
   }
   if (resolved.color != null) {
     btn.style.setProperty("--blakfy-fab-bg", resolved.color);

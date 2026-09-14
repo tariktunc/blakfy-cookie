@@ -46,6 +46,7 @@ export function BlakfyCookieProvider({
   fabColor,
   fabRadius,
   fabIconColor,
+  fabIconSize,
   src: srcOverride,
 }: Props) {
   useEffect(() => {
@@ -103,6 +104,7 @@ export function BlakfyCookieProvider({
   if (fabColor) dataAttrs["data-blakfy-fab-color"] = fabColor;
   if (fabRadius) dataAttrs["data-blakfy-fab-radius"] = fabRadius;
   if (fabIconColor) dataAttrs["data-blakfy-fab-icon-color"] = fabIconColor;
+  if (fabIconSize != null) dataAttrs["data-blakfy-fab-icon-size"] = String(fabIconSize);
 
   return (
     <>

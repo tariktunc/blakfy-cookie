@@ -4,6 +4,16 @@ All notable changes follow [Keep a Changelog](https://keepachangelog.com/) and S
 
 ---
 
+## [2.4.5] — 2026-09-14
+
+### Fixed
+
+- **FAB icon (20px default) overflowed a custom `fabHeight` smaller than that** — shrinking the box via `fabWidth`/`fabHeight` never shrank the glyph inside it, so a small custom FAB (e.g. 28×16) had its icon touching/exceeding the box edges.
+
+### Added
+
+- **`fabIconSize`** (`data-blakfy-fab-icon-size`) — sizes the glyph independent of the box. Number = px, or pass a raw CSS value.
+
 ## [2.4.4] — 2026-09-14
 
 ### Fixed
