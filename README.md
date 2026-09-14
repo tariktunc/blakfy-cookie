@@ -4,7 +4,7 @@
 >
 > Tek script ile **KVKK + GDPR + CCPA + Google CMv2 + Microsoft UET + Yandex Metrica + IAB TCF v2.2** uyumlu cookie consent (çerez onayı) widget. **23 dil**, **18 hazır preset** (üçüncü parti araç entegrasyonu), **3 renk teması**, **3-tab tercihler modalı** (Kategoriler / Hizmetler / Hakkında), **tag-gating** (script engelleme/serbest bırakma) dahil.
 
-**Versiyon:** 2.4.2 • **Lisans:** MIT • **npm:** `@blakfy/cookie@2.4.2` · `@blakfy/cookie-next@2.3.2` • **CDN:** `cdn.jsdelivr.net/npm/@blakfy/cookie@latest` (varsayılan, owner kararı 2026-09-14)
+**Versiyon:** 2.4.6 • **Lisans:** MIT • **npm:** `@blakfy/cookie@2.4.6` · `@blakfy/cookie-next@2.3.6` • **CDN:** `cdn.jsdelivr.net/npm/@blakfy/cookie@latest` (varsayılan, owner kararı 2026-09-14)
 
 ---
 
@@ -17,7 +17,7 @@
 | Strateji                             | URL                                                             | Ne zaman kullan                                                                                |
 | ------------------------------------ | --------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
 | **`@latest`** (önerilen, varsayılan) | `cdn.jsdelivr.net/npm/@blakfy/cookie@latest/dist/cookie.min.js` | Owner kararı 2026-09-14: her site otomatik en güncel sürüme geçsin, manuel redeploy gerekmesin |
-| **Pinned + SRI** (istisna)           | `cdn.jsdelivr.net/npm/@blakfy/cookie@2.4.2/dist/cookie.min.js`  | SADECE SRI kuruluysa — SRI sabit/hash'lenebilir dosya ister, `@latest` ile uyuşmaz             |
+| **Pinned + SRI** (istisna)           | `cdn.jsdelivr.net/npm/@blakfy/cookie@2.4.6/dist/cookie.min.js`  | SADECE SRI kuruluysa — SRI sabit/hash'lenebilir dosya ister, `@latest` ile uyuşmaz             |
 
 unpkg da çalışır: `unpkg.com/@blakfy/cookie@latest/dist/cookie.min.js`.
 
@@ -26,7 +26,7 @@ unpkg da çalışır: `unpkg.com/@blakfy/cookie@latest/dist/cookie.min.js`.
 > script'tir. CDN'den `integrity`/`crossorigin` olmadan yüklemek, tedarik zinciri (supply-chain)
 > saldırısına açık kapı bırakır — bkz. [docs/compliance.md §13](./docs/compliance.md#13-content-security-policy-csp--sri-subresource-integrity).
 > **Bu, `@latest` varsayılanının TEK istisnasıdır (owner kararı 2026-09-14):** SRI kullanan bir
-> site **pinned** bir sürüm (`@2.4.2`) + `integrity` hash'i birlikte kullanmak ZORUNDADIR —
+> site **pinned** bir sürüm (`@2.4.6`) + `integrity` hash'i birlikte kullanmak ZORUNDADIR —
 > `@latest`/floating tag SRI'yı by design bozar (hash sürümle birlikte değişir). SRI kurulu
 > değilse `@latest` kullan. Hash'ler her release'de `npm run sri` ile üretilir — bkz. Quick Start
 > adım 1 ve 3.
@@ -59,7 +59,7 @@ Bundler ile gelen versiyonu kontrol etmek için: `import { version } from "@blak
 <!-- Bootstrap: Tüm consent sinyallerini 'denied' olarak başlatır -->
 <!-- integrity: her release'de "npm run sri" ile üretilir (dist/sri-hashes.json) -->
 <script
-  src="https://cdn.jsdelivr.net/npm/@blakfy/cookie@2.4.2/dist/cookie-defaults.min.js"
+  src="https://cdn.jsdelivr.net/npm/@blakfy/cookie@2.4.6/dist/cookie-defaults.min.js"
   integrity="sha384-<npm run sri çıktısındaki hash>"
   crossorigin="anonymous"
 ></script>
@@ -90,7 +90,7 @@ Bunlar olduğu gibi kalır. Bootstrap zaten consent default'larını `denied` ol
 ```html
 <!-- integrity: her release'de "npm run sri" ile üretilir (dist/sri-hashes.json) -->
 <script
-  src="https://cdn.jsdelivr.net/npm/@blakfy/cookie@2.4.2/dist/cookie.min.js"
+  src="https://cdn.jsdelivr.net/npm/@blakfy/cookie@2.4.6/dist/cookie.min.js"
   integrity="sha384-<npm run sri çıktısındaki hash>"
   crossorigin="anonymous"
   data-blakfy-locale="auto"
@@ -363,6 +363,23 @@ Tüm `<script>` tag'i üzerine konabilen `data-blakfy-*` attribute'ları:
 | `data-blakfy-cookie-panel`   | `false`                                             | bool               | `true` ise modal'a "Cookies" sekmesi eklenir (#39) — o an gerçekten var olan çerezlerin listesi + tek tek silme. Bkz. "Opsiyonel 4. Sekme" bölümü.                                                                                                                                            |
 | `data-blakfy-attribution`    | `null` (host-name)                                  | string/`off`       | "Powered by" badge linkinin `utm_source`'unu domain yerine bir slug'a sabitler; `off` atıfı tamamen kapatır (#40).                                                                                                                                                                            |
 
+### Reopen FAB (#34, #63) — konum/şekil site başına özelleştirilebilir
+
+Karar verildikten sonra tercihleri tekrar açmak için kalıcı bir buton. **Varsayılan: sağ-alt köşe, siyah daire, beyaz ikon** — erişilebilirlik widget'ı (`@blakfy/accessibility-widget-next`) sol-altı sabit kullandığı için (spec, değişmez), FAB varsayılan olarak sağda açılır ve iki widget asla çakışmaz. Bir site kendi düzenine göre (örn. WhatsApp butonu gibi başka bir sabit elemanla çakışmasın diye) tamamen yeniden şekillendirebilir — bkz. `birinciogluticaret.com` referans örneği: sağ-alt, 0 offset, 40×16 dikdörtgen, 2px köşe, 11px ikon.
+
+| Attribute                    | Default           | Tip          | Açıklama                                                                                           |
+| ---------------------------- | ----------------- | ------------ | -------------------------------------------------------------------------------------------------- |
+| `data-blakfy-fab`            | `right`           | enum         | `left` \| `right` \| `off` (kapatır — site kendi footer linkini kurar)                             |
+| `data-blakfy-fab-offset`     | `20px`            | px           | Kenardan boşluk (x ve y aynı). `0` = köşeye yapışık.                                               |
+| `data-blakfy-fab-width`      | `44px`            | px           | Tıklanabilir kutunun genişliği — **görünen şekli de belirler** (`fab-size` sadece eski, kare API). |
+| `data-blakfy-fab-height`     | `44px`            | px           | Kutunun yüksekliği. Genişlik ≠ yükseklik verirsen gerçek dikdörtgen olur.                          |
+| `data-blakfy-fab-radius`     | `50%`             | CSS değeri   | `50%` = tam daire, `0`/`2px` gibi düşük değer = keskin köşeli kutu/sekme.                          |
+| `data-blakfy-fab-color`      | `#111827` (siyah) | hex/CSS renk | Arkaplan rengi.                                                                                    |
+| `data-blakfy-fab-icon-color` | `#fff`            | hex/CSS renk | İkon (parmak izi) rengi.                                                                           |
+| `data-blakfy-fab-icon-size`  | `20px`            | px           | İkon boyutu — küçük bir kutuda (ör. yükseklik 16px) ikon taşmasın diye küçültülmeli.               |
+
+Next.js (`@blakfy/cookie-next`) tarafında aynı ayarlar `BlakfyCookieProvider` prop'ları: `fabSide`, `fabOffset`, `fabWidth`, `fabHeight`, `fabRadius`, `fabColor`, `fabIconColor`, `fabIconSize`.
+
 **Desteklenen 23 dil:** `tr`, `en`, `ar`, `fa`, `ur`, `fr`, `ru`, `de`, `he`, `uk`, `es`, `it`, `pt`, `nl`, `pl`, `sv`, `cs`, `zh`, `zh-TW`, `ja`, `ko`, `id`, `hi` (RTL: `ar`, `fa`, `ur`, `he`).
 
 ---
@@ -373,7 +390,7 @@ Tüm `<script>` tag'i üzerine konabilen `data-blakfy-*` attribute'ları:
 
 | Metod                   | Sürüm      | İmza                                               | Açıklama                                                                                                                                                                            |
 | ----------------------- | ---------- | -------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `version`               | v1         | `string`                                           | Kütüphane sürümü, örn. `"2.4.2"`.                                                                                                                                                   |
+| `version`               | v1         | `string`                                           | Kütüphane sürümü, örn. `"2.4.6"`.                                                                                                                                                   |
 | `open()`                | v1         | `() => void`                                       | Tercihler modalını aç.                                                                                                                                                              |
 | `acceptAll()`           | v1         | `() => void`                                       | Tüm kategorileri kabul et.                                                                                                                                                          |
 | `rejectAll()`           | v1         | `() => void`                                       | Tüm kategorileri reddet (essential dışında).                                                                                                                                        |
