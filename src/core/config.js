@@ -74,6 +74,8 @@ export const DEFAULTS = {
   fabSide: "right",
   fabOffset: null,
   fabSize: null,
+  fabWidth: null,
+  fabHeight: null,
   fabColor: null,
   // #39: cookie transparency panel — off by default (issue proposal: "Off by default;
   // a site opts in"). Lists cookies actually present in document.cookie, with
@@ -167,6 +169,8 @@ export const readConfig = (scriptEl) => {
     fabSide: attr("data-blakfy-fab", DEFAULTS.fabSide),
     fabOffset: attr("data-blakfy-fab-offset", DEFAULTS.fabOffset),
     fabSize: attr("data-blakfy-fab-size", DEFAULTS.fabSize),
+    fabWidth: attr("data-blakfy-fab-width", DEFAULTS.fabWidth),
+    fabHeight: attr("data-blakfy-fab-height", DEFAULTS.fabHeight),
     fabColor: attr("data-blakfy-fab-color", DEFAULTS.fabColor),
     cookiePanel: attr("data-blakfy-cookie-panel", DEFAULTS.cookiePanel) === "true",
   };

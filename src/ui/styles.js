@@ -181,9 +181,16 @@ const RULES = [
   // and any --blakfy-fab-* override a site sets on ITS OWN :root still inherit in across
   // the shadow boundary (custom properties are inheritable), so a site override always
   // wins; these are only the widget's own defaults.
-  ":host,:root{--blakfy-fab-side:right;--blakfy-fab-offset-x:20px;--blakfy-fab-offset-y:20px;--blakfy-fab-z:2147483640;--blakfy-fab-size:40px;--blakfy-fab-target:44px;--blakfy-fab-icon-size:20px;--blakfy-fab-bg:var(--blakfy-accent,#6b7280);--blakfy-fab-color:#fff;--blakfy-fab-radius:50%;--blakfy-fab-shadow:0 2px 8px rgb(0 0 0 / 0.18);--blakfy-fab-opacity:0.55;--blakfy-fab-opacity-hover:1}",
-  ".blakfy-fab{position:fixed;z-index:var(--blakfy-fab-z);width:var(--blakfy-fab-target);height:var(--blakfy-fab-target);display:flex;align-items:center;justify-content:center;padding:0;border:none;cursor:pointer;background:transparent;bottom:calc(var(--blakfy-fab-offset-y) + env(safe-area-inset-bottom,0px))}",
-  ".blakfy-fab::before{content:'';position:absolute;width:var(--blakfy-fab-size);height:var(--blakfy-fab-size);border-radius:var(--blakfy-fab-radius);background:var(--blakfy-fab-bg);box-shadow:var(--blakfy-fab-shadow);opacity:var(--blakfy-fab-opacity);transition:opacity .15s}",
+  // #63b: target-w/h (the actual positioned, clickable box) and size-w/h (the visual
+  // fill) default to the old single --blakfy-fab-target/--blakfy-fab-size values, so
+  // every existing site keeps its current look with zero changes. A site that sets
+  // fabWidth/fabHeight gets BOTH pairs pointed at the same custom value (fab.js) --
+  // the clickable box becomes exactly the visible shape, no invisible touch-target
+  // padding around a smaller dot (that mismatch read as "unpositioned/floating" at
+  // small custom sizes -- owner finding 2026-09-14, birinciogluticaret-com).
+  ":host,:root{--blakfy-fab-side:right;--blakfy-fab-offset-x:20px;--blakfy-fab-offset-y:20px;--blakfy-fab-z:2147483640;--blakfy-fab-size:40px;--blakfy-fab-target:44px;--blakfy-fab-target-w:var(--blakfy-fab-target);--blakfy-fab-target-h:var(--blakfy-fab-target);--blakfy-fab-size-w:var(--blakfy-fab-size);--blakfy-fab-size-h:var(--blakfy-fab-size);--blakfy-fab-icon-size:20px;--blakfy-fab-bg:var(--blakfy-accent,#6b7280);--blakfy-fab-color:#fff;--blakfy-fab-radius:50%;--blakfy-fab-shadow:0 2px 8px rgb(0 0 0 / 0.18);--blakfy-fab-opacity:0.55;--blakfy-fab-opacity-hover:1}",
+  ".blakfy-fab{position:fixed;z-index:var(--blakfy-fab-z);width:var(--blakfy-fab-target-w);height:var(--blakfy-fab-target-h);display:flex;align-items:center;justify-content:center;padding:0;border:none;cursor:pointer;background:transparent;bottom:calc(var(--blakfy-fab-offset-y) + env(safe-area-inset-bottom,0px))}",
+  ".blakfy-fab::before{content:'';position:absolute;inset:0;margin:auto;width:var(--blakfy-fab-size-w);height:var(--blakfy-fab-size-h);border-radius:var(--blakfy-fab-radius);background:var(--blakfy-fab-bg);box-shadow:var(--blakfy-fab-shadow);opacity:var(--blakfy-fab-opacity);transition:opacity .15s}",
   ".blakfy-fab:hover::before,.blakfy-fab:focus-visible::before{opacity:var(--blakfy-fab-opacity-hover)}",
   ".blakfy-fab svg{position:relative;color:var(--blakfy-fab-color);pointer-events:none}",
   ".blakfy-fab:focus-visible{outline:2px solid var(--blakfy-fab-bg);outline-offset:2px}",

@@ -41,6 +41,8 @@ export function BlakfyCookieProvider({
   fabSide,
   fabOffset,
   fabSize,
+  fabWidth,
+  fabHeight,
   fabColor,
   src: srcOverride,
 }: Props) {
@@ -94,6 +96,8 @@ export function BlakfyCookieProvider({
   if (fabSide) dataAttrs["data-blakfy-fab"] = fabSide;
   if (fabOffset != null) dataAttrs["data-blakfy-fab-offset"] = String(fabOffset);
   if (fabSize != null) dataAttrs["data-blakfy-fab-size"] = String(fabSize);
+  if (fabWidth != null) dataAttrs["data-blakfy-fab-width"] = String(fabWidth);
+  if (fabHeight != null) dataAttrs["data-blakfy-fab-height"] = String(fabHeight);
   if (fabColor) dataAttrs["data-blakfy-fab-color"] = fabColor;
 
   return (

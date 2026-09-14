@@ -84,6 +84,11 @@ export interface BlakfyCookieConfig {
   fabSide?: "left" | "right" | "off";
   fabOffset?: number;
   fabSize?: number;
+  /** #63b: independent width/height for a non-square (e.g. rectangular) FAB.
+   * Also resizes the clickable box to match — no invisible touch-target padding
+   * around a smaller visible shape. */
+  fabWidth?: number;
+  fabHeight?: number;
   fabColor?: string;
 }
 

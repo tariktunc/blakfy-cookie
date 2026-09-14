@@ -67,6 +67,11 @@ export const resolveFabConfig = (config) => {
     side: side === "left" ? "left" : "right",
     offset: config && config.fabOffset != null ? config.fabOffset : null,
     size: config && config.fabSize != null ? config.fabSize : null,
+    // #63b: independent width/height -> a real rectangle, not just a smaller square.
+    // Also sizes the clickable box to match (see applyFabTokens) so there is no
+    // invisible touch-target padding around a smaller visible shape.
+    width: config && config.fabWidth != null ? config.fabWidth : null,
+    height: config && config.fabHeight != null ? config.fabHeight : null,
     color: config && config.fabColor != null ? config.fabColor : null,
   };
 };
@@ -82,6 +87,14 @@ export const applyFabTokens = (btn, resolved) => {
   }
   if (resolved.size != null) {
     btn.style.setProperty("--blakfy-fab-size", resolved.size + "px");
+  }
+  if (resolved.width != null) {
+    btn.style.setProperty("--blakfy-fab-target-w", resolved.width + "px");
+    btn.style.setProperty("--blakfy-fab-size-w", resolved.width + "px");
+  }
+  if (resolved.height != null) {
+    btn.style.setProperty("--blakfy-fab-target-h", resolved.height + "px");
+    btn.style.setProperty("--blakfy-fab-size-h", resolved.height + "px");
   }
   if (resolved.color != null) {
     btn.style.setProperty("--blakfy-fab-bg", resolved.color);

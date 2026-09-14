@@ -4,6 +4,16 @@ All notable changes follow [Keep a Changelog](https://keepachangelog.com/) and S
 
 ---
 
+## [2.4.3] — 2026-09-14
+
+### Fixed
+
+- **`fabSize` didn't actually shrink the clickable FAB** — the button's positioned box always used `--blakfy-fab-target` (44px, the a11y touch-target floor); `fabSize` only shrank the visual dot drawn inside it via `::before`, leaving an invisible padding ring around the smaller shape that read as "floating"/misaligned next to a neighboring element (found on birinciogluticaret-com's WhatsApp button).
+
+### Added
+
+- **`fabWidth` / `fabHeight`** (`data-blakfy-fab-width` / `data-blakfy-fab-height`) — independent width and height for a genuinely rectangular (non-square) FAB. When set, both the clickable box and the visual fill move together, so there is no size mismatch.
+
 ## [cookie-next 2.3.3] — 2026-09-14
 
 ### Added
