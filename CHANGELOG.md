@@ -4,6 +4,12 @@ All notable changes follow [Keep a Changelog](https://keepachangelog.com/) and S
 
 ---
 
+## [2.4.6] — 2026-09-14
+
+### Changed
+
+- **FAB default background corrected to black (`#111827`), not gray** — 2.4.4 decoupled the FAB's background from `--blakfy-accent` (so it wouldn't silently change per site) but picked the wrong fixed color; the intended stable default is black with a white icon, per owner spec. `fabColor`/`fabIconColor` still override it per site.
+
 ## [2.4.5] — 2026-09-14
 
 ### Fixed
