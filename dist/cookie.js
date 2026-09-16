@@ -1,5 +1,5 @@
 /*!
- * Blakfy Cookie Widget v2.4.6
+ * Blakfy Cookie Widget v2.5.0
  * https://github.com/tariktunc/blakfy-cookie
  * MIT License | (c) Blakfy Studio
  *
@@ -126,7 +126,7 @@
   };
 
   // src/core/config.js
-  var RUNTIME_VERSION = "2.4.6" ? "2.4.6" : "2";
+  var RUNTIME_VERSION = "2.5.0" ? "2.5.0" : "2";
   var STATUS_BASE = "https://cdn.jsdelivr.net/npm/@blakfy/cookie@" + RUNTIME_VERSION;
   var DEFAULTS = {
     locale: "auto",

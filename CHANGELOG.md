@@ -4,6 +4,55 @@ All notable changes follow [Keep a Changelog](https://keepachangelog.com/) and S
 
 ---
 
+## [2.5.0] — 2026-09-17
+
+### Fixed
+
+- **Preferences modal fits the screen on mobile, and the action bar stays reachable.** The
+  modal sized itself with `100vh` and scrolled as a single box. On a phone `100vh` is the
+  large viewport — it excludes the retractable URL bar — so the card was taller than the
+  visible area: the title was cut off at the top in Chrome/iOS and the bottom was cut in
+  Safari. Because the whole card scrolled, the tab bar and the Save / Accept All buttons
+  scrolled away with the content; Accept All sat below the fold on first open, so a choice
+  could only be made after scrolling to find it.
+
+  On mobile the card is now a flex column that clips, with one scrolling box inside it
+  (`.blakfy-card-body`) holding the tab panels. The tab bar stays above it and the action
+  bar below it, both outside the scroll area. `position: sticky` was tried first and did
+  not hold in this structure, so the layout answers it instead.
+
+- **"Powered by Blakfy Studio" no longer prints across the buttons on mobile.** The badge
+  is absolutely positioned by default, so it is out of flow and nothing can push it; on a
+  short card it landed on Save Choices and Accept All. On mobile it now sits in flow
+  directly under the buttons, inside the fixed bottom block.
+
+- **Nested scroll regions removed on short viewports.** The service and cookie lists had
+  their own capped scroll area inside the scrolling card. On touch that trapped the
+  gesture — a drag starting over the inner list moved only that list, leaving the rest of
+  the panel unreachable. There is now one scroll surface.
+
+### Changed
+
+- Card height is capped with `100dvh` (`100vh` kept as the fallback), which tracks the
+  viewport the user can actually see.
+- On mobile the panel is 85% of the screen wide and **at most** 75% of it tall — a cap,
+  not a fixed height, so a tab with little content stays short.
+- On short viewports the action buttons stay on one row and the card padding tightens, so
+  the bar cannot grow tall enough to crowd out the content. The 44px touch-target floor
+  (WCAG 2.2 SC 2.5.8) is unchanged.
+- `overscroll-behavior: contain` — scrolling to the end of the list no longer chains to
+  the page behind the overlay. The bottom block reserves `safe-area-inset-bottom` so it
+  clears the home indicator on notched phones.
+- Save / Accept All moved from inside the Categories panel to card level, so they are
+  available from every tab: switching individual services off under "Services" and saving
+  from there no longer requires a trip back to "Categories".
+- **Desktop behaviour is unchanged** — the card still scrolls as one box and the badge
+  stays absolutely positioned. All of the above is scoped to the mobile media queries
+  (`max-width: 480px` or `max-height: 700px`); both are needed because portrait phones are
+  narrow but tall while landscape phones are wide but short.
+
+---
+
 ## [2.4.6] — 2026-09-14
 
 ### Changed
