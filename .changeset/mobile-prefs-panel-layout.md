@@ -18,8 +18,10 @@ Also in this change:
 
 - Card height is capped with `100dvh` (`100vh` kept as the fallback), which tracks the
   viewport the user can actually see.
-- On a phone the panel is 85% of the screen wide and 75% tall. Both a narrow-width and a
-  short-height query are used: portrait phones are narrow but tall, landscape phones are
+- On a phone the panel is 85% of the screen wide, and at most 75% of it tall. The height
+  is a cap rather than a fixed size: a tab with little content stays short, and only one
+  with more content than fits grows to 75% and scrolls from there. Both a narrow-width and
+  a short-height query are used: portrait phones are narrow but tall, landscape phones are
   wide but short, and a single query misses one of them.
 - The service and cookie lists no longer scroll independently on short viewports. Nested
   scroll regions trap touch gestures — a drag starting over the inner list moved only that

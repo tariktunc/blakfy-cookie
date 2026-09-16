@@ -177,14 +177,14 @@ const RULES = [
   // Both conditions are needed to mean "a phone": portrait phones are narrow but tall
   // (caught by max-width), landscape phones are wide but short (caught by max-height).
   // A single query would miss one of the two orientations.
-  // The height is a FIXED 75%, not a cap, so the panel is the same size whatever tab is
-  // open — the body scrolls inside it and the action bar never moves. max-width has to be
-  // restated because .blakfy-card's base rule pins it to 560px.
+  // The height is a CAP, not a fixed size: a panel with little content stays short, and
+  // only one with more content than fits grows to 75% and scrolls its body from there.
+  // max-width has to be restated because .blakfy-card's base rule pins it to 560px.
   // vh/vw first as the fallback, then the dynamic-viewport line for engines that have it:
   // on mobile the URL bar is the difference between "75% of the screen" and "75% of a
   // taller box than the screen", and only dvh measures what the user can actually see.
-  "@media (max-width:480px),(max-height:700px){.blakfy-overlay.modal .blakfy-card{width:85vw;max-width:85vw;height:75vh;max-height:75vh}}",
-  "@media (max-width:480px),(max-height:700px){.blakfy-overlay.modal .blakfy-card{width:85dvw;max-width:85dvw;height:75dvh;max-height:75dvh}}",
+  "@media (max-width:480px),(max-height:700px){.blakfy-overlay.modal .blakfy-card{width:85vw;max-width:85vw;height:auto;max-height:75vh}}",
+  "@media (max-width:480px),(max-height:700px){.blakfy-overlay.modal .blakfy-card{width:85dvw;max-width:85dvw;max-height:75dvh}}",
   // ── Themes: gray ──────────────────────────────────────────────────────────
   ".blakfy-card[data-blakfy-theme=gray]{background:#f0f0f0}",
   ".blakfy-card[data-blakfy-theme=gray] .blakfy-btn{background:#e4e4e4;border-color:#ccc}",
