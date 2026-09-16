@@ -16,37 +16,12 @@ const RULES = [
   //     card sized by it is taller than what the user can actually see and its bottom
   //     sits under the browser chrome. 100dvh tracks the visible area. The 100vh line
   //     stays first as the fallback for engines without dvh; the dvh line overrides it.
-  //   - The card does NOT scroll. It is a flex column that CLIPS, with .blakfy-card-body
-  //     as the single scrolling box and .blakfy-actions below it as a sibling. A footer
-  //     inside the scroller scrolls away with the content, which is the whole bug this
-  //     structure removes — see buildActions() in modal.js for why sticky was not enough.
-  ".blakfy-overlay.modal .blakfy-card{max-height:calc(100vh - 32px);display:flex;flex-direction:column;overflow:hidden}",
+  //
+  // DESKTOP behaviour, unchanged: the card itself scrolls as one box. It has the room to,
+  // and the fixed-header/fixed-footer split below is a MOBILE requirement only — on a
+  // desktop window the panel already fits. .blakfy-card-body is an inert wrapper here.
+  ".blakfy-overlay.modal .blakfy-card{max-height:calc(100vh - 32px);overflow-y:auto}",
   ".blakfy-overlay.modal .blakfy-card{max-height:calc(100dvh - 32px)}",
-  // min-height:0 is load-bearing. A flex item's automatic minimum size is its content
-  // size, so without it this box refuses to shrink below its content and overflows the
-  // card instead of scrolling — the classic reason an overflow:auto flex child does
-  // nothing. overscroll-behavior stops a scroll that hits the end from chaining to the
-  // page behind the overlay.
-  ".blakfy-overlay.modal .blakfy-card-body{flex:1 1 auto;min-height:0;overflow-y:auto;overscroll-behavior:contain}",
-  // Never shrink the bar to make room for content — content scrolls, the bar does not.
-  ".blakfy-overlay.modal .blakfy-actions{flex:0 0 auto;margin-top:16px}",
-  // The badge joins the fixed bottom block, directly under the buttons.
-  // It is absolutely positioned by default (inline style from buildBadge(), card
-  // bottom:8/right:12). Absolute means it is out of flow, so nothing can push it — when
-  // the card is short it lands ON the action buttons, which is exactly what it did on
-  // iOS: "Powered by Blakfy Studio" printed across Save Choices and Accept All.
-  // Overriding with !important is required, not stylistic: the defaults are inline, and
-  // the anti-tamper watcher in badge.js replaces any badge whose style attribute is
-  // mutated, so JS cannot be used to move it. It only guards display/visibility/opacity/
-  // pointer-events, never position, so this override does not fight it.
-  ".blakfy-overlay.modal .blakfy-badge{position:static !important;bottom:auto !important;right:auto !important;left:auto !important}",
-  ".blakfy-overlay.modal .blakfy-badge-slot{flex:0 0 auto;display:flex;justify-content:flex-end;margin-top:8px}",
-  "[dir=rtl] .blakfy-overlay.modal .blakfy-badge-slot{justify-content:flex-start}",
-  // The card's wide bottom padding existed only to reserve a strip for the absolute
-  // badge. In flow it reserves its own space, so the modal goes back to even padding.
-  ".blakfy-overlay.modal .blakfy-card{padding-bottom:16px}",
-  // Keeps the bottom block clear of the home indicator on notched phones.
-  ".blakfy-overlay.modal .blakfy-badge-slot{padding-bottom:env(safe-area-inset-bottom,0px)}",
   // Widget mode (transparent, no backdrop)
   ".blakfy-overlay.widget{position:fixed !important;inset:auto;background:transparent;padding:0;display:block !important;z-index:2147483646 !important;pointer-events:none}",
   ".blakfy-overlay.widget .blakfy-card{width:min(96vw,1100px);max-width:none;border-radius:8px;position:relative;pointer-events:auto;padding-bottom:40px;box-sizing:border-box}",
@@ -200,6 +175,29 @@ const RULES = [
   // taller box than the screen", and only dvh measures what the user can actually see.
   "@media (max-width:480px),(max-height:700px){.blakfy-overlay.modal .blakfy-card{width:85vw;max-width:85vw;height:auto;max-height:75vh}}",
   "@media (max-width:480px),(max-height:700px){.blakfy-overlay.modal .blakfy-card{width:85dvw;max-width:85dvw;max-height:75dvh}}",
+  // ── MOBILE ONLY: fixed header, scrolling middle, fixed footer ────────────────
+  // Everything below is scoped to the mobile queries on purpose. On desktop the panel
+  // already fits and the card scrolls as one box (see the modal rule near the top); the
+  // owner asked for this three-part split for mobile, and only mobile.
+  //
+  // The card stops scrolling and becomes a flex column that CLIPS. .blakfy-card-body is
+  // then the single scrolling box, with the tab bar above it and the action bar below it
+  // as siblings — neither can scroll away because neither is inside the scroller.
+  // min-height:0 is load-bearing: a flex item's automatic minimum size is its content
+  // size, so without it the body refuses to shrink and overflows the card instead of
+  // scrolling. That is the usual reason an overflow:auto flex child does nothing.
+  // overscroll-behavior stops a scroll that hits the end from chaining to the page behind.
+  "@media (max-width:480px),(max-height:700px){.blakfy-overlay.modal .blakfy-card{display:flex;flex-direction:column;overflow:hidden;padding-bottom:16px}.blakfy-overlay.modal .blakfy-card-body{flex:1 1 auto;min-height:0;overflow-y:auto;overscroll-behavior:contain}.blakfy-overlay.modal .blakfy-actions{flex:0 0 auto;margin-top:16px}}",
+  // The badge joins that fixed bottom block, directly under the buttons. By default it is
+  // absolutely positioned (inline style from buildBadge(), card bottom:8/right:12), which
+  // puts it out of flow so nothing can push it — on a short card it lands ON the buttons,
+  // which is exactly what iOS showed: "Powered by Blakfy Studio" printed across Save
+  // Choices and Accept All. !important is required rather than stylistic: the defaults are
+  // inline, and badge.js's anti-tamper watcher replaces any badge whose style attribute is
+  // mutated, so JS cannot move it. That watcher guards display/visibility/opacity/
+  // pointer-events only, never position, so this override does not fight it.
+  "@media (max-width:480px),(max-height:700px){.blakfy-overlay.modal .blakfy-badge{position:static !important;bottom:auto !important;right:auto !important;left:auto !important}.blakfy-overlay.modal .blakfy-badge-slot{flex:0 0 auto;display:flex;justify-content:flex-end;margin-top:8px;padding-bottom:env(safe-area-inset-bottom,0px)}}",
+  "@media (max-width:480px),(max-height:700px){[dir=rtl] .blakfy-overlay.modal .blakfy-badge-slot{justify-content:flex-start}}",
   // ── Themes: gray ──────────────────────────────────────────────────────────
   ".blakfy-card[data-blakfy-theme=gray]{background:#f0f0f0}",
   ".blakfy-card[data-blakfy-theme=gray] .blakfy-btn{background:#e4e4e4;border-color:#ccc}",
