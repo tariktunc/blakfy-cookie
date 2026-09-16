@@ -30,8 +30,23 @@ const RULES = [
   ".blakfy-overlay.modal .blakfy-card-body{flex:1 1 auto;min-height:0;overflow-y:auto;overscroll-behavior:contain}",
   // Never shrink the bar to make room for content — content scrolls, the bar does not.
   ".blakfy-overlay.modal .blakfy-actions{flex:0 0 auto;margin-top:16px}",
-  // Keeps the bar clear of the home indicator on notched phones.
-  ".blakfy-overlay.modal .blakfy-actions{padding-bottom:env(safe-area-inset-bottom,0px)}",
+  // The badge joins the fixed bottom block, directly under the buttons.
+  // It is absolutely positioned by default (inline style from buildBadge(), card
+  // bottom:8/right:12). Absolute means it is out of flow, so nothing can push it — when
+  // the card is short it lands ON the action buttons, which is exactly what it did on
+  // iOS: "Powered by Blakfy Studio" printed across Save Choices and Accept All.
+  // Overriding with !important is required, not stylistic: the defaults are inline, and
+  // the anti-tamper watcher in badge.js replaces any badge whose style attribute is
+  // mutated, so JS cannot be used to move it. It only guards display/visibility/opacity/
+  // pointer-events, never position, so this override does not fight it.
+  ".blakfy-overlay.modal .blakfy-badge{position:static !important;bottom:auto !important;right:auto !important;left:auto !important}",
+  ".blakfy-overlay.modal .blakfy-badge-slot{flex:0 0 auto;display:flex;justify-content:flex-end;margin-top:8px}",
+  "[dir=rtl] .blakfy-overlay.modal .blakfy-badge-slot{justify-content:flex-start}",
+  // The card's wide bottom padding existed only to reserve a strip for the absolute
+  // badge. In flow it reserves its own space, so the modal goes back to even padding.
+  ".blakfy-overlay.modal .blakfy-card{padding-bottom:16px}",
+  // Keeps the bottom block clear of the home indicator on notched phones.
+  ".blakfy-overlay.modal .blakfy-badge-slot{padding-bottom:env(safe-area-inset-bottom,0px)}",
   // Widget mode (transparent, no backdrop)
   ".blakfy-overlay.widget{position:fixed !important;inset:auto;background:transparent;padding:0;display:block !important;z-index:2147483646 !important;pointer-events:none}",
   ".blakfy-overlay.widget .blakfy-card{width:min(96vw,1100px);max-width:none;border-radius:8px;position:relative;pointer-events:auto;padding-bottom:40px;box-sizing:border-box}",
@@ -172,7 +187,7 @@ const RULES = [
   // content does, and since the card clips, what gets cut is the bottom — the action bar.
   // The bottom value stays larger than the top because the "Powered by Blakfy Studio"
   // badge sits in that strip (see the card base rule) and must not land under a button.
-  "@media (max-height:700px){.blakfy-service-list,.blakfy-cookie-list{max-height:none;overflow-y:visible}.blakfy-actions{flex-wrap:nowrap;margin-top:10px}.blakfy-btn{min-width:0;font-size:13px;padding:10px 8px}.blakfy-overlay.modal .blakfy-card{padding:16px 16px 28px}.blakfy-overlay.modal .blakfy-card h2{font-size:16px;margin-bottom:4px}}",
+  "@media (max-height:700px){.blakfy-service-list,.blakfy-cookie-list{max-height:none;overflow-y:visible}.blakfy-actions{flex-wrap:nowrap;margin-top:10px}.blakfy-btn{min-width:0;font-size:13px;padding:10px 8px}.blakfy-overlay.modal .blakfy-card{padding:16px}.blakfy-overlay.modal .blakfy-card h2{font-size:16px;margin-bottom:4px}}",
   // Mobile panel footprint — owner spec: 85% of the screen wide, 75% tall.
   // Both conditions are needed to mean "a phone": portrait phones are narrow but tall
   // (caught by max-width), landscape phones are wide but short (caught by max-height).
