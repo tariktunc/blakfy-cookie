@@ -1,5 +1,5 @@
 /*!
- * Blakfy Cookie Widget v2.4.5
+ * Blakfy Cookie Widget v2.4.6
  * https://github.com/tariktunc/blakfy-cookie
  * MIT License | (c) Blakfy Studio
  *
@@ -126,7 +126,7 @@
   };
 
   // src/core/config.js
-  var RUNTIME_VERSION = "2.4.5" ? "2.4.5" : "2";
+  var RUNTIME_VERSION = "2.4.6" ? "2.4.6" : "2";
   var STATUS_BASE = "https://cdn.jsdelivr.net/npm/@blakfy/cookie@" + RUNTIME_VERSION;
   var DEFAULTS = {
     locale: "auto",
@@ -3427,8 +3427,10 @@
     panel.appendChild(buildCatRow("marketing", t, false, !!current.marketing));
     panel.appendChild(buildCatRow("functional", t, false, !!current.functional));
     panel.appendChild(buildCatRow("recording", t, false, !!current.recording));
+    return panel;
+  };
+  var buildActions = (t, card, onSave, onAccept) => {
     const actions = el("div", { class: "blakfy-actions" });
-    actions.style.marginTop = "16px";
     const btnSave = el("button", { class: "blakfy-btn", "data-act": "save", text: t.save || "Save" });
     btnSave.addEventListener("click", () => {
       const prefs = {};
@@ -3450,8 +3452,7 @@
       if (onAccept) onAccept();
     });
     actions.appendChild(btnAccept);
-    panel.appendChild(actions);
-    return panel;
+    return actions;
   };
   var buildServiceCard = (presetKey, meta, t) => {
     const s = safeGet(t, "service", {});
@@ -3823,9 +3824,10 @@
         if (meta) enriched.push({ key, meta });
       }
     }
-    card.appendChild(buildCategoriesPanel(t, current, card, onSave, onAccept));
-    card.appendChild(buildServicesPanel(enriched, t));
-    card.appendChild(buildAboutPanel(t, version));
+    const body = el("div", { class: "blakfy-card-body" });
+    body.appendChild(buildCategoriesPanel(t, current, card, onSave, onAccept));
+    body.appendChild(buildServicesPanel(enriched, t));
+    body.appendChild(buildAboutPanel(t, version));
     if (isAutoPolicy(policyUrl)) {
       const policy = buildPolicyText({
         locale,
@@ -3843,13 +3845,15 @@
         );
       }
       tabBar.appendChild(makeTabBtn("policy", policy.strings.tabLabel, false));
-      card.appendChild(buildPolicyPanel(policy));
+      body.appendChild(buildPolicyPanel(policy));
     }
     if (cookiePanel) {
       const cookieTabLabel = safeGet(t, "tabs.cookies", "Cookies");
       tabBar.appendChild(makeTabBtn("cookies", cookieTabLabel, false));
-      card.appendChild(buildCookiesPanel(observedCookies, t, onDeleteCookie));
+      body.appendChild(buildCookiesPanel(observedCookies, t, onDeleteCookie));
     }
+    card.appendChild(body);
+    card.appendChild(buildActions(t, card, onSave, onAccept));
     card.appendChild(el("div", { class: "blakfy-badge-slot" }));
     initTabs(card, initialTab);
     return card;
@@ -3999,12 +4003,31 @@
     "/* Layout architecture is locked \u2014 only --blakfy-accent is overridable */",
     // Modal mode (centered, dimmed backdrop)
     ".blakfy-overlay.modal{position:fixed !important;inset:0;background:rgba(0,0,0,.4);z-index:2147483646 !important;display:flex !important;align-items:center;justify-content:center;padding:16px}",
-    // #57: on a short viewport (<500px tall) the card had no max-height/overflow, so it
-    // overflowed both above and below the visible area with no way to scroll to the
-    // header/close button or the accept/save actions — a dead end for anyone without a
-    // physical Escape key. Capping height to the overlay's own padded viewport and
-    // scrolling the card's own content keeps both ends reachable.
-    ".blakfy-overlay.modal .blakfy-card{max-height:calc(100vh - 32px);overflow-y:auto}",
+    // #57: on a short viewport the card had no height cap, so it overflowed above and below
+    // the visible area with no way to reach the header, the close button or the actions — a
+    // dead end for anyone without a physical Escape key. The cap below fixes that.
+    //
+    // Two things about the cap:
+    //   - 100vh is the LARGE viewport on mobile: it excludes the retractable URL bar, so a
+    //     card sized by it is taller than what the user can actually see and its bottom
+    //     sits under the browser chrome. 100dvh tracks the visible area. The 100vh line
+    //     stays first as the fallback for engines without dvh; the dvh line overrides it.
+    //   - The card does NOT scroll. It is a flex column that CLIPS, with .blakfy-card-body
+    //     as the single scrolling box and .blakfy-actions below it as a sibling. A footer
+    //     inside the scroller scrolls away with the content, which is the whole bug this
+    //     structure removes — see buildActions() in modal.js for why sticky was not enough.
+    ".blakfy-overlay.modal .blakfy-card{max-height:calc(100vh - 32px);display:flex;flex-direction:column;overflow:hidden}",
+    ".blakfy-overlay.modal .blakfy-card{max-height:calc(100dvh - 32px)}",
+    // min-height:0 is load-bearing. A flex item's automatic minimum size is its content
+    // size, so without it this box refuses to shrink below its content and overflows the
+    // card instead of scrolling — the classic reason an overflow:auto flex child does
+    // nothing. overscroll-behavior stops a scroll that hits the end from chaining to the
+    // page behind the overlay.
+    ".blakfy-overlay.modal .blakfy-card-body{flex:1 1 auto;min-height:0;overflow-y:auto;overscroll-behavior:contain}",
+    // Never shrink the bar to make room for content — content scrolls, the bar does not.
+    ".blakfy-overlay.modal .blakfy-actions{flex:0 0 auto;margin-top:16px}",
+    // Keeps the bar clear of the home indicator on notched phones.
+    ".blakfy-overlay.modal .blakfy-actions{padding-bottom:env(safe-area-inset-bottom,0px)}",
     // Widget mode (transparent, no backdrop)
     ".blakfy-overlay.widget{position:fixed !important;inset:auto;background:transparent;padding:0;display:block !important;z-index:2147483646 !important;pointer-events:none}",
     ".blakfy-overlay.widget .blakfy-card{width:min(96vw,1100px);max-width:none;border-radius:8px;position:relative;pointer-events:auto;padding-bottom:40px;box-sizing:border-box}",
@@ -4123,7 +4146,41 @@
     ".blakfy-about-panel p{font-size:13px;color:#555;margin:0 0 10px;line-height:1.6}",
     ".blakfy-about-panel a{font-size:13px;color:var(--blakfy-accent,#6b7280);text-decoration:underline}",
     ".blakfy-about-meta{font-size:12px;color:#aaa;margin-top:12px}",
-    "@media (max-width:480px){.blakfy-tab-btn{font-size:12px;padding:8px 6px}.blakfy-service-list{max-height:260px}}",
+    // Width-based sizing only — what a narrow screen changes is type and padding, not the
+    // scroll model. The scroll model is a question about HEIGHT, handled in the rule below.
+    "@media (max-width:480px){.blakfy-tab-btn{font-size:12px;padding:8px 6px}}",
+    // Nested scrolling is a function of available HEIGHT, not width. A phone held sideways
+    // is wide and short, and a max-width query misses it entirely while it is exactly the
+    // case that runs out of room. Whenever the viewport is short, the card is already a
+    // scroll container (see the modal rule above), and a capped service/cookie list nests a
+    // second scroll region inside it. On touch that traps the gesture: a drag started over
+    // the inner list scrolls the list and never the card, so the rest of the panel is
+    // unreachable. Releasing the caps hands all scrolling to the card — one scroll surface.
+    // The threshold is px on purpose: viewport-relative units are not valid lengths in a
+    // media feature, and `height` here already reports the viewport the layout is using.
+    // The same height budget governs the sticky bar's own size. At the default min-width
+    // the buttons wrap onto two or three 44px rows, and a bar that tall eats most of a
+    // short card — past a point it is taller than the scrollport, which sticky cannot pin
+    // at all, so it starts sliding again. One row keeps the bar near 64px. min-height stays
+    // 44px: that is the touch-target floor (WCAG 2.2 SC 2.5.8), not a stylistic number.
+    // Padding is part of the height budget too. The card's 24px top / 40px bottom are sized
+    // for a desktop dialog; on a short screen they can consume more of the card than the
+    // content does, and since the card clips, what gets cut is the bottom — the action bar.
+    // The bottom value stays larger than the top because the "Powered by Blakfy Studio"
+    // badge sits in that strip (see the card base rule) and must not land under a button.
+    "@media (max-height:700px){.blakfy-service-list,.blakfy-cookie-list{max-height:none;overflow-y:visible}.blakfy-actions{flex-wrap:nowrap;margin-top:10px}.blakfy-btn{min-width:0;font-size:13px;padding:10px 8px}.blakfy-overlay.modal .blakfy-card{padding:16px 16px 28px}.blakfy-overlay.modal .blakfy-card h2{font-size:16px;margin-bottom:4px}}",
+    // Mobile panel footprint — owner spec: 85% of the screen wide, 75% tall.
+    // Both conditions are needed to mean "a phone": portrait phones are narrow but tall
+    // (caught by max-width), landscape phones are wide but short (caught by max-height).
+    // A single query would miss one of the two orientations.
+    // The height is a FIXED 75%, not a cap, so the panel is the same size whatever tab is
+    // open — the body scrolls inside it and the action bar never moves. max-width has to be
+    // restated because .blakfy-card's base rule pins it to 560px.
+    // vh/vw first as the fallback, then the dynamic-viewport line for engines that have it:
+    // on mobile the URL bar is the difference between "75% of the screen" and "75% of a
+    // taller box than the screen", and only dvh measures what the user can actually see.
+    "@media (max-width:480px),(max-height:700px){.blakfy-overlay.modal .blakfy-card{width:85vw;max-width:85vw;height:75vh;max-height:75vh}}",
+    "@media (max-width:480px),(max-height:700px){.blakfy-overlay.modal .blakfy-card{width:85dvw;max-width:85dvw;height:75dvh;max-height:75dvh}}",
     // ── Themes: gray ──────────────────────────────────────────────────────────
     ".blakfy-card[data-blakfy-theme=gray]{background:#f0f0f0}",
     ".blakfy-card[data-blakfy-theme=gray] .blakfy-btn{background:#e4e4e4;border-color:#ccc}",

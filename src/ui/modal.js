@@ -80,8 +80,22 @@ const buildCategoriesPanel = (t, current, card, onSave, onAccept) => {
   panel.appendChild(buildCatRow("functional", t, false, !!current.functional));
   panel.appendChild(buildCatRow("recording", t, false, !!current.recording));
 
+  return panel;
+};
+
+// ── Action bar ────────────────────────────────────────────────────────────────
+// Built separately from the categories panel and mounted at CARD level, outside the
+// scrolling body. Two reasons, in order of weight:
+//   1. A footer inside the scroll container scrolls away with the content. On a short
+//      screen that means scrolling back down to commit a choice. position:sticky was
+//      tried first and did not hold here, so the layout answers it instead: the card is
+//      a flex column, the body is the only scrolling box, and this bar is its sibling —
+//      it cannot scroll out of view because it was never in the scroll area.
+//   2. Save/Accept now reach every tab. Turning individual services off under "Services"
+//      and saving from there no longer requires a trip back to "Categories".
+// It still reads the switches out of the card, so it does not care which tab is showing.
+const buildActions = (t, card, onSave, onAccept) => {
   const actions = el("div", { class: "blakfy-actions" });
-  actions.style.marginTop = "16px";
 
   const btnSave = el("button", { class: "blakfy-btn", "data-act": "save", text: t.save || "Save" });
   btnSave.addEventListener("click", () => {
@@ -106,8 +120,7 @@ const buildCategoriesPanel = (t, current, card, onSave, onAccept) => {
   });
   actions.appendChild(btnAccept);
 
-  panel.appendChild(actions);
-  return panel;
+  return actions;
 };
 
 // ── Services tab ──────────────────────────────────────────────────────────────
@@ -578,10 +591,15 @@ export const createModal = ({
     }
   }
 
+  // Scrolling body. Every tab panel goes in here and nowhere else — this is the ONLY
+  // box in the modal that scrolls, which is what keeps the action bar (appended to the
+  // card further down, as a sibling of this element) permanently on screen.
+  const body = el("div", { class: "blakfy-card-body" });
+
   // Panels
-  card.appendChild(buildCategoriesPanel(t, current, card, onSave, onAccept));
-  card.appendChild(buildServicesPanel(enriched, t));
-  card.appendChild(buildAboutPanel(t, version));
+  body.appendChild(buildCategoriesPanel(t, current, card, onSave, onAccept));
+  body.appendChild(buildServicesPanel(enriched, t));
+  body.appendChild(buildAboutPanel(t, version));
 
   // #49: Policy tab — only when no real off-site policy page is configured. The
   // generated notice needs somewhere to live that is "reachable before consent,
@@ -609,15 +627,20 @@ export const createModal = ({
       );
     }
     tabBar.appendChild(makeTabBtn("policy", policy.strings.tabLabel, false));
-    card.appendChild(buildPolicyPanel(policy));
+    body.appendChild(buildPolicyPanel(policy));
   }
 
   // #39: Cookies tab — off by default, opt-in via data-blakfy-cookie-panel="true".
   if (cookiePanel) {
     const cookieTabLabel = safeGet(t, "tabs.cookies", "Cookies");
     tabBar.appendChild(makeTabBtn("cookies", cookieTabLabel, false));
-    card.appendChild(buildCookiesPanel(observedCookies, t, onDeleteCookie));
+    body.appendChild(buildCookiesPanel(observedCookies, t, onDeleteCookie));
   }
+
+  // Order matters: body (scrolls) first, then the action bar as its sibling. Appending
+  // the bar to the card rather than into the body is the whole point — see buildActions.
+  card.appendChild(body);
+  card.appendChild(buildActions(t, card, onSave, onAccept));
 
   // Badge slot
   card.appendChild(el("div", { class: "blakfy-badge-slot" }));
