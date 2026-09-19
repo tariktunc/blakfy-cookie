@@ -4,6 +4,12 @@ All notable changes follow [Keep a Changelog](https://keepachangelog.com/) and S
 
 ---
 
+## [Unreleased]
+
+### Fixed
+
+- Run size limits directly on pushes to main; reserve the size comparison/comment action for pull requests.
+
 ## [2.5.0] — 2026-09-17
 
 ### Fixed
