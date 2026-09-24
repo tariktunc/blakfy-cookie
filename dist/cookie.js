@@ -1,5 +1,5 @@
 /*!
- * Blakfy Cookie Widget v2.5.0
+ * Blakfy Cookie Widget v2.6.0
  * https://github.com/tariktunc/blakfy-cookie
  * MIT License | (c) Blakfy Studio
  *
@@ -126,7 +126,7 @@
   };
 
   // src/core/config.js
-  var RUNTIME_VERSION = "2.5.0" ? "2.5.0" : "2";
+  var RUNTIME_VERSION = "2.6.0" ? "2.6.0" : "2";
   var STATUS_BASE = "https://cdn.jsdelivr.net/npm/@blakfy/cookie@" + RUNTIME_VERSION;
   var DEFAULTS = {
     locale: "auto",
@@ -151,7 +151,10 @@
     operatorAddress: null,
     position: "bottom-center",
     margin: "16",
-    theme: "auto",
+    // Default flipped to "light" (owner decision 2026-09-23): the reference site look
+    // is a white banner/modal with black text regardless of OS color-scheme. A site
+    // that wants the old OS-following behaviour sets data-blakfy-theme="auto" itself.
+    theme: "light",
     // #56: owner decision — default look is neutral, not the old brand-green. Site
     // owners who want a brand color still set data-blakfy-accent; this only changes
     // what renders when that attribute is absent. #6b7280 (neutral gray) rather than
@@ -175,13 +178,14 @@
     // www.example.com are treated as two different sites for consent purposes.
     cookieDomain: null,
     // #34: reopen FAB — "off" disables it (a site wiring its own footer link
-    // instead). Default flipped to "right" 2026-09-14: the Blakfy accessibility
-    // widget's FAB is bottom-left on EVERY site (CLAUDE.md Core Decision #4,
-    // non-negotiable) and this cookie FAB used to default to the same corner,
-    // sitting directly on top of it. "left" is still available via
-    // data-blakfy-fab="left" for sites where the right corner is genuinely
-    // occupied (e.g. a Wix chat/map widget) and the accessibility widget is off.
-    fabSide: "right",
+    // instead). Default flipped back to "left" (owner decision 2026-09-23): the
+    // Blakfy accessibility widget's FAB is bottom-left on EVERY site (CLAUDE.md
+    // Core Decision #4, non-negotiable). Rather than moving this FAB to the right
+    // corner, it now shares the same left corner but stacks ABOVE the a11y FAB via
+    // --blakfy-fab-offset-y:116px (see src/ui/styles.js), matching the reference
+    // stacking order: cookie FAB above, accessibility FAB below. "right" is still
+    // available via data-blakfy-fab="right" for sites that genuinely need it.
+    fabSide: "left",
     fabOffset: null,
     fabSize: null,
     fabWidth: null,
@@ -3186,10 +3190,10 @@
     return btn;
   };
   var resolveFabConfig = (config) => {
-    const side = config && config.fabSide ? String(config.fabSide) : "right";
+    const side = config && config.fabSide ? String(config.fabSide) : "left";
     if (side === "off") return null;
     return {
-      side: side === "left" ? "left" : "right",
+      side: side === "right" ? "right" : "left",
       offset: config && config.fabOffset != null ? config.fabOffset : null,
       size: config && config.fabSize != null ? config.fabSize : null,
       // #63b: independent width/height -> a real rectangle, not just a smaller square.
@@ -4039,32 +4043,32 @@
     // Accept All) sits directly under it. This used to be reserved only in widget mode
     // (".blakfy-overlay.widget .blakfy-card"); the preferences MODAL had no such
     // reservation, so the badge overlapped its Accept/Save buttons every time.
-    ".blakfy-card{box-sizing:border-box;background:#fff;color:#222;border-radius:16px;max-width:560px;width:100%;padding:24px 24px 40px;border:3px solid var(--blakfy-accent,#6b7280);font-family:system-ui,-apple-system,sans-serif;line-height:1.5;position:relative}",
+    ".blakfy-card{box-sizing:border-box;background:#fff;color:#0a0a0a;border-radius:16px;max-width:560px;width:100%;padding:24px 24px 40px;border:3px solid var(--blakfy-accent,#6b7280);font-family:system-ui,-apple-system,sans-serif;line-height:1.5;position:relative}",
     ".blakfy-card[dir=rtl]{text-align:right}",
     ".blakfy-card h2{margin:0 0 8px;font-size:18px;font-weight:600}",
-    ".blakfy-card p{margin:0 0 16px;font-size:14px;color:#444}",
+    ".blakfy-card p{margin:0 0 16px;font-size:14px;color:#0a0a0a}",
     ".blakfy-card a{color:var(--blakfy-accent,#6b7280);text-decoration:underline}",
     // Actions
     ".blakfy-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}",
     // Buttons (3px radius per spec)
-    ".blakfy-btn{flex:1;min-width:120px;min-height:44px;padding:12px 16px;border:1px solid #ddd;border-radius:3px;background:#fff;color:#222;font-size:14px;font-weight:500;cursor:pointer;transition:transform .1s,background .15s}",
+    ".blakfy-btn{flex:1;min-width:120px;min-height:44px;padding:12px 16px;border:1px solid #ddd;border-radius:3px;background:#fff;color:#0a0a0a;font-size:14px;font-weight:500;cursor:pointer;transition:transform .1s,background .15s}",
     ".blakfy-btn:hover{transform:translateY(-1px)}",
     ".blakfy-btn-primary{background:var(--blakfy-accent,#6b7280);color:#fff;border-color:transparent}",
     ".blakfy-cat{padding:12px 0;border-top:1px solid #eee;display:flex;align-items:flex-start;gap:12px}",
     ".blakfy-cat:first-of-type{border-top:none}",
     ".blakfy-cat-text{flex:1}",
     ".blakfy-cat-text strong{display:block;font-size:14px;margin-bottom:2px}",
-    ".blakfy-cat-text span{font-size:13px;color:#666}",
+    ".blakfy-cat-text span{font-size:13px;color:#0a0a0a}",
     // Switches (pill-shaped — UX standard)
     ".blakfy-switch{flex-shrink:0;width:44px;height:24px;border-radius:999px;background:#ccc;position:relative;cursor:pointer;border:none;padding:0}",
     ".blakfy-switch[aria-checked=true]{background:var(--blakfy-accent,#6b7280)}",
     ".blakfy-switch::after{content:'';position:absolute;top:2px;left:2px;width:20px;height:20px;border-radius:50%;background:#fff;transition:transform .2s}",
     ".blakfy-switch[aria-checked=true]::after{transform:translateX(20px)}",
     ".blakfy-switch:disabled{opacity:.6;cursor:not-allowed}",
-    ".blakfy-close{position:absolute;top:12px;right:12px;background:none;border:none;font-size:20px;cursor:pointer;color:#666;width:32px;height:32px;border-radius:50%}",
+    ".blakfy-close{position:absolute;top:12px;right:12px;background:none;border:none;font-size:20px;cursor:pointer;color:#0a0a0a;width:32px;height:32px;border-radius:50%}",
     ".blakfy-close:hover{background:#f3f3f3}",
     "[dir=rtl] .blakfy-close{right:auto;left:12px}",
-    ".blakfy-badge{position:absolute;bottom:8px;right:12px;font-size:11px;opacity:0.6;transition:opacity 0.2s;display:flex !important;pointer-events:auto !important;align-items:center;gap:4px;color:#666;text-decoration:none}",
+    ".blakfy-badge{position:absolute;bottom:8px;right:12px;font-size:11px;opacity:0.6;transition:opacity 0.2s;display:flex !important;pointer-events:auto !important;align-items:center;gap:4px;color:#0a0a0a;text-decoration:none}",
     ".blakfy-badge:hover{opacity:1}",
     "[dir=rtl] .blakfy-badge{right:auto;left:12px}",
     ".blakfy-status{position:fixed;bottom:0;left:0;right:0;z-index:2147483645;display:flex;align-items:center;gap:12px;padding:10px 20px;font-family:system-ui,-apple-system,sans-serif;font-size:13px;line-height:1.5}",
@@ -4078,8 +4082,8 @@
     "@media (max-width:480px){.blakfy-overlay.widget .blakfy-card{width:100%;max-width:calc(100vw - 2 * var(--blakfy-margin,16px))}}",
     // Tab bar
     ".blakfy-tabs{display:flex;border-bottom:2px solid #eee;margin:12px 0 16px;gap:0}",
-    ".blakfy-tab-btn{flex:1;background:none;border:none;border-bottom:2px solid transparent;margin-bottom:-2px;padding:8px 10px;font-size:13px;font-weight:500;color:#666;cursor:pointer;transition:color .15s,border-color .15s;white-space:nowrap;font-family:inherit}",
-    ".blakfy-tab-btn:hover{color:#222}",
+    ".blakfy-tab-btn{flex:1;background:none;border:none;border-bottom:2px solid transparent;margin-bottom:-2px;padding:8px 10px;font-size:13px;font-weight:500;color:#0a0a0a;cursor:pointer;transition:color .15s,border-color .15s;white-space:nowrap;font-family:inherit}",
+    ".blakfy-tab-btn:hover{color:#0a0a0a}",
     ".blakfy-tab-btn--active{color:var(--blakfy-accent,#6b7280);border-bottom-color:var(--blakfy-accent,#6b7280);font-weight:600}",
     // Tab panels
     ".blakfy-tab-panel[aria-hidden=true]{display:none}",
@@ -4108,34 +4112,34 @@
     // on the header then centers that oversized line-box, not the text itself, so the
     // glyphs (sitting low within their line-box, per normal font metrics) render
     // visibly below-center inside the header row.
-    ".blakfy-service-name{flex:1;font-size:13px;font-weight:600;color:#222;line-height:1}",
-    ".blakfy-service-cat{font-size:11px;padding:2px 8px;border-radius:999px;background:#eee;color:#555;text-transform:capitalize;line-height:1}",
-    ".blakfy-service-toggle{font-size:11px;color:#aaa;line-height:1}",
+    ".blakfy-service-name{flex:1;font-size:13px;font-weight:600;color:#0a0a0a;line-height:1}",
+    ".blakfy-service-cat{font-size:11px;padding:2px 8px;border-radius:999px;background:#eee;color:#0a0a0a;text-transform:capitalize;line-height:1}",
+    ".blakfy-service-toggle{font-size:11px;color:#0a0a0a;line-height:1}",
     ".blakfy-service-body[aria-hidden=true]{display:none}",
     ".blakfy-service-body[aria-hidden=false]{display:block;padding:12px;border-top:1px solid #eee}",
     ".blakfy-service-dl{margin:0 0 10px;display:grid;grid-template-columns:auto 1fr;gap:4px 12px}",
-    ".blakfy-service-dt{font-size:11px;font-weight:600;color:#888;text-transform:uppercase;letter-spacing:.4px;white-space:nowrap}",
-    ".blakfy-service-dd{margin:0;font-size:12px;color:#444;word-break:break-word}",
+    ".blakfy-service-dt{font-size:11px;font-weight:600;color:#0a0a0a;text-transform:uppercase;letter-spacing:.4px;white-space:nowrap}",
+    ".blakfy-service-dd{margin:0;font-size:12px;color:#0a0a0a;word-break:break-word}",
     ".blakfy-service-links{display:flex;gap:12px;margin-top:8px;flex-wrap:wrap}",
     ".blakfy-service-links a{font-size:12px;color:var(--blakfy-accent,#6b7280);text-decoration:underline}",
-    ".blakfy-svc-empty{font-size:13px;color:#888;padding:16px 0}",
+    ".blakfy-svc-empty{font-size:13px;color:#0a0a0a;padding:16px 0}",
     // Cookie transparency panel (#39)
-    ".blakfy-cookie-caveat{font-size:11px;color:#888;line-height:1.5;margin:0 0 12px;padding:8px 10px;background:#f7f7f7;border-radius:6px}",
+    ".blakfy-cookie-caveat{font-size:11px;color:#0a0a0a;line-height:1.5;margin:0 0 12px;padding:8px 10px;background:#f7f7f7;border-radius:6px}",
     ".blakfy-cookie-list{display:flex;flex-direction:column;gap:6px;max-height:360px;overflow-y:auto;padding-right:2px}",
     ".blakfy-cookie-row{display:flex;align-items:center;gap:8px;padding:8px 10px;border:1px solid #eee;border-radius:6px}",
     ".blakfy-cookie-info{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}",
-    ".blakfy-cookie-name{font-size:12px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;color:#222;word-break:break-all}",
-    ".blakfy-cookie-meta{font-size:11px;color:#888}",
-    ".blakfy-cookie-unrecognised{color:#b45309}",
-    ".blakfy-cookie-essential{font-size:11px;color:#888;white-space:nowrap}",
+    ".blakfy-cookie-name{font-size:12px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;color:#0a0a0a;word-break:break-all}",
+    ".blakfy-cookie-meta{font-size:11px;color:#0a0a0a}",
+    ".blakfy-cookie-unrecognised{color:#0a0a0a}",
+    ".blakfy-cookie-essential{font-size:11px;color:#0a0a0a;white-space:nowrap}",
     ".blakfy-cookie-delete{font-size:11px;padding:4px 10px;white-space:nowrap}",
     // About panel
     ".blakfy-about-panel{padding:4px 0}",
     ".blakfy-about-brand{display:flex;align-items:center;gap:8px;margin-bottom:14px}",
-    ".blakfy-about-brand strong{font-size:15px;color:#222}",
-    ".blakfy-about-panel p{font-size:13px;color:#555;margin:0 0 10px;line-height:1.6}",
+    ".blakfy-about-brand strong{font-size:15px;color:#0a0a0a}",
+    ".blakfy-about-panel p{font-size:13px;color:#0a0a0a;margin:0 0 10px;line-height:1.6}",
     ".blakfy-about-panel a{font-size:13px;color:var(--blakfy-accent,#6b7280);text-decoration:underline}",
-    ".blakfy-about-meta{font-size:12px;color:#aaa;margin-top:12px}",
+    ".blakfy-about-meta{font-size:12px;color:#0a0a0a;margin-top:12px}",
     // Width-based sizing only — what a narrow screen changes is type and padding, not the
     // scroll model. The scroll model is a question about HEIGHT, handled in the rule below.
     "@media (max-width:480px){.blakfy-tab-btn{font-size:12px;padding:8px 6px}}",
@@ -4255,7 +4259,7 @@
     // a site set an accent color for the banner. Default is a fixed black with a
     // white icon glyph; a site that wants a matching FAB explicitly passes
     // fabColor/fabIconColor.
-    ":host,:root{--blakfy-fab-side:right;--blakfy-fab-offset-x:20px;--blakfy-fab-offset-y:20px;--blakfy-fab-z:2147483640;--blakfy-fab-size:40px;--blakfy-fab-target:44px;--blakfy-fab-target-w:var(--blakfy-fab-target);--blakfy-fab-target-h:var(--blakfy-fab-target);--blakfy-fab-size-w:var(--blakfy-fab-size);--blakfy-fab-size-h:var(--blakfy-fab-size);--blakfy-fab-icon-size:20px;--blakfy-fab-bg:#111827;--blakfy-fab-color:#fff;--blakfy-fab-radius:50%;--blakfy-fab-shadow:0 2px 8px rgb(0 0 0 / 0.18);--blakfy-fab-opacity:0.55;--blakfy-fab-opacity-hover:1}",
+    ":host,:root{--blakfy-fab-side:left;--blakfy-fab-offset-x:16px;--blakfy-fab-offset-y:116px;--blakfy-fab-z:2147483640;--blakfy-fab-size:40px;--blakfy-fab-target:44px;--blakfy-fab-target-w:var(--blakfy-fab-target);--blakfy-fab-target-h:var(--blakfy-fab-target);--blakfy-fab-size-w:var(--blakfy-fab-size);--blakfy-fab-size-h:var(--blakfy-fab-size);--blakfy-fab-icon-size:20px;--blakfy-fab-bg:#0a0a0a;--blakfy-fab-color:#fff;--blakfy-fab-radius:50%;--blakfy-fab-shadow:0 1px 3px rgba(0, 0, 0, 0.03);--blakfy-fab-opacity:1;--blakfy-fab-opacity-hover:1}",
     ".blakfy-fab{position:fixed;z-index:var(--blakfy-fab-z);width:var(--blakfy-fab-target-w);height:var(--blakfy-fab-target-h);display:flex;align-items:center;justify-content:center;padding:0;border:none;cursor:pointer;background:transparent;bottom:calc(var(--blakfy-fab-offset-y) + env(safe-area-inset-bottom,0px))}",
     ".blakfy-fab::before{content:'';position:absolute;inset:0;margin:auto;width:var(--blakfy-fab-size-w);height:var(--blakfy-fab-size-h);border-radius:var(--blakfy-fab-radius);background:var(--blakfy-fab-bg);box-shadow:var(--blakfy-fab-shadow);opacity:var(--blakfy-fab-opacity);transition:opacity .15s}",
     ".blakfy-fab:hover::before,.blakfy-fab:focus-visible::before{opacity:var(--blakfy-fab-opacity-hover)}",
@@ -4266,7 +4270,12 @@
     "[dir=rtl] .blakfy-fab--left{left:auto;right:calc(var(--blakfy-fab-offset-x) + env(safe-area-inset-right,0px))}",
     "[dir=rtl] .blakfy-fab--right{right:auto;left:calc(var(--blakfy-fab-offset-x) + env(safe-area-inset-left,0px))}",
     "@media (prefers-reduced-motion:reduce){.blakfy-fab::before{transition:none}}",
-    "@media (max-width:640px){:root{--blakfy-fab-offset-x:12px;--blakfy-fab-offset-y:12px;--blakfy-fab-size:36px}}"
+    // Mobile override MUST also target :host, not :root alone (found 2026-09-24, same
+    // #35 shadow-scoping rule as the base block above) -- inside a shadow-scoped
+    // stylesheet :root never matches anything, so a :root-only media rule here is
+    // dead code and the widget silently keeps its >=758px offset-x on every width.
+    // Boundary is <758px per spec.md, i.e. max-width:757px.
+    "@media (max-width:757px){:host,:root{--blakfy-fab-offset-x:12px;--blakfy-fab-offset-y:116px;--blakfy-fab-size:36px}}"
   ];
   var injectStyles = (root2) => {
     const target = root2 || (typeof document !== "undefined" ? document.head : null);

@@ -4,6 +4,18 @@ All notable changes follow [Keep a Changelog](https://keepachangelog.com/) and S
 
 ---
 
+## [2.6.0] — 2026-09-24
+
+### Changed
+
+- **FAB default placement moved to bottom-left, stacked above the accessibility-widget
+  FAB.** Offset 16px (12px under the 758px breakpoint) from the edges, 116px from the
+  bottom so it clears the a11y FAB. The button is a dark, round FAB with a 3% black
+  shadow; theme is light with black (`#0a0a0a`) text everywhere in the panel.
+- Fixed a `:host` sizing bug that broke the mobile offset calculation for the FAB.
+
+---
+
 ## [2.5.0] — 2026-09-17
 
 ### Fixed

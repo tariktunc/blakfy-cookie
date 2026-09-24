@@ -59,12 +59,12 @@ export const createFab = (opts) => {
  * "off" disables the control entirely (a site wiring its own footer link).
  */
 export const resolveFabConfig = (config) => {
-  // Default "right" (2026-09-14) — the accessibility widget's FAB owns
-  // bottom-left on every site, so this control must not default there too.
-  const side = config && config.fabSide ? String(config.fabSide) : "right";
+  // Default "left" (owner decision 2026-09-23) — shares the accessibility
+  // widget's bottom-left corner, stacked above it via --blakfy-fab-offset-y.
+  const side = config && config.fabSide ? String(config.fabSide) : "left";
   if (side === "off") return null;
   return {
-    side: side === "left" ? "left" : "right",
+    side: side === "right" ? "right" : "left",
     offset: config && config.fabOffset != null ? config.fabOffset : null,
     size: config && config.fabSize != null ? config.fabSize : null,
     // #63b: independent width/height -> a real rectangle, not just a smaller square.

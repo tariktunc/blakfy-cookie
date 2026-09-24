@@ -41,7 +41,10 @@ export const DEFAULTS = {
   operatorAddress: null,
   position: "bottom-center",
   margin: "16",
-  theme: "auto",
+  // Default flipped to "light" (owner decision 2026-09-23): the reference site look
+  // is a white banner/modal with black text regardless of OS color-scheme. A site
+  // that wants the old OS-following behaviour sets data-blakfy-theme="auto" itself.
+  theme: "light",
   // #56: owner decision — default look is neutral, not the old brand-green. Site
   // owners who want a brand color still set data-blakfy-accent; this only changes
   // what renders when that attribute is absent. #6b7280 (neutral gray) rather than
@@ -65,13 +68,14 @@ export const DEFAULTS = {
   // www.example.com are treated as two different sites for consent purposes.
   cookieDomain: null,
   // #34: reopen FAB — "off" disables it (a site wiring its own footer link
-  // instead). Default flipped to "right" 2026-09-14: the Blakfy accessibility
-  // widget's FAB is bottom-left on EVERY site (CLAUDE.md Core Decision #4,
-  // non-negotiable) and this cookie FAB used to default to the same corner,
-  // sitting directly on top of it. "left" is still available via
-  // data-blakfy-fab="left" for sites where the right corner is genuinely
-  // occupied (e.g. a Wix chat/map widget) and the accessibility widget is off.
-  fabSide: "right",
+  // instead). Default flipped back to "left" (owner decision 2026-09-23): the
+  // Blakfy accessibility widget's FAB is bottom-left on EVERY site (CLAUDE.md
+  // Core Decision #4, non-negotiable). Rather than moving this FAB to the right
+  // corner, it now shares the same left corner but stacks ABOVE the a11y FAB via
+  // --blakfy-fab-offset-y:116px (see src/ui/styles.js), matching the reference
+  // stacking order: cookie FAB above, accessibility FAB below. "right" is still
+  // available via data-blakfy-fab="right" for sites that genuinely need it.
+  fabSide: "left",
   fabOffset: null,
   fabSize: null,
   fabWidth: null,

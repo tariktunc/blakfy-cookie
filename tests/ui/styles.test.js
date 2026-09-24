@@ -37,7 +37,7 @@ describe("injectStyles — light theme CSS (#23)", () => {
     const baseRule = css.match(/(?:^|\})(\.blakfy-card\{[^}]*\})/);
     expect(baseRule).not.toBeNull();
     expect(baseRule[1]).toMatch(/background:#fff/);
-    expect(baseRule[1]).toMatch(/color:#222/);
+    expect(baseRule[1]).toMatch(/color:#0a0a0a/);
   });
 
   it("does NOT gate the base card rule behind [data-blakfy-theme=light]", () => {
@@ -51,5 +51,19 @@ describe("injectStyles — light theme CSS (#23)", () => {
     const css = getInjectedCss();
     expect(css).toMatch(/\[data-blakfy-theme=dark\]\{background:#1a1a1a/);
     expect(css).toMatch(/\[data-blakfy-theme=gray\]\{background:#f0f0f0/);
+  });
+
+  it("#35b (2026-09-24): the <758px FAB offset override targets :host, not :root alone", () => {
+    // :root never matches inside a shadow-scoped stylesheet (#35) -- a media rule
+    // written as "@media(...){:root{--blakfy-fab-offset-x:12px}}" is dead code for
+    // every site that mounts the widget in shadow DOM (i.e. every real install).
+    // This must fail against that old code and pass only once :host is included.
+    injectStyles();
+    const css = getInjectedCss();
+    const mobileRule = css.match(/@media \(max-width:757px\)\{([^}]*\{[^}]*\})\}/);
+    expect(mobileRule, "mobile FAB offset media rule must exist").not.toBeNull();
+    const [selector] = mobileRule[1].split("{");
+    expect(selector.split(",")).toEqual(expect.arrayContaining([":host"]));
+    expect(mobileRule[1]).toMatch(/--blakfy-fab-offset-x:12px/);
   });
 });
