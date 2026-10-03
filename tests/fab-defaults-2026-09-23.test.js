@@ -58,7 +58,7 @@ describe("rendered FAB defaults from the built dist (spec.md criterion 3)", () =
 
   it("defines the base (>=758px) offset-x as 16px and offset-y as 62px", () => {
     expect(cssText).toMatch(/--blakfy-fab-offset-x:\s*16px/);
-    expect(cssText).toMatch(/--blakfy-fab-offset-y:\s*116px/);
+    expect(cssText).toMatch(/--blakfy-fab-offset-y:\s*62px/);
   });
 
   it("keeps offset-x at 16px and offset-y at 62px below 758px, via a media query whose boundary keeps 758px wide and 757px narrow", () => {
@@ -90,8 +90,8 @@ describe("rendered FAB defaults from the built dist (spec.md criterion 3)", () =
       mediaBody,
       "the narrowed rule must target a selector that matches inside a shadow root (:host)"
     ).toMatch(/:host/);
-    expect(mediaBody).toMatch(/--blakfy-fab-offset-x:\s*12px/);
-    expect(mediaBody).toMatch(/--blakfy-fab-offset-y:\s*116px/);
+    expect(mediaBody).toMatch(/--blakfy-fab-offset-x:\s*16px/);
+    expect(mediaBody).toMatch(/--blakfy-fab-offset-y:\s*62px/);
   });
 
   it("defines the FAB paint tokens: shadow, bg, color, radius, opacity", () => {
