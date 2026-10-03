@@ -72,7 +72,7 @@ export const DEFAULTS = {
   // Blakfy accessibility widget's FAB is bottom-left on EVERY site (CLAUDE.md
   // Core Decision #4, non-negotiable). Rather than moving this FAB to the right
   // corner, it now shares the same left corner but stacks ABOVE the a11y FAB via
-  // --blakfy-fab-offset-y:116px (see src/ui/styles.js), matching the reference
+  // --blakfy-fab-offset-y:62px (see src/ui/styles.js), matching the reference
   // stacking order: cookie FAB above, accessibility FAB below. "right" is still
   // available via data-blakfy-fab="right" for sites that genuinely need it.
   fabSide: "left",

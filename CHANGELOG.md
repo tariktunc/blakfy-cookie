@@ -4,6 +4,17 @@ All notable changes follow [Keep a Changelog](https://keepachangelog.com/) and S
 
 ---
 
+## [2.6.1] — 2026-10-04
+
+### Changed
+
+- **FAB is 40px on every viewport and sits right above the accessibility-widget FAB.**
+  Offset 16px from the edge on all widths (the 12px narrow override is gone) and 62px
+  from the bottom, which leaves an 8px gap above the 40px a11y FAB (16px + 40px).
+  The mobile 36px size is removed.
+
+---
+
 ## [2.6.0] — 2026-09-24
 
 ### Changed

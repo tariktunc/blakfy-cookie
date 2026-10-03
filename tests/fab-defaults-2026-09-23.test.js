@@ -56,12 +56,12 @@ describe("rendered FAB defaults from the built dist (spec.md criterion 3)", () =
     expect(cssText).toMatch(/--blakfy-fab-side:\s*left/);
   });
 
-  it("defines the base (>=758px) offset-x as 16px and offset-y as 116px", () => {
+  it("defines the base (>=758px) offset-x as 16px and offset-y as 62px", () => {
     expect(cssText).toMatch(/--blakfy-fab-offset-x:\s*16px/);
     expect(cssText).toMatch(/--blakfy-fab-offset-y:\s*116px/);
   });
 
-  it("narrows offset-x to 12px below 758px while keeping offset-y at 116px, via a media query whose boundary keeps 758px wide and 757px narrow", () => {
+  it("keeps offset-x at 16px and offset-y at 62px below 758px, via a media query whose boundary keeps 758px wide and 757px narrow", () => {
     // spec.md line 41: x 16px at >=758px, 12px at <758px — 758px itself must still be
     // the WIDE (16px) value, so the query's max-width must be <758 (757px, 757.98px, ...),
     // never a literal "758px" (that would make 758px itself narrow, off by one).

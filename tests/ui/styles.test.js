@@ -64,6 +64,6 @@ describe("injectStyles — light theme CSS (#23)", () => {
     expect(mobileRule, "mobile FAB offset media rule must exist").not.toBeNull();
     const [selector] = mobileRule[1].split("{");
     expect(selector.split(",")).toEqual(expect.arrayContaining([":host"]));
-    expect(mobileRule[1]).toMatch(/--blakfy-fab-offset-x:12px/);
+    expect(mobileRule[1]).toMatch(/--blakfy-fab-offset-x:16px/);
   });
 });

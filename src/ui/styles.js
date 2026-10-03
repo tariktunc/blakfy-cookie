@@ -259,7 +259,7 @@ const RULES = [
   // a site set an accent color for the banner. Default is a fixed black with a
   // white icon glyph; a site that wants a matching FAB explicitly passes
   // fabColor/fabIconColor.
-  ":host,:root{--blakfy-fab-side:left;--blakfy-fab-offset-x:16px;--blakfy-fab-offset-y:116px;--blakfy-fab-z:2147483640;--blakfy-fab-size:40px;--blakfy-fab-target:44px;--blakfy-fab-target-w:var(--blakfy-fab-target);--blakfy-fab-target-h:var(--blakfy-fab-target);--blakfy-fab-size-w:var(--blakfy-fab-size);--blakfy-fab-size-h:var(--blakfy-fab-size);--blakfy-fab-icon-size:20px;--blakfy-fab-bg:#0a0a0a;--blakfy-fab-color:#fff;--blakfy-fab-radius:50%;--blakfy-fab-shadow:0 1px 3px rgba(0, 0, 0, 0.03);--blakfy-fab-opacity:1;--blakfy-fab-opacity-hover:1}",
+  ":host,:root{--blakfy-fab-side:left;--blakfy-fab-offset-x:16px;--blakfy-fab-offset-y:62px;--blakfy-fab-z:2147483640;--blakfy-fab-size:40px;--blakfy-fab-target:44px;--blakfy-fab-target-w:var(--blakfy-fab-target);--blakfy-fab-target-h:var(--blakfy-fab-target);--blakfy-fab-size-w:var(--blakfy-fab-size);--blakfy-fab-size-h:var(--blakfy-fab-size);--blakfy-fab-icon-size:20px;--blakfy-fab-bg:#0a0a0a;--blakfy-fab-color:#fff;--blakfy-fab-radius:50%;--blakfy-fab-shadow:0 1px 3px rgba(0, 0, 0, 0.03);--blakfy-fab-opacity:1;--blakfy-fab-opacity-hover:1}",
   ".blakfy-fab{position:fixed;z-index:var(--blakfy-fab-z);width:var(--blakfy-fab-target-w);height:var(--blakfy-fab-target-h);display:flex;align-items:center;justify-content:center;padding:0;border:none;cursor:pointer;background:transparent;bottom:calc(var(--blakfy-fab-offset-y) + env(safe-area-inset-bottom,0px))}",
   ".blakfy-fab::before{content:'';position:absolute;inset:0;margin:auto;width:var(--blakfy-fab-size-w);height:var(--blakfy-fab-size-h);border-radius:var(--blakfy-fab-radius);background:var(--blakfy-fab-bg);box-shadow:var(--blakfy-fab-shadow);opacity:var(--blakfy-fab-opacity);transition:opacity .15s}",
   ".blakfy-fab:hover::before,.blakfy-fab:focus-visible::before{opacity:var(--blakfy-fab-opacity-hover)}",
@@ -275,7 +275,7 @@ const RULES = [
   // stylesheet :root never matches anything, so a :root-only media rule here is
   // dead code and the widget silently keeps its >=758px offset-x on every width.
   // Boundary is <758px per spec.md, i.e. max-width:757px.
-  "@media (max-width:757px){:host,:root{--blakfy-fab-offset-x:12px;--blakfy-fab-offset-y:116px;--blakfy-fab-size:36px}}",
+  "@media (max-width:757px){:host,:root{--blakfy-fab-offset-x:16px;--blakfy-fab-offset-y:62px;--blakfy-fab-size:40px}}",
 ];
 
 // #35: `root` is the shadow root (or its light-DOM fallback) the widget mounts into —

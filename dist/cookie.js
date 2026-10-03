@@ -1,5 +1,5 @@
 /*!
- * Blakfy Cookie Widget v2.6.0
+ * Blakfy Cookie Widget v2.6.1
  * https://github.com/tariktunc/blakfy-cookie
  * MIT License | (c) Blakfy Studio
  *
@@ -126,7 +126,7 @@
   };
 
   // src/core/config.js
-  var RUNTIME_VERSION = "2.6.0" ? "2.6.0" : "2";
+  var RUNTIME_VERSION = "2.6.1" ? "2.6.1" : "2";
   var STATUS_BASE = "https://cdn.jsdelivr.net/npm/@blakfy/cookie@" + RUNTIME_VERSION;
   var DEFAULTS = {
     locale: "auto",
@@ -182,7 +182,7 @@
     // Blakfy accessibility widget's FAB is bottom-left on EVERY site (CLAUDE.md
     // Core Decision #4, non-negotiable). Rather than moving this FAB to the right
     // corner, it now shares the same left corner but stacks ABOVE the a11y FAB via
-    // --blakfy-fab-offset-y:116px (see src/ui/styles.js), matching the reference
+    // --blakfy-fab-offset-y:62px (see src/ui/styles.js), matching the reference
     // stacking order: cookie FAB above, accessibility FAB below. "right" is still
     // available via data-blakfy-fab="right" for sites that genuinely need it.
     fabSide: "left",
@@ -4259,7 +4259,7 @@
     // a site set an accent color for the banner. Default is a fixed black with a
     // white icon glyph; a site that wants a matching FAB explicitly passes
     // fabColor/fabIconColor.
-    ":host,:root{--blakfy-fab-side:left;--blakfy-fab-offset-x:16px;--blakfy-fab-offset-y:116px;--blakfy-fab-z:2147483640;--blakfy-fab-size:40px;--blakfy-fab-target:44px;--blakfy-fab-target-w:var(--blakfy-fab-target);--blakfy-fab-target-h:var(--blakfy-fab-target);--blakfy-fab-size-w:var(--blakfy-fab-size);--blakfy-fab-size-h:var(--blakfy-fab-size);--blakfy-fab-icon-size:20px;--blakfy-fab-bg:#0a0a0a;--blakfy-fab-color:#fff;--blakfy-fab-radius:50%;--blakfy-fab-shadow:0 1px 3px rgba(0, 0, 0, 0.03);--blakfy-fab-opacity:1;--blakfy-fab-opacity-hover:1}",
+    ":host,:root{--blakfy-fab-side:left;--blakfy-fab-offset-x:16px;--blakfy-fab-offset-y:62px;--blakfy-fab-z:2147483640;--blakfy-fab-size:40px;--blakfy-fab-target:44px;--blakfy-fab-target-w:var(--blakfy-fab-target);--blakfy-fab-target-h:var(--blakfy-fab-target);--blakfy-fab-size-w:var(--blakfy-fab-size);--blakfy-fab-size-h:var(--blakfy-fab-size);--blakfy-fab-icon-size:20px;--blakfy-fab-bg:#0a0a0a;--blakfy-fab-color:#fff;--blakfy-fab-radius:50%;--blakfy-fab-shadow:0 1px 3px rgba(0, 0, 0, 0.03);--blakfy-fab-opacity:1;--blakfy-fab-opacity-hover:1}",
     ".blakfy-fab{position:fixed;z-index:var(--blakfy-fab-z);width:var(--blakfy-fab-target-w);height:var(--blakfy-fab-target-h);display:flex;align-items:center;justify-content:center;padding:0;border:none;cursor:pointer;background:transparent;bottom:calc(var(--blakfy-fab-offset-y) + env(safe-area-inset-bottom,0px))}",
     ".blakfy-fab::before{content:'';position:absolute;inset:0;margin:auto;width:var(--blakfy-fab-size-w);height:var(--blakfy-fab-size-h);border-radius:var(--blakfy-fab-radius);background:var(--blakfy-fab-bg);box-shadow:var(--blakfy-fab-shadow);opacity:var(--blakfy-fab-opacity);transition:opacity .15s}",
     ".blakfy-fab:hover::before,.blakfy-fab:focus-visible::before{opacity:var(--blakfy-fab-opacity-hover)}",
@@ -4275,7 +4275,7 @@
     // stylesheet :root never matches anything, so a :root-only media rule here is
     // dead code and the widget silently keeps its >=758px offset-x on every width.
     // Boundary is <758px per spec.md, i.e. max-width:757px.
-    "@media (max-width:757px){:host,:root{--blakfy-fab-offset-x:12px;--blakfy-fab-offset-y:116px;--blakfy-fab-size:36px}}"
+    "@media (max-width:757px){:host,:root{--blakfy-fab-offset-x:16px;--blakfy-fab-offset-y:62px;--blakfy-fab-size:40px}}"
   ];
   var injectStyles = (root2) => {
     const target = root2 || (typeof document !== "undefined" ? document.head : null);
