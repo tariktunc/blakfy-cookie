@@ -1,15 +1,15 @@
 {
-  "version": "2.6.1",
-  "generatedAt": "2026-10-03T23:20:29.566Z",
+  "version": "2.6.2",
+  "generatedAt": "2026-10-04T11:47:40.544Z",
   "files": [
     {
       "file": "cookie-defaults.min.js",
-      "integrity": "sha384-ToDIm4xo6+hOGRs72ZlQ3IKaL6LPrZoecZTy0ohzPCceK0yzV63AwUwDdViL1zpx",
+      "integrity": "sha384-Z0nMrasVSQbgdBCPsrSp9kU2M7cwRBNu8x0voVQ6nfOYl7l1CPYnqufW5cAA+I0v",
       "bytes": 2247
     },
     {
       "file": "cookie.min.js",
-      "integrity": "sha384-gnLg+szHH63Sg/zuKKdC+lHX3d+IZtJmdX2CkgdR1Y99FIAYrf3MpVtcrT0HQWAi",
+      "integrity": "sha384-N7HoQDNQ2psqA9Cqq4Q8Vq1YgS9orbP6XAb5SOgZd8z+wdyX1+ukrVh49lO/sYeP",
       "bytes": 114126
     }
   ]

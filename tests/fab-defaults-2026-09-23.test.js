@@ -56,9 +56,9 @@ describe("rendered FAB defaults from the built dist (spec.md criterion 3)", () =
     expect(cssText).toMatch(/--blakfy-fab-side:\s*left/);
   });
 
-  it("defines the base (>=758px) offset-x as 16px and offset-y as 62px", () => {
+  it("defines the base (>=758px) offset-x as 16px and offset-y as 80px", () => {
     expect(cssText).toMatch(/--blakfy-fab-offset-x:\s*16px/);
-    expect(cssText).toMatch(/--blakfy-fab-offset-y:\s*62px/);
+    expect(cssText).toMatch(/--blakfy-fab-offset-y:\s*80px/);
   });
 
   it("keeps offset-x at 16px and offset-y at 62px below 758px, via a media query whose boundary keeps 758px wide and 757px narrow", () => {

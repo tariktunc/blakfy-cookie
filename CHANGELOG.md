@@ -4,6 +4,16 @@ All notable changes follow [Keep a Changelog](https://keepachangelog.com/) and S
 
 ---
 
+## [2.6.2] — 2026-10-04
+
+### Changed
+
+- **FAB sits 80px from the bottom on >=758px** (62px below 758px, unchanged), so it
+  stays 8px above the accessibility-widget FAB, which moved up to make room for the
+  brand badge under it.
+
+---
+
 ## [2.6.1] — 2026-10-04
 
 ### Changed
